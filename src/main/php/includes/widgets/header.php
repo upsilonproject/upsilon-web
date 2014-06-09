@@ -24,6 +24,8 @@ if (Session::isLoggedIn()) {
 	$tpl->assign('isNighttime', false);
 }
 
+$tpl->assign('siteTitle', getSiteSetting('siteTitle', 'Upsilon'));
+
 if (isset($title)) {
 	$tpl->assign('title', $title);
 } else {
@@ -91,6 +93,7 @@ if (Session::isLoggedIn()) {
 	$systemLinks->add('listUsers.php', 'Users');
 	$systemLinks->add('listApiClients.php', 'API Clients');
 	$systemLinks->add('preferences.php', 'Preferences');
+	$systemLinks->add('settings.php', 'Settings');
 	$systemLinks->add('logout.php', 'Logout');
 
 	$generalLinks->add('#', 'System');

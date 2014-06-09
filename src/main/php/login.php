@@ -19,7 +19,7 @@ if ($f->validate()) {
 require_once 'includes/widgets/header.php';
 global $crypto;
 
-if (!isUsingSsl()) {
+if (!isUsingSsl() && getSiteSetting('warn_not_using_https', true)) {
 	$httpsUrl = 'https://' . $_SERVER['HTTP_HOST'] . '/' . $_SERVER['PHP_SELF'];
 	$tpl->assign('message', 'You are not using SSL! Would you like to switch to the <a href = "' . $httpsUrl . '">HTTPS</a> version?');
 	$tpl->assign('messageClass', 'loginFormContainer box tutorialMessage');

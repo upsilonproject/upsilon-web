@@ -23,6 +23,18 @@ function explodeOrEmpty($delimiter = null, $serialString = "") {
 	}
 }
 
+function setSiteSetting($key, $val) {
+        global $settings;
+
+        $sql = 'INSERT INTO settings (`key`, `value`) VALUES (:key, :valueInsert) ON DUPLICATE KEY UPDATE value = :valueUpdate';
+        $stmt = DatabaseFactory::getInstance()->prepare($sql);
+        $stmt->bindValue(':key', $key);
+        $stmt->bindValue(':valueInsert', $val);
+        $stmt->bindValue(':valueUpdate', $val);
+        $stmt->execute();
+}
+
+
 function getSiteSetting($key, $default = '') {
         global $settings;
         global $db;

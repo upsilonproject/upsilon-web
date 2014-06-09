@@ -2,7 +2,7 @@
 
 <html>
 <head>
-	<title>Upsilon &raquo; {$title|default:'Untitled page'}</title>
+	<title>{$siteTitle} &raquo; {$title|default:'Untitled page'}</title>
 
 	{if $mobile}
 	<link rel = "alternative stylesheet" type = "text/css" href = "resources/stylesheets/mobile.css" title = "mobile" />
@@ -26,7 +26,7 @@
 	{if $drawHeader}
 	<div class = "title">
 		<h1>
-			<a href = "index.php">Upsilon</a>
+			<a href = "index.php">{$siteTitle}</a>
 			&raquo;
 			<span class = "pageTitle">{$title|default:'Untitled page'}</span>
 		</h1>
