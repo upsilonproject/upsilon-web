@@ -33,6 +33,9 @@ class FormAddMembership extends Form {
 			$el->addOption($service['node'] . '::' . $service['identifier'] . ' (' . $service['groups'] . ' groups)', $service['identifier']);
 		}
 
+
+		$el->setValue($_REQUEST['serviceId']);
+
 		return $el;
 		
 	}
