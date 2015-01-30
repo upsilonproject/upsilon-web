@@ -33,8 +33,9 @@ class FormAddMembership extends Form {
 			$el->addOption($service['node'] . '::' . $service['identifier'] . ' (' . $service['groups'] . ' groups)', $service['identifier']);
 		}
 
-
-		$el->setValue($_REQUEST['serviceId']);
+		if (isset($_REQUEST['serviceId'])) {
+			$el->setValue($_REQUEST['serviceId']);
+		}
 
 		return $el;
 		
@@ -55,6 +56,8 @@ class FormAddMembership extends Form {
 		if (!empty($group)) {
 			$el->setValue($group);
 		}
+
+		$el->description = ('If the group you want is not listed, <a href = "createGroup.php">create a new group</a>.');
 
 		$this->addElement($el);
 	}
