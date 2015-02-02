@@ -1232,4 +1232,12 @@ function getClassParents($class) {
 	return $stmt->fetchAll();
 }
 
+function getDashboards() {
+	$sql = 'SELECT d.title, d.id, count(w.id) AS widgetCount FROM dashboard d LEFT JOIN widget_instances w ON w.dashboard = d.id GROUP BY d.id';
+	$stmt = stmt($sql);
+	$stmt->execute();
+
+	return $stmt->fetchAll();
+}
+
 ?>

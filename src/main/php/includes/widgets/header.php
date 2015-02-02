@@ -56,6 +56,18 @@ if (Session::isLoggedIn()) {
 	}
 
 	$generalLinks->add('listDashboards.php', 'Dashboards');
+
+	$listDashboards = getDashboards();
+
+	$dashboardLinks = linksCollection();
+
+	foreach (getDashboards() as $dashboard) {
+		$dashboardLinks->add('viewDashboard.php?id=' . $dashboard['id'], $dashboard['title']);
+	}
+
+	$dashboardLinks->add('listDashboards.php', 'All Dashboards');
+
+	$generalLinks->addChildCollection('Dashboards', $dashboardLinks);
 	
 	$generalLinks->add('#', 'Services');
 
