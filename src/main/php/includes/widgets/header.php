@@ -57,12 +57,15 @@ if (Session::isLoggedIn()) {
 
 	$generalLinks->add('listDashboards.php', 'Dashboards');
 
+	$dashboardLinks = linksCollection();
 	$listDashboards = getDashboards();
 
-	$dashboardLinks = linksCollection();
+	if (!empty($listDashboards)) {
+		foreach (getDashboards() as $dashboard) {
+			$dashboardLinks->add('viewDashboard.php?id=' . $dashboard['id'], $dashboard['title']);
+		}
 
-	foreach (getDashboards() as $dashboard) {
-		$dashboardLinks->add('viewDashboard.php?id=' . $dashboard['id'], $dashboard['title']);
+		$dashboardLinks->addSeparator();
 	}
 
 	$dashboardLinks->add('listDashboards.php', 'All Dashboards');
@@ -101,11 +104,13 @@ if (Session::isLoggedIn()) {
 
 	$systemLinks = linksCollection();
 	$systemLinks->addIf(Session::getUser()->getData('enableDebug'), 'viewDebugInfo.php', 'Debug');
+	$systemLinks->add('preferences.php', 'Preferences');
+	$systemLinks->addSeparator();
 	$systemLinks->add('listUsergroups.php', 'Usergroups');
 	$systemLinks->add('listUsers.php', 'Users');
 	$systemLinks->add('listApiClients.php', 'API Clients');
-	$systemLinks->add('preferences.php', 'Preferences');
 	$systemLinks->add('settings.php', 'Settings');
+	$systemLinks->addSeparator();
 	$systemLinks->add('logout.php', 'Logout');
 
 	$generalLinks->add('#', 'System');

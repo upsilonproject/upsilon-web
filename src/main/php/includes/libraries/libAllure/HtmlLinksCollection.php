@@ -106,9 +106,22 @@ class HtmlLinksCollection implements \Iterator {
 			'enabled' => true,
 			'containerClass'=> $containerClass,
 			'children' => null,
+			'separator' => false,
 		);
 
 		return key($this->collection);
+	}
+
+	public function addSeparator() {
+		$this->collection[] = array(
+			'url' => null,
+			'title' => uniqid(),
+			'iconUrl' => null,
+			'enabled' => true,
+			'containerClass'=> null,
+			'children' => null,
+			'separator' => true,
+		);
 	}
 
 	public function addChildCollection($title, HtmlLinksCollection $childCollection = null) {

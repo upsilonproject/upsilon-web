@@ -182,7 +182,7 @@ table.hover tr:hover td {
 	background-color: beige;
 }
 
-tr:nth-child(even) {
+#content tr:nth-child(even) {
 	background-color: #efefef;
 }
 
