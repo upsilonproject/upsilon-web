@@ -97,11 +97,10 @@ function initGridNodes() {
  
 function loadListNodes(nodes) {
 	require([
-	     "dijit/Dialog", 
 	     "dijit/registry",
 	     "dojo/store/Memory",
 	     "dojo/domReady!" 
-     ], function (Dialog, registry, Store) {
+     ], function (registry, Store) {
 		if (!registry.byId("gridNodes")) {
 			initGridNodes(); 
 		} 
@@ -109,13 +108,7 @@ function loadListNodes(nodes) {
 		grid = registry.byId("gridNodes"); 
 		grid.setStore(new Store({data: nodes}));
 
-		new Dialog({
-			title: "List of nodes",
-			content: grid,  
-			resizable: true,
-			style: "width: 640px; height: 480px",
-		}).show(); 
-		
+		setContentElement(grid);
 	});
 }
 
@@ -369,11 +362,15 @@ function clickedTreeNode(item) {
 }
 
 function switchContentToGroup(group) {
+	setContentElement("Group:" + group.title + "<br />ID:" + group.id);
+}
+
+function setContentElement(contentToSet) {
 	require([
 		"dijit/registry",
 	], function(registry) {
 		content = registry.byId("content");
-		content.set("content", "Group:" + group.title + "<br />ID:" + group.id);
+		content.set("content", contentToSet);
 	});
 }
 
