@@ -423,7 +423,7 @@ function setupRootContainer() {
 				liveSplitters: true,
 			});
 
-			contentTree = new ContentPane({ content: tree, region: "left", splitter: true});
+			contentTree = new ContentPane({ content: tree, region: "left", splitter: true, style: "width: 20%"});
 			contentTree.startup();
 
 			rootContainer.addChild(contentTree);
