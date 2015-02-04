@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojox/rpc/Service,dojo/io/script"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojox/rpc/Service,dojo/io/script"], function(dijit,dojo,dojox){
 dojo.provide("dojox.help._base");
 dojo.require("dojox.rpc.Service");
 dojo.require("dojo.io.script");

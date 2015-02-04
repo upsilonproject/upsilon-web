@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dijit/_Widget,dojox/xml/parser,dojox/wire/_base,dojox/wire/ml/util"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dijit/_Widget,dojox/xml/parser,dojox/wire/_base,dojox/wire/ml/util"], function(dijit,dojo,dojox){
 dojo.provide("dojox.wire.ml.Service");
 
 dojo.require("dijit._Widget");

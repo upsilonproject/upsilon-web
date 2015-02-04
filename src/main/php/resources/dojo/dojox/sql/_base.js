@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojox/sql/_crypto"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojox/sql/_crypto"], function(dijit,dojo,dojox){
 dojo.provide("dojox.sql._base");
 dojo.require("dojox.sql._crypto");
 

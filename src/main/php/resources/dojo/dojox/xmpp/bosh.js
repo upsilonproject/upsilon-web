@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojo/io/script,dojo/io/iframe,dojox/xml/parser"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojo/io/script,dojo/io/iframe,dojox/xml/parser"], function(dijit,dojo,dojox){
 dojo.provide("dojox.xmpp.bosh");
 
 dojo.require("dojo.io.script");

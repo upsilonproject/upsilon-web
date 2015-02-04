@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojox/grid/DataGrid,dojox/data/ItemExplorer,dijit/layout/BorderContainer,dijit/layout/ContentPane"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojox/grid/DataGrid,dojox/data/ItemExplorer,dijit/layout/BorderContainer,dijit/layout/ContentPane"], function(dijit,dojo,dojox){
 dojo.provide("dojox.data.StoreExplorer");
 dojo.require("dojox.grid.DataGrid");
 dojo.require("dojox.data.ItemExplorer");

@@ -137,18 +137,32 @@ function setupToolbar() {
 	require([
 		"dijit/MenuBar",
 		"dijit/MenuBarItem",
-	], function(MenuBar, MenuBarItem) {
+		"dijit/MenuItem",
+		"dijit/PopupMenuBarItem", 
+		"dijit/DropDownMenu", 
+		"dijit/MenuSeparator",
+	], function(MenuBar, MenuBarItem, MenuItem, PopupMenuBarItem, DropDownMenu, MenuSeparator) {
 		window.mainToolbar = new MenuBar({});
 		mainToolbar.placeAt("wrapper");
 		mainToolbar.startup();  
 
 		mainToolbar.addChild(new MenuBarItem({id: "mniDashboard", label: "Dashboard", onClick: mniDashboardClicked, disabled: true }));
+		
+		//mnuSystem.addChild(new MenuBarItem({label: "foo"}));
 		mainToolbar.addChild(new MenuBarItem({id: "mniNodes", label: "Nodes", onClick: mniNodesClicked, disabled: true})); 
 		mainToolbar.addChild(new MenuBarItem({id: "mniServices", label: "Services", onClick: mniServicesClicked, disabled: true }));
-		mainToolbar.addChild(new MenuBarItem({id: "mniLogout", label: "Logout", onClick: mniLogoutClicked, disabled: true }));
-		mainToolbar.addChild(new MenuBarItem({id: "mniLogin", label: "Login", onClick: showFormLogin, disabled: true }));
 
+		menuSystem = new DropDownMenu();
+		menuSystem.addChild(new MenuItem({label: "Classic Console", onClick: gotoClassic}));
+		menuSystem.addChild(new MenuSeparator());
+		menuSystem.addChild(new MenuItem({id: "mniLogout", label: "Logout", onClick: mniLogoutClicked, disabled: true }));
+		menuSystem.addChild(new MenuItem({id: "mniLogin", label: "Login", onClick: showFormLogin, disabled: true }));
+		mainToolbar.addChild(new PopupMenuBarItem({label: "System", popup: menuSystem}));
 	});
+}
+
+function gotoClassic() {
+	window.location = "index.php";
 }
 
 function loadGetServices(services) {

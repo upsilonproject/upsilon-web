@@ -295,7 +295,7 @@ function serviceIconChanged() {
 
 function menuButtonClick(address) {
 	// Hide your eyes. This will be temporary.
-	if (address.indexOf(".php") != -1) {
+	if (address.indexOf(".php") != -1 || address.indexOf(".html") != -1) {
 		window.location = address;
 	} else {
 		eval(address);

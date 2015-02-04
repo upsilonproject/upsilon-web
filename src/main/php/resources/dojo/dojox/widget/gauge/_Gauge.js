@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojox/gauges/_Gauge"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojox/gauges/_Gauge"], function(dijit,dojo,dojox){
 dojo.provide("dojox.widget.gauge._Gauge");
 dojo.require("dojox.gauges._Gauge");
 

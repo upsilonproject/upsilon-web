@@ -111,6 +111,8 @@ if (Session::isLoggedIn()) {
 	$systemLinks->add('listApiClients.php', 'API Clients');
 	$systemLinks->add('settings.php', 'Settings');
 	$systemLinks->addSeparator();
+	$systemLinks->add('html5app.html', 'HTML5 Console (testing)');
+	$systemLinks->addSeparator();
 	$systemLinks->add('logout.php', 'Logout');
 
 	$generalLinks->add('#', 'System');

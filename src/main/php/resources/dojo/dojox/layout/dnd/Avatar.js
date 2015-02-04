@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojo/dnd/Avatar,dojo/dnd/common"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojo/dnd/Avatar,dojo/dnd/common"], function(dijit,dojo,dojox){
 dojo.provide("dojox.layout.dnd.Avatar");
 
 dojo.require("dojo.dnd.Avatar");

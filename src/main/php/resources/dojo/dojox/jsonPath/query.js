@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox"], function(dijit,dojo,dojox){
 dojo.provide("dojox.jsonPath.query");
 
 dojox.jsonPath.query = function(/*Object*/ obj, /*String*/ expr, /*Object*/ arg){

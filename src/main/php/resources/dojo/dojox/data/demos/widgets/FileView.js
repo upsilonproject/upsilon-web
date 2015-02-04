@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dijit/_Templated,dijit/_Widget"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dijit/_Templated,dijit/_Widget"], function(dijit,dojo,dojox){
 dojo.provide("dojox.data.demos.widgets.FileView");
 dojo.require("dijit._Templated");
 dojo.require("dijit._Widget");

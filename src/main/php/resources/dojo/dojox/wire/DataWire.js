@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojox/wire/Wire"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojox/wire/Wire"], function(dijit,dojo,dojox){
 dojo.provide("dojox.wire.DataWire");
 
 dojo.require("dojox.wire.Wire");

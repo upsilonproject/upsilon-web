@@ -61,6 +61,7 @@
 					"dijit/form/FilteringSelect",
 					"dijit/Menu",
 					"dijit/MenuBar",
+					"dijit/DropDownMenu",
 					"dijit/PopupMenuBarItem",
 					"dijit/MenuBarItem",
 					"dijit/MenuItem", 

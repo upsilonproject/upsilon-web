@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojox/help/_base"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojox/help/_base"], function(dijit,dojo,dojox){
 dojo.provide("dojox.help.console");
 dojo.require("dojox.help._base");
 

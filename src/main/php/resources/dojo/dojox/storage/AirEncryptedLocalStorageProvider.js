@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojox/storage/manager,dojox/storage/Provider"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojox/storage/manager,dojox/storage/Provider"], function(dijit,dojo,dojox){
 dojo.provide("dojox.storage.AirEncryptedLocalStorageProvider");
 dojo.require("dojox.storage.manager");
 dojo.require("dojox.storage.Provider");

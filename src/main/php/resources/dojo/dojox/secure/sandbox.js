@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojox/secure/DOM,dojox/secure/capability,dojo/NodeList-fx,dojo/_base/url"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojox/secure/DOM,dojox/secure/capability,dojo/NodeList-fx,dojo/_base/url"], function(dijit,dojo,dojox){
 dojo.provide("dojox.secure.sandbox");
 dojo.require("dojox.secure.DOM");
 dojo.require("dojox.secure.capability");

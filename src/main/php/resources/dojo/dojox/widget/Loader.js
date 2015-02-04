@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dijit/_Widget,dijit/_Templated"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dijit/_Widget,dijit/_Templated"], function(dijit,dojo,dojox){
 dojo.provide("dojox.widget.Loader");
 dojo.deprecated("dojox.widget.Loader", "", "2.0");
 

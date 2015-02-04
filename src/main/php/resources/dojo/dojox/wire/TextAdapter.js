@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojox/wire/CompositeWire"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojox/wire/CompositeWire"], function(dijit,dojo,dojox){
 dojo.provide("dojox.wire.TextAdapter");
 
 dojo.require("dojox.wire.CompositeWire");

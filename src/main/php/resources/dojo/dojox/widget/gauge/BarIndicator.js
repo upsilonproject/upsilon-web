@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojox/gauges/BarIndicator"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojox/gauges/BarIndicator"], function(dijit,dojo,dojox){
 dojo.provide('dojox.widget.gauge.BarIndicator');
 dojo.require('dojox.gauges.BarIndicator');
 

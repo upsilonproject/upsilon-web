@@ -1,5 +1,5 @@
 // wrapped by build app
-define(["dojo","dijit","dojox","dojo/require!dojox/gauges/AnalogArcIndicator"], function(dojo,dijit,dojox){
+define(["dijit","dojo","dojox","dojo/require!dojox/gauges/AnalogArcIndicator"], function(dijit,dojo,dojox){
 dojo.provide('dojox.widget.gauge.AnalogArcIndicator');
 dojo.require("dojox.gauges.AnalogArcIndicator");
 
