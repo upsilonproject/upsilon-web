@@ -148,12 +148,12 @@ div#rootContainer {
 }
 
 .claro .dijitTreeRowHover,
-.claro .dijitMenuItemHover 
+.claro .dijitMenuItemHover, 
+.claro .dijitMenuBarItemHover 
 {
-	background-color: Chartreuse; 
-	background-image: none;
+	background-color: #cf9; 
 	color: black;
-	border-color: gray !important;
+	border-color: #bbb !important;
 }
 
 
@@ -161,10 +161,9 @@ div#rootContainer {
 .claro .dijitMenuItemSelected,
 .claro .dijitMenuItemSelected td
 {
-	background-color: Chartreuse;
-	background-image: none;
+	background-color: Chartreuse !important;
 	color: black;
-	border-color: gray !important;
+	border-color: #bbb !important;
 }
 
 .gridxCell {
