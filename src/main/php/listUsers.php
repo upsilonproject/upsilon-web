@@ -12,13 +12,7 @@ require_once 'includes/widgets/header.php';
 
 use \libAllure\DatabaseFactory;
 
-$sql = 'SELECT u.id, u.username FROM users u';
-$stmt = DatabaseFactory::getInstance()->prepare($sql);
-$stmt->execute();
-
-$listUsers = $stmt->fetchAll();
-
-$tpl->assign('listUsers', $listUsers);
+$tpl->assign('listUsers', getUsers());
 $tpl->display('listUsers.tpl');
 
 require_once 'includes/widgets/footer.php';

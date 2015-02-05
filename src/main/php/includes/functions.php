@@ -1240,4 +1240,20 @@ function getDashboards() {
 	return $stmt->fetchAll();
 }
 
+function getCommands() {
+	$sql = 'SELECT c.id, c.commandIdentifier, c.icon, count(s.id) AS serviceCount FROM command_metadata c LEFT JOIN services s ON s.commandIdentifier = c.commandIdentifier GROUP BY c.id';
+	$stmt = stmt($sql);
+	$stmt->execute();
+
+	return $stmt->fetchAll();
+}
+
+function getUsers() {
+	$sql = 'SELECT u.id, u.username FROM users u';
+	$stmt = DatabaseFactory::getInstance()->prepare($sql);
+	$stmt->execute();
+
+	return $stmt->fetchAll();
+}
+
 ?>
