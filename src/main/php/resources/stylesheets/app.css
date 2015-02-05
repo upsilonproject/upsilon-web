@@ -64,7 +64,7 @@ div.gridx * {
 }
 
 .claro .gridxRowOdd .gridxRowTable {
-	background-color: #efefef;
+	background-color: #efefef !important;
 }
 
 .claro .gridxRowTable:hover .gridxCell {
@@ -146,3 +146,28 @@ div.box h2, div.block h2 {
 div#rootContainer {
 	height: 100%;
 }
+
+.claro .dijitTreeRowHover,
+.claro .dijitMenuItemHover 
+{
+	background-color: Chartreuse; 
+	background-image: none;
+	color: black;
+	border-color: gray !important;
+}
+
+
+.claro .dijitTreeRowSelected,
+.claro .dijitMenuItemSelected,
+.claro .dijitMenuItemSelected td
+{
+	background-color: Chartreuse;
+	background-image: none;
+	color: black;
+	border-color: gray !important;
+}
+
+.gridxCell {
+	padding: 1em !important;
+}
+
