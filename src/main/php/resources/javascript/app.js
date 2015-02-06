@@ -135,6 +135,19 @@ function initGridClasses() {
 	});
 }
 
+function karmaStyler(a, b, c) {
+	contents = a.data();
+
+	switch (contents) {
+		case "GOOD": return "good";
+		case "BAD": return "bad";
+		case "SKIPPED": return "skipped";
+		case "WARNING": return "warning";
+		case "UNKNOWN":
+		default: return "";
+	}
+}
+
 function initGridServices() {
 	require([
 		"gridx/Grid",
@@ -151,7 +164,9 @@ function initGridServices() {
 			store: new Store({data: [{identifier: "foo"}] }),
 			structure: [
 				{field:"identifier", name: "Identifier"},
-				{field:"karma", name: "Karma"}
+				{field:"lastUpdated", name: "Last Updated"},
+				{field:"output", name: "Output", class: "code"},
+				{field:"karma", name: "Karma", class: karmaStyler}
 			],
 			modules: [
 				scroller, resizer, filter, filterBar
@@ -345,14 +360,14 @@ function setupToolbar() {
 		"dijit/DropDownMenu", 
 		"dijit/MenuSeparator",
 	], function(MenuBar, MenuBarItem, MenuItem, PopupMenuBarItem, DropDownMenu, MenuSeparator) {
-		window.mainToolbar = new MenuBar({});
+		window.mainToolbar = new MenuBar({title: "Main Menu"});
 		mainToolbar.placeAt("wrapper");
 		mainToolbar.startup();  
 
 		mainToolbar.addChild(new MenuBarItem({id: "mniDashboard", label: "Dashboard", onClick: mniDashboardClicked, disabled: true }));
 		
-		menuServices = new DropDownMenu();
-		menuServices.addChild(new MenuItem({id: "mniServices", label: "Full List", onClick: mniServicesClicked, disabled: true }));
+		menuServices = new DropDownMenu({});
+		menuServices.addChild(new MenuItem({id: "mniServices", label: "Full List", onClick: mniServicesClicked, disabled: true, accelKey: 's' }));
 		menuServices.addChild(new MenuSeparator());
 		menuServices.addChild(new MenuItem({id: "mniCommands", label: "Commands", onClick: mniCommandsClicked }));
 		menuServices.addChild(new MenuItem({label: "Groups", onClick: mniGroupsClicked, disabled: true }));
@@ -606,8 +621,10 @@ function mniServicesClicked() {
 
 function setTitle(newTitle) {
 	require(["dijit/registry"], function(registry){
-		registry.byId("title").setContent("Upsilon &raquo; " + newTitle);
+		registry.byId("title").setContent('<span class = "pageTitle">Upsilon &raquo; <h1>' + newTitle + '</h1></span>');
 	});
+
+	document.title = newTitle;
 }
 
 function setupHeader() {
@@ -616,15 +633,13 @@ function setupHeader() {
 	], function (ContentPane) {
 		header = new ContentPane({
 			id: "header",
-			content: new ContentPane({
-				class: 'pageTitle title',
-				content: 'Upsilon',
-				id: 'title',
-			})
+			content: new ContentPane({id: "title", content: 'Untitled page'}),
 		});
 
 		header.placeAt("wrapper");
 	});
+
+	setTitle("Home");
 }
 
 function clickedTreeNode(item) {
