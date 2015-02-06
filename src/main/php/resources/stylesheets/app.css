@@ -170,3 +170,14 @@ div#rootContainer {
 	padding: 1em !important;
 }
 
+.pageTitle, h1 {
+	font-size: 100%;
+	padding: 0;
+	margin: 0;
+	display: inline;
+}
+
+.gridxCell.code {
+	color: gray;
+	font-family: monospace;
+}
