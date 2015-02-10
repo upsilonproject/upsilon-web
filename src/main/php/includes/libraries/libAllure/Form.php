@@ -39,7 +39,7 @@ if (!function_exists('array_flatten')) {
 
 abstract class Form {
 	private $rules = array();
-	protected $elements = array();
+	public $elements = array();
 	public $scripts = array();
 	private $name;
 	private $submitter;
@@ -64,6 +64,15 @@ abstract class Form {
 		}
 
 		$this->action = $action;
+	}
+
+	public function toJson() {
+		return array(
+			'name' => $this->name,
+			'title' => $this->title,
+			'elements' => $this->elements,
+			'scripts' => $this->scripts,
+		);
 	}
 
 	public function orderElements() {
@@ -404,12 +413,13 @@ abstract class Form {
 }
 
 abstract class Element {
-	protected $name;
-	protected $caption;
-	protected $value;
+	public $name;
+	public $caption;
+	public $value;
 	protected $enabled;
-	protected $required = false;
+	public $required = false;
 	protected $isSubmitter = false;
+	public $elType;
 
 	public $description;
 	public $suffix;
@@ -430,6 +440,7 @@ abstract class Element {
 		$this->description = $description;
 		$this->suffix = $suffix;
 		$this->enabled = $enabled;
+		$this->elType = $this->getType();
 
 		$this->afterConstruct();
 	}

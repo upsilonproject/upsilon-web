@@ -223,7 +223,7 @@ function initGridNodes() {
 				{field: "nodeType", name: "Type"},
 				{field: "serviceCount", name: "Service count"},
 				{field: "lastUpdated", name: "Last updated Relative"},
-				{field: "karma", name: "Karma"},
+				{field: "karma", name: "Karma", class: karmaStyler},
 			],
 			modules: [
 		              scroller, resizer, filter, filterBar
