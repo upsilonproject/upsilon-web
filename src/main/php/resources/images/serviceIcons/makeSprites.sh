@@ -1,3 +1,4 @@
+#!/bin/bash
 x=0
 
 rm sprites.css

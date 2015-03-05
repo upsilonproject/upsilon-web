@@ -1,2 +1,6 @@
 **/target/**
 **/*.swp
+build/
+.gradle
+.project
+.settings

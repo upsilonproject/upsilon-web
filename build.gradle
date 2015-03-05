@@ -1,0 +1,27 @@
+version = "1.5.0"
+
+apply plugin: 'distribution'
+
+delete "src/main/php/includes/libraries/Smarty"
+delete "src/main/php/resources/dojo"
+
+"./buildDojo.sh".execute()
+
+distZip {
+	from ("src/main/php") {
+		include "**"
+		exclude "includes/config.php"
+		exclude "includes/locale"
+		into "upsilon-web-${version}/upload"
+	}
+
+	from ("var") {
+		include "initialData.sql"
+		into "upsilon-web-${version}/setup"
+	}
+
+	from (".") {
+		include "README.md" 
+		into "upsilon-web-${version}/"
+	}
+}
