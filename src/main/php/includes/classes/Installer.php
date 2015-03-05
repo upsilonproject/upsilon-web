@@ -8,7 +8,8 @@ class Installer {
                 $this->testResults['phpVersion'] = $this->testPhpVersion();
                 $this->testResults['pdoAvailable'] = class_exists('pdo');
                 $this->testResults['mysqliAvailable'] = class_exists('mysqli');
-		$this->testResults['configFileCreated'] = !file_exists('includes/config.php');
+				$tihs->testResults['mysqlServerUp'] = @mysql_stat();
+				$this->testResults['configFileCreated'] = !file_exists('includes/config.php');
         }
 
         private function testPhpVersion() {
