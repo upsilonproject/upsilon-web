@@ -37,24 +37,27 @@ function setSiteSetting($key, $val) {
 
 function getSiteSetting($key, $default = '') {
         global $settings;
-        global $db;
 
-        if (empty($settings)) {
-                $sql = 'SELECT s.`key`, s.value FROM settings s';
-                $stmt = DatabaseFactory::getInstance()->prepare($sql);
-                $stmt->execute();
+		try {
+			if (empty($settings)) {
+					$sql = 'SELECT s.`key`, s.value FROM settings s';
+					$stmt = DatabaseFactory::getInstance()->prepare($sql);
+					$stmt->execute();
 
-                foreach ($stmt->fetchAll() as $row) {
-                        $settings[$row['key']] = $row['value'];
-                }
-        }
+					foreach ($stmt->fetchAll() as $row) {
+							$settings[$row['key']] = $row['value'];
+					}
+			}
 
 
-        if (!isset($settings[$key])) {
-                return $default;
-        } else {
-                return $settings[$key];
-        }
+			if (!isset($settings[$key])) {
+					return $default;
+			} else {
+					return $settings[$key];
+			}
+		} catch (Exception $e) {
+			return $default;
+		}
 }
 
 function connectDatabase() {
