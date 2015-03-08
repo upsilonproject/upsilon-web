@@ -16,6 +16,7 @@ distZip {
 	}
 
 	from ("var") {
+		include "upsilon-apache.conf"
 		include "initialData.sql"
 		into "upsilon-web-${version}/setup"
 	}
