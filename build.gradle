@@ -5,7 +5,9 @@ apply plugin: 'distribution'
 delete "src/main/php/includes/libraries/Smarty"
 delete "src/main/php/resources/dojo"
 
-"./buildDojo.sh".execute()
+task buildDojo(type: Exec) {
+	commandLine "./buildDojo.sh"
+}
 
 distZip {
 	from ("src/main/php") {
@@ -18,6 +20,7 @@ distZip {
 	from ("var") {
 		include "upsilon-apache.conf"
 		include "initialData.sql"
+		include "upsilon-web.spec"
 		into "upsilon-web-${version}/setup"
 	}
 
