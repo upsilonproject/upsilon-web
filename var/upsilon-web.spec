@@ -24,6 +24,7 @@ cp -r upload/*  %{buildroot}/usr/share/upsilon-web/
 mkdir -p %{buildroot}/usr/share/doc/upsilon-web/
 cp README.md %{buildroot}/usr/share/doc/upsilon-web/
 cp setup/initialData.sql %{buildroot}/usr/share/doc/upsilon-web/
+cp setup/schema.sql %{buildroot}/usr/share/doc/upsilon-web/
 
 mkdir -p %{buildroot}/etc/httpd/conf.d
 cp setup/upsilon-apache.conf %{buildroot}/etc/httpd/conf.d/upsilon.conf
@@ -34,6 +35,7 @@ service httpd restart
 %files
 %doc /usr/share/doc/upsilon-web/README.md
 %doc /usr/share/doc/upsilon-web/initialData.sql
+%doc /usr/share/doc/upsilon-web/schema.sql
 /usr/share/upsilon-web/*
 /etc/httpd/conf.d/upsilon.conf
 
