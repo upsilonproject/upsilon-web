@@ -1,0 +1,2 @@
+# it isn't Java, but this makes Travis use gradle.
+language: java
