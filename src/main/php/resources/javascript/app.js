@@ -679,7 +679,7 @@ function setupRootContainer() {
 			store = new JsonRestStore({
 				target: "/json/getServiceGroup/",
 				getRoot: function (onItem, onError) {
-					this.get(7888395).then(onItem, onError);
+					this.get(1).then(onItem, onError);
 				},
 				getChildren: function(group, onComplete, onError) {
 					onComplete(group.listSubgroups);
