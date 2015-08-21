@@ -1,9 +1,20 @@
-version = "1.5.0"
 
 apply plugin: 'distribution'
 
 delete "src/main/php/includes/libraries/Smarty"
 delete "src/main/php/resources/dojo"
+
+def generateBuildId() {
+	"buildid -n".execute()
+
+	Properties buildid = new Properties()
+	buildid.load(new File(".buildid").newReader());
+
+	return buildid
+}
+
+Properties buildid = generateBuildId()
+version = buildid.get("version.formatted.short")
 
 task buildDojo(type: Exec) {
 	commandLine "./buildDojo.sh"

@@ -14,9 +14,9 @@ class FormInstallationQuestions extends Form {
 
                 $this->addSection('Database');
 
-	        if ($this->isOpenShift()) {
-                        $this->addElement(new ElementHtml('dialog', 'OpenShift', '<p class = "formSection">You are running on OpenShift. The installer has completed the database section of the installer with defaults. You still need to enter the database password.</p>'));
-		}
+		        if ($this->isOpenShift()) {
+    	                $this->addElement(new ElementHtml('dialog', 'OpenShift', '<p class = "formSection">You are running on OpenShift. The installer has completed the database section of the installer with defaults. You still need to enter the database password.</p>'));
+				}
 
                 $this->addElement(new ElementInput('dbHost', 'Database host or unix socket', 'localhost'));
                 $this->getElement('dbHost')->setMinMaxLengths(0, 128);
