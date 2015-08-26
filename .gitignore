@@ -1,6 +1,7 @@
 **/target/**
 **/*.swp
 build/
+.buildid
 .gradle
 .project
 .settings
