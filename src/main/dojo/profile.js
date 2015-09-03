@@ -1,6 +1,6 @@
   var profile = (function(){
 	return {
-		basePath:	"../../../target/dojo-release/",
+		basePath:	"../../../target/dojo-release-buildarea/",
 		releaseDir:	"../../target/",
 		releaseName: "dojo-upsilon",
 

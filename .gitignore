@@ -5,3 +5,5 @@ build/
 .gradle
 .project
 .settings
+src/main/php/includes/libraries/smarty
+src/main/php/resources/dojo/
