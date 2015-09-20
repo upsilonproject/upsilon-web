@@ -38,6 +38,7 @@ distZip {
 	}
 
 	from (".") {
+		include ".buildid"
 		include "README.md" 
 		into "upsilon-web-${version}/"
 	}
