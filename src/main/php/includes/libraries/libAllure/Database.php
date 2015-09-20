@@ -85,6 +85,8 @@ class DatabaseFactory {
 	}
 }
 
+class DuplicateKeyException extends \PdoException {};
+
 class DatabaseStatement extends \PdoStatement {
 	public $dbh;
 	private $numRows = null;
@@ -121,6 +123,20 @@ class DatabaseStatement extends \PdoStatement {
 
 		return $this->numRows;
 	}
+
+	public function execute($inputParams = null) {
+		try {
+			parent::execute($inputParams);
+		} catch (\PdoException $e) {
+			switch ($e->getCode()) {
+				case 23000: throw new DuplicateKeyException($e->getMessage());
+				default: throw $e;
+			}
+		}
+
+		return $this;
+	}
+
 }
 
 ?>

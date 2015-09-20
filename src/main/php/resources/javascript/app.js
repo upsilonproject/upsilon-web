@@ -4,6 +4,10 @@ if (typeof String.prototype.endsWith !== 'function') {
 	};
 }
 
+function filterReset() {
+	return true;
+}
+
 function onLoad() {
 	try {
 		setupHeader();
@@ -34,6 +38,8 @@ function applyPermissionsToToolbar() {
 		registry.byId("mniDashboard").set("disabled", !permissions.viewDashboard);
 		registry.byId("mniServices").set("disabled", !permissions.viewServices);
 		registry.byId("mniNodes").set("disabled", !permissions.viewNodes);
+		registry.byId("mniClasses").set("disabled", !permissions.viewClasses);
+		registry.byId("mniMaintPeriods").set("disabled", !permissions.viewMaintPeriods);
 		registry.byId("mniLogout").set("disabled", !permissions.loggedIn);
 		registry.byId("mniLogin").set("disabled", permissions.loggedIn);
 
@@ -58,9 +64,26 @@ function reqUpdatePermissions() {
 
 function displayError(err) {
 	window.alert("General Error: " + err);
-} 
+}
 
-function initGridUsergroups() {
+function presetFilterer(config) {
+	var filterer = {}
+
+	require([
+		"dijit/form/Button",
+	], function(Button) {
+		filterer = new Button({
+			label: config.title, 
+			onClick: function() { 
+				config.grid.filter.setFilter(config.filterFunc)
+			}
+		});
+	});
+
+	return filterer;
+}
+
+function newGrid(configuration) {
 	require([
 		"gridx/Grid",
 		"dojo/store/Memory",
@@ -69,69 +92,77 @@ function initGridUsergroups() {
 		"gridx/modules/ColumnResizer",
 		"gridx/modules/Filter",
 		"gridx/modules/filter/FilterBar",
-	], function (Grid, Store, Cache, scroller, resizer, filter, filterBar) {
-		grid = new Grid({
-			id: "gridUsergroups",
-			cacheClass: Cache,
-			store: new Store({data: [{identifier: "foo"}] }),
-			structure: [
-				{field:"id", name: "ID"},
-				{field:"title", name: "Title"},
+		"gridx/modules/Bar",
+		"gridx/modules/NestedSort",
+		"gridx/modules/filter/QuickFilter",
+		"gridx/support/Summary",
+		"gridx/support/QuickFilter",
+		"gridx/support/menu/AZFilterMenu"
+	], function (Grid, Store, Cache, scroller, resizer, filter, filterBar, bar, nestedSort, mfQuickFilter, summary, QuickFilter) {
+		gridConfiguration = {
+			columnWidthAutoResize: true,
+			id: configuration.id,
+			cacheClass: Cache, 
+			store: new Store(),
+			structure: configuration.structure,
+			barTop: [ 
+				summary, 
+				{pluginClass: presetFilterer, title: "All", filterFunc: filterReset},
+				{pluginClass: QuickFilter, style: 'text-align: right'}, 
 			],
 			modules: [
-				scroller, resizer, filter, filterBar
-			]
-		});
+				scroller, resizer, filter, bar, nestedSort, filterBar			]	
+		};
+
+		if (typeof(configuration.filters) != "undefined") {
+			configuration.filters.forEach(function(e, i) {
+				gridConfiguration.barTop.splice(2, 0, {
+					pluginClass: presetFilterer, title: e.title, filterFunc: e.filterFunc 
+				});
+			})
+		}
+
+		grid = new Grid(gridConfiguration);
+
+		grid.filterBar.closeButton = false;
+		grid.filterBar.refresh();
+		grid.startup();
 	});
+
+}
+
+function initGridUsergroups() {
+	configuration = {
+		id: "gridUsergroups",
+		structure: [
+			{field:"id", name: "ID", width: "5%"},
+			{field:"title", name: "Title"},
+		],
+	}
+
+	newGrid(configuration);
 }
 
 
 function initGridUsers() {
-	require([
-		"gridx/Grid",
-		"dojo/store/Memory",
-		"gridx/core/model/cache/Sync",
-		"gridx/modules/VirtualVScroller",
-		"gridx/modules/ColumnResizer",
-		"gridx/modules/Filter",
-		"gridx/modules/filter/FilterBar",
-	], function (Grid, Store, Cache, scroller, resizer, filter, filterBar) {
-		grid = new Grid({
-			id: "gridUsers",
-			cacheClass: Cache,
-			store: new Store({data: [{identifier: "foo"}] }),
-			structure: [
-				{field:"id", name: "ID"},
-				{field:"username", name: "Username"},
-			],
-			modules: [
-				scroller, resizer, filter, filterBar
-			]
-		});
+	newGrid({
+		id: "gridUsers",
+		structure: [
+			{field:"id", name: "ID", width: "5%"},
+			{field:"username", name: "Username"},
+		],
 	});
 }
 
 function initGridClasses() {
-	require([
-		"gridx/Grid",
-		"dojo/store/Memory",
-		"gridx/core/model/cache/Sync",
-		"gridx/modules/VirtualVScroller",
-		"gridx/modules/ColumnResizer",
-		"gridx/modules/Filter",
-		"gridx/modules/filter/FilterBar",
-	], function (Grid, Store, Cache, scroller, resizer, filter, filterBar) {
-		grid = new Grid({
-			id: "gridClasses",
-			cacheClass: Cache,
-			store: new Store({data: [{identifier: "foo"}] }),
-			structure: [
-				{field:"identifier", name: "Identifier"},
-			],
-			modules: [
-				scroller, resizer, filter, filterBar
-			]
-		});
+	newGrid({
+		id: "gridClasses",
+		structure: [
+			{field:"id", name: "ID", width: "5%"},
+			{field:"icon", name: "Icon", width: "10%"},
+			{field:"title", name: "Title"},
+		],
+
 	});
 }
 
@@ -149,93 +180,41 @@ function karmaStyler(a, b, c) {
 }
 
 function initGridServices() {
-	require([
-		"gridx/Grid",
-		"dojo/store/Memory",
-		"gridx/core/model/cache/Sync",
-		"gridx/modules/VirtualVScroller",
-		"gridx/modules/ColumnResizer",
-		"gridx/modules/Filter",
-		"gridx/modules/filter/FilterBar",
-	], function (Grid, Store, Cache, scroller, resizer, filter, filterBar) {
-		grid = new Grid({
-			id: "gridServices",
-			cacheClass: Cache,
-			store: new Store({data: [{identifier: "foo"}] }),
-			structure: [
-				{field:"identifier", name: "Identifier"},
-				{field:"lastUpdated", name: "Last Updated"},
-				{field:"output", name: "Output", class: "code"},
-				{field:"karma", name: "Karma", class: karmaStyler}
-			],
-			modules: [
-				scroller, resizer, filter, filterBar
-			]
-		});
+	newGrid({
+		id: "gridServices",
+		structure: [
+			{field:"identifier", name: "Identifier"},
+			{field:"lastUpdated", name: "Last Updated"},
+			{field:"output", name: "Output", class: "code"},
+			{field:"karma", name: "Karma", class: karmaStyler}
+		],
 	});
 }
 
-function initGridCommands() {
-	require([
-		"gridx/Grid",
-		"dojo/store/Memory",
-		"gridx/core/model/cache/Sync",
-		"gridx/modules/VirtualVScroller",
-		"gridx/modules/ColumnResizer",
-		"gridx/modules/Filter",
-		"gridx/modules/filter/FilterBar",
-	], function (Grid, Store, Cache, scroller, resizer, filter, filterBar) {
-		grid = new Grid({
-			id: "gridCommands",
-			cacheClass: Cache,
-			store: new Store({data: [{identifier: "foo"}] }),
-			structure: [
-				{field:"id", name: "ID"},
-				{field:"commandIdentifier", name: "Identifier"},
-				{field:"serviceCount", name: "Services"},
-			],
-			modules: [
-				scroller, resizer, filter, filterBar
-			]
-		});
+function filterCommandsNone() {
+	return false;
+}
 
-		grid.columns(0)[0].setWidth(0);
-	});
+function filterNodesWithProblems(rowData, rowId) {
+	console.log("filtering nodes with problems");;
+	return true;
 }
 
 function initGridNodes() {
-	require([
-		"gridx/Grid",
-		"dojo/store/Memory",
-		"gridx/core/model/cache/Sync",
-		"gridx/modules/VirtualVScroller",
-		"gridx/modules/ColumnResizer",
-		"gridx/modules/Filter",
-		"gridx/modules/filter/FilterBar",
-	], function (Grid, Store, Cache, scroller, resizer, filter, filterBar) {
-		grid = new Grid({
-			id: "gridNodes",
-			cacheClass: Cache, 
-			store: new Store({data: [{identifier: "foo"}]}),
-			structure: [
-				{field: "identifier", name: "Identifier"},
-				{field: "instanceApplicationVersion", name: "Version", hidden: true},
-				{field: "nodeType", name: "Type"},
-				{field: "serviceCount", name: "Service count"},
-				{field: "lastUpdated", name: "Last updated Relative"},
-				{field: "karma", name: "Karma", class: karmaStyler},
-			],
-			modules: [
-		              scroller, resizer, filter, filterBar
-            		]
-		    	
-		});
-
-		grid.filterBar.closeButton = false;
-		grid.filterBar.refresh();
-		console.log(grid.filterBar.closeButton);
-		grid.startup();
-	});
+	newGrid({
+		id: "gridNodes",
+		structure: [
+			{field: "identifier", name: "Identifier"},
+			{field: "instanceApplicationVersion", name: "Version", hidden: true, width: "8%"},
+			{field: "nodeType", name: "Type"},
+			{field: "serviceCount", name: "Service count"},
+			{field: "lastUpdated", name: "Last updated Relative"},
+			{field: "karma", name: "Karma", class: karmaStyler, width: "8%"},
+		],
+		filters: [
+			{title: "Nodes with Problems", filterFunc: filterNodesWithProblems}
+		]
+	})
 }
 
 function loadUsergroups(usergroups) {
@@ -290,7 +269,7 @@ function loadListClasses(classes) {
 		} 
 		  
 		grid = registry.byId("gridClasses"); 
-		grid.setStore(new Store({data: nodes}));
+		grid.setStore(new Store({data: classes}));
 
 		setContentElement(grid);
 	});
@@ -302,7 +281,7 @@ function loadListNodes(nodes) {
 	     "dojo/store/Memory",
 	     "dojo/domReady!" 
      ], function (registry, Store) {
-	    	setTitle("Nodes");
+	    setTitle("Nodes");
 
 		if (!registry.byId("gridNodes")) {
 			initGridNodes(); 
@@ -317,7 +296,7 @@ function loadListNodes(nodes) {
 
 function mniClassesClicked() {
 	var req = newJsonReq();
-	req.url = "json/listClasses",
+	req.url = "json/listClassImmediateChildren?id=1",
 	req.load = loadListClasses,
 	req.get();
 }
@@ -371,7 +350,7 @@ function setupToolbar() {
 		menuServices.addChild(new MenuSeparator());
 		menuServices.addChild(new MenuItem({id: "mniCommands", label: "Commands", onClick: mniCommandsClicked }));
 		menuServices.addChild(new MenuItem({label: "Groups", onClick: mniGroupsClicked, disabled: true }));
-		menuServices.addChild(new MenuItem({label: "Maintenence Periods", onClick: mniMaintPeriodsClicked, disabled: true }));
+		menuServices.addChild(new MenuItem({id: "mniMaintPeriods", label: "Maintenence Periods", onClick: mniMaintPeriodsClicked, disabled: true }));
 		mainToolbar.addChild(new PopupMenuBarItem({label: "Services", popup: menuServices}));
 
 		mainToolbar.addChild(new MenuBarItem({id: "mniNodes", label: "Nodes", onClick: mniNodesClicked, disabled: true})); 
@@ -400,7 +379,9 @@ function loadGetServices(services) {
 	     "dojo/store/Memory",
 	     "dojo/domReady!" 
      ], function (registry, Store) {
-	    	setTitle("Services");
+    	setTitle("Services");
+
+		console.log("gridServices", registry.byId("gridServices"))
 
 		if (!registry.byId("gridServices")) {
 			initGridServices(); 
@@ -411,8 +392,6 @@ function loadGetServices(services) {
 
 		setContentElement(grid);
 	});
-
-	console.log(services);
 }
 
 function mniDashboardClicked() {
@@ -457,9 +436,25 @@ function reqLogin(username, password) {
 	req.get();
 }
 
+function getBasePath() {
+	ret = "";
+
+	pathElements = window.location.pathname.split("/");
+
+	pathElements.forEach(function(e, i) {
+		if (i == pathElements.length - 1) {
+			return;
+		} else {
+			ret += e + "/"
+		}
+	});
+	
+	return ret
+}
+
 function newJsonReq(url) {
 	return {
-		url: url,
+		url: getBasePath() + url,
 		handleAs: "json", 
 		error: displayError,
 		get: function() {
@@ -586,23 +581,47 @@ function serviceGroupsModel() {
 	}
 }
 
-function loadGetCommands(commands) {
+function loadGridContentView(id, data, title, gridConfig) {
 	require([
 	     "dijit/registry",
 	     "dojo/store/Memory",
 	     "dojo/domReady!" 
-     ], function (registry, Store) {
-	    	setTitle("Commands");
+    ], function (registry, Store) {
+	    	setTitle(title);
 
-		if (!registry.byId("gridCommands")) {
-			initGridCommands(); 
+		if (!registry.byId(id)) {
+			newGrid(gridConfig)
 		} 
 		  
-		grid = registry.byId("gridCommands"); 
-		grid.setStore(new Store({data: commands}));
+		grid = registry.byId(id); 
+		grid.setStore(new Store({data: data}));
 
 		setContentElement(grid);
 	});
+}
+
+function loadGetMaintPeriods(maintPeriods) {
+	loadGridContentView("gridMaintPeriods", maintPeriods, "Maintainence Periods", {
+		id: "gridMaintPeriods",
+		structure: [
+			{field:"id", name: "ID", width: "5%"},
+			{field:"title", name: "Title"},
+		],
+	})
+}
+
+function loadGetCommands(commands) {
+	loadGridContentView("gridCommands", commands, "Commands", {
+		id: "gridCommands",
+		structure: [
+			{field:"id", name: "ID", width: "5%"},
+			{field:"commandIdentifier", name: "Identifier"},
+			{field:"serviceCount", name: "Services"},
+		],
+		filters: [
+			{title: "None", filterFunc: filterCommandsNone}
+		]
+	})
 }
 
 function mniCommandsClicked() {
@@ -613,7 +632,13 @@ function mniCommandsClicked() {
 }
 
 function mniGroupsClicked() {}
-function mniMaintPeriodsClicked() {}
+
+function mniMaintPeriodsClicked() {
+	var req = newJsonReq();
+	req.url = "json/listMaintPeriods";
+	req.load = loadGetMaintPeriods;
+	req.get();	
+}
 
 function mniServicesClicked() {
 	reqGetServices();
@@ -651,10 +676,19 @@ function switchContentToGroup(group) {
 }
 
 function setContentElement(contentToSet) {
+	console.log("set content", contentToSet);
 	require([
 		"dijit/registry",
 	], function(registry) {
 		content = registry.byId("content");
+
+		if (content.containerNode.children.length > 0) {
+			if (content.containerNode.children[0].id == contentToSet.id) {
+				// don't set the same content twice
+				return;
+			}
+		}	
+
 		content.set("content", contentToSet);
 	});
 }
@@ -673,11 +707,12 @@ function setupRootContainer() {
 			contentBody = new ContentPane({
 				id: "content",
 				content: "main content",
-				region: "center"
+				region: "center",
+				style: "padding: 0",
 			});
 
 			store = new JsonRestStore({
-				target: "/json/getServiceGroup/",
+				target: getBasePath() + "/json/getServiceGroup/",
 				getRoot: function (onItem, onError) {
 					this.get(1).then(onItem, onError);
 				},

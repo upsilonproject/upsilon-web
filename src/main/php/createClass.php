@@ -11,7 +11,7 @@ use \libAllure\ElementSelect;
 
 class FormCreateClass extends Form {
 	public function __construct($parent) {
-		parent::__construct('Create class');
+		parent::__construct('createClass', 'Create class');
 
 		$this->addElement(new ElementInput('title', 'Title'));
 
