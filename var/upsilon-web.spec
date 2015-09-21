@@ -1,12 +1,12 @@
 Name:		upsilon-web
-Version:	1.6.0
+Version:	%{buildid_tag}
 Release:	1%{?dist}
 Summary:	Upsilon web
 
 Group:		Applications/System
 License:	GPLv2
 URL:		http://upsilon-project.co.uk
-Source0:	upsilon-web-%{version}-*.zip
+Source0:	upsilon-web-%{buildid_tag}.zip
 
 Requires: httpd php php-pdo php-mysql mariadb-server
 
