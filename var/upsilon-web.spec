@@ -1,6 +1,6 @@
 Name:		upsilon-web
 Version:	%{buildid_version}
-Release:	1%{?dist}
+Release:	%{buildid_timestamp}%{?dist}
 Summary:	Upsilon web
 
 Group:		Applications/System
