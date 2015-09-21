@@ -1259,4 +1259,18 @@ function getUsers() {
 	return $stmt->fetchAll();
 }
 
+function getVersion() {
+	$buildIdFile = __DIR__ . '/../.buildid';
+
+	if (file_exists($buildIdFile)) {
+		$buildId = parse_ini_file($buildIdFile);
+
+		$version = $buildId['version.formatted.short'];
+
+		return $version;
+	}
+
+	return '???';
+}
+
 ?>
