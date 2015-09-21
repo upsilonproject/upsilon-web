@@ -1,5 +1,5 @@
 Name:		upsilon-web
-Version:	%{buildid_tag}
+Version:	%{buildid_version}
 Release:	1%{?dist}
 Summary:	Upsilon web
 
