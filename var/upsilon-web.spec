@@ -17,7 +17,7 @@ Upsilon web
 %setup -q
 
 
-%build
+%build -n upsilon-web-%{buildid_tag}
 mkdir -p %{buildroot}/usr/share/upsilon-web/
 cp -r upload/*  %{buildroot}/usr/share/upsilon-web/
 
