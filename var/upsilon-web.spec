@@ -39,6 +39,7 @@ service httpd restart
 %doc /usr/share/doc/upsilon-web/initialData.sql
 %doc /usr/share/doc/upsilon-web/schema.sql
 /usr/share/upsilon-web/*
+/usr/share/upsilon-web/.buildid
 /etc/httpd/conf.d/upsilon-web.conf
 
 %changelog
