@@ -471,7 +471,7 @@ function getBasePath() {
 		}
 	});
 	
-	return ret
+	return window.location.origin + "/" + ret
 }
 
 function newJsonReq(url) {
