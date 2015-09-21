@@ -6,7 +6,7 @@ Summary:	Upsilon web
 Group:		Applications/System
 License:	GPLv2
 URL:		http://upsilon-project.co.uk
-Source0:	upsilon-web-%{version}.zip
+Source0:	upsilon-web-%{version}-*.zip
 
 Requires: httpd php php-pdo php-mysql mariadb-server
 
