@@ -2,6 +2,6 @@
 
 require_once 'jsonCommon.php';
 
-die("deprecated");
+outputJson(listMaintPeriods());
 
 ?>

@@ -1273,4 +1273,13 @@ function getVersion() {
 	return '???';
 }
 
+function listMaintPeriods() {
+	$sql = 'SELECT s.id, s.title, s.content, COUNT(m.id) AS countServices FROM acceptable_downtime_sla s LEFT JOIN service_metadata m ON m.acceptableDowntimeSla = s.id GROUP BY s.id';
+	$stmt = DatabaseFactory::getInstance()->prepare($sql);
+	$stmt->execute();
+	$listMaintPeriods = $stmt->fetchAll();
+
+	return $listMaintPeriods;
+}
+
 ?>

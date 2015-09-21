@@ -21,13 +21,15 @@ Upsilon web
 mkdir -p %{buildroot}/usr/share/upsilon-web/
 cp -r upload/*  %{buildroot}/usr/share/upsilon-web/
 
+cp .buildid %{buildroot}/usr/share/upsilon-web/
+
 mkdir -p %{buildroot}/usr/share/doc/upsilon-web/
 cp README.md %{buildroot}/usr/share/doc/upsilon-web/
 cp setup/initialData.sql %{buildroot}/usr/share/doc/upsilon-web/
 cp setup/schema.sql %{buildroot}/usr/share/doc/upsilon-web/
 
 mkdir -p %{buildroot}/etc/httpd/conf.d
-cp setup/upsilon-apache.conf %{buildroot}/etc/httpd/conf.d/upsilon.conf
+cp setup/upsilon-apache.conf %{buildroot}/etc/httpd/conf.d/upsilon-web.conf
 
 %post 
 service httpd restart
@@ -37,7 +39,7 @@ service httpd restart
 %doc /usr/share/doc/upsilon-web/initialData.sql
 %doc /usr/share/doc/upsilon-web/schema.sql
 /usr/share/upsilon-web/*
-/etc/httpd/conf.d/upsilon.conf
+/etc/httpd/conf.d/upsilon-web.conf
 
 %changelog
 * Thu Mar 05 2015 James Read <contact@jwread.com> 1.5.0-1
