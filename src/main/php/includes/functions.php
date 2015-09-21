@@ -1274,7 +1274,7 @@ function getBuildId() {
 	$buildIdFile = __DIR__ . '/../.buildid';
 
 	if (file_exists($buildIdFile)) {
-		$buildId = parse_ini_file($buildIdFile);
+		$buildId = parse_ini_file($buildIdFile, false, INI_SCANNER_RAW);
 
 		if (!$buildId) {
 			throw new Exception('buildid found, but could not be parsed');
