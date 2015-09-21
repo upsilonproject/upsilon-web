@@ -66,7 +66,7 @@ function displayError(err) {
 	window.alert("General Error: " + err);
 }
 
-function presetFilterer(config) {
+function createButton(config) {
 	var filterer = {}
 
 	require([
@@ -74,9 +74,7 @@ function presetFilterer(config) {
 	], function(Button) {
 		filterer = new Button({
 			label: config.title, 
-			onClick: function() { 
-				config.grid.filter.setFilter(config.filterFunc)
-			}
+			onClick: config.onClick
 		});
 	});
 
@@ -97,29 +95,44 @@ function newGrid(configuration) {
 		"gridx/modules/filter/QuickFilter",
 		"gridx/support/Summary",
 		"gridx/support/QuickFilter",
-		"gridx/support/menu/AZFilterMenu"
-	], function (Grid, Store, Cache, scroller, resizer, filter, filterBar, bar, nestedSort, mfQuickFilter, summary, QuickFilter) {
+		"gridx/modules/extendedSelect/Row",
+		"gridx/modules/RowHeader",
+		"gridx/modules/IndirectSelect",
+		"dijit/form/Button"
+	], function (Grid, MemoryStore, Cache, scroller, resizer, filter, filterBar, bar, nestedSort, mfQuickFilter, summary, QuickFilter, extendedSelectRow, rowHeader, IndirectSelect, Button) {
 		gridConfiguration = {
 			columnWidthAutoResize: true,
 			id: configuration.id,
 			cacheClass: Cache, 
-			store: new Store(),
+			store: new MemoryStore(),
 			structure: configuration.structure,
 			barTop: [ 
 				summary, 
-				{pluginClass: presetFilterer, title: "All", filterFunc: filterReset},
+				{pluginClass: createButton, title: "All", filterFunc: filterReset},
 				{pluginClass: QuickFilter, style: 'text-align: right'}, 
 			],
 			modules: [
-				scroller, resizer, filter, bar, nestedSort, filterBar			]	
+				scroller, resizer, filter, bar, nestedSort, filterBar, IndirectSelect, extendedSelectRow, rowHeader
+			]	
 		};
 
 		if (typeof(configuration.filters) != "undefined") {
 			configuration.filters.forEach(function(e, i) {
 				gridConfiguration.barTop.splice(2, 0, {
-					pluginClass: presetFilterer, title: e.title, filterFunc: e.filterFunc 
+					pluginClass: createButton, title: e.title, onClick: function(fff) { 
+						console.log(fff)
+						config.grid.filter.setFilter(e.filterFunc);
+					}
 				});
 			})
+		}
+
+		if (typeof(configuration.buttons) != "undefined") {
+			configuration.buttons.forEach(function(e, i) {
+				gridConfiguration.barTop.splice(2, 0, {
+					pluginClass: createButton, title: e.title, onClick: e.onClick 
+				});
+			});
 		}
 
 		grid = new Grid(gridConfiguration);
@@ -154,6 +167,10 @@ function initGridUsers() {
 	});
 }
 
+function onClickClassesUpdate(a, b, c, d) {
+	console.log("update", a, b, c, d, this)
+}
+
 function initGridClasses() {
 	newGrid({
 		id: "gridClasses",
@@ -162,7 +179,12 @@ function initGridClasses() {
 			{field:"icon", name: "Icon", width: "10%"},
 			{field:"title", name: "Title"},
 		],
-
+		filters: [
+			{title: "Nodes with Problems", filterFunc: filterNodesWithProblems}
+		],
+		buttons: [
+			{title: "Update", onClick: onClickClassesUpdate}
+		]
 	});
 }
 

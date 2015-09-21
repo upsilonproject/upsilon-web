@@ -3,7 +3,7 @@
 	<p>
 		<strong>Crypto:</strong> <span class = "{if $crypto}good{else}bad{/if}">{if $crypto}on{else}off{/if}</span>
 		&nbsp;&nbsp;&nbsp;&nbsp;
-		<strong>Version:</strong> {$version}
+		<strong>Version:</strong> <a href = "viewVersion.php">{$version}</a>
 		&nbsp;&nbsp;&nbsp;&nbsp;
 	{if !empty($apiClient)}
 		<strong>API Client:</strong> {$apiClient}

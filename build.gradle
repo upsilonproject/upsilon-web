@@ -15,7 +15,7 @@ def generateBuildId() {
 }
 
 Properties buildid = generateBuildId()
-version = buildid.get("version.formatted.short")
+version = buildid.get("tag")
 
 task buildDojo(type: Exec) {
 	commandLine "./buildDojo.sh"

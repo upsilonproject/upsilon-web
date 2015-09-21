@@ -1260,17 +1260,30 @@ function getUsers() {
 }
 
 function getVersion() {
+	$version = '???';
+
+	try {
+		$buildId = getBuildId();
+		$version = $buildId['tag'];
+	} catch (Exception $e) {}
+
+	return $version;
+}
+
+function getBuildId() {
 	$buildIdFile = __DIR__ . '/../.buildid';
 
 	if (file_exists($buildIdFile)) {
 		$buildId = parse_ini_file($buildIdFile);
 
-		$version = $buildId['version.formatted.short'];
+		if (!$buildId) {
+			throw new Exception('buildid found, but could not be parsed');
+		}
 
-		return $version;
+		return $buildId;
+	} else {
+		throw new Exception('buildid does not exist.');
 	}
-
-	return '???';
 }
 
 function listMaintPeriods() {
