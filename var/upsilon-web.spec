@@ -14,10 +14,9 @@ Requires: httpd php php-pdo php-mysql mariadb-server
 Upsilon web
 
 %prep
-%setup -q
+%setup -q -n upsilon-web-%{buildid_tag}
 
-
-%build -n upsilon-web-%{buildid_tag}
+%build 
 mkdir -p %{buildroot}/usr/share/upsilon-web/
 cp -r upload/*  %{buildroot}/usr/share/upsilon-web/
 
