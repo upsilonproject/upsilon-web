@@ -17,6 +17,10 @@ def generateBuildId() {
 Properties buildid = generateBuildId()
 version = buildid.get("version.formatted.short")
 
+task setupLibraries(type: Exec) {
+	commandLine "./setupLibraries.sh"
+}
+
 task buildDojo(type: Exec) {
 	commandLine "./buildDojo.sh"
 }

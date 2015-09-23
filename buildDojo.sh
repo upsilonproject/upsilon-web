@@ -1,5 +1,4 @@
 # Note: edit src/main/dojo/profile.js
-./setupLibraries.sh
 rm -rf target/dojo-upsilon
 mkdir -p src/main/php/resources/dojo/
 mkdir -p target/dojo-upsilon/
