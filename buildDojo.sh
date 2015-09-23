@@ -3,6 +3,10 @@ rm -rf target/dojo-upsilon
 mkdir -p src/main/php/resources/dojo/
 mkdir -p target/dojo-upsilon/
 echo "buildDojo.sh pwd: `pwd`"
+
+mkdir -p target/dojo-release-buildarea/gridx
+tar xaf lib/gridx.tar.gz --strip 1 -C target/dojo-release-buildarea/gridx/ 'gridx-*/'
+
 ./target/dojo-release-buildarea/util/buildscripts/build.sh profile=src/main/dojo/profile.js
 
 echo "Size of release before clean: `find target/dojo-upsilon | wc -l` files, `du -hs target/dojo-upsilon/`"
