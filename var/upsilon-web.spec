@@ -1,12 +1,12 @@
 Name:		upsilon-web
-Version:	1.6.0
-Release:	1%{?dist}
+Version:	%{buildid_version}
+Release:	%{buildid_timestamp}%{?dist}
 Summary:	Upsilon web
 
 Group:		Applications/System
 License:	GPLv2
 URL:		http://upsilon-project.co.uk
-Source0:	upsilon-web-%{version}.zip
+Source0:	upsilon-web-%{buildid_tag}.zip
 
 Requires: httpd php php-pdo php-mysql mariadb-server
 
@@ -14,10 +14,9 @@ Requires: httpd php php-pdo php-mysql mariadb-server
 Upsilon web
 
 %prep
-%setup -q
+%setup -q -n upsilon-web-%{buildid_tag}
 
-
-%build
+%build 
 mkdir -p %{buildroot}/usr/share/upsilon-web/
 cp -r upload/*  %{buildroot}/usr/share/upsilon-web/
 
@@ -39,6 +38,7 @@ service httpd restart
 %doc /usr/share/doc/upsilon-web/initialData.sql
 %doc /usr/share/doc/upsilon-web/schema.sql
 /usr/share/upsilon-web/*
+/usr/share/upsilon-web/.buildid
 /etc/httpd/conf.d/upsilon-web.conf
 
 %changelog

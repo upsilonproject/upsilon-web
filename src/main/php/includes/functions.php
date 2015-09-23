@@ -1259,6 +1259,33 @@ function getUsers() {
 	return $stmt->fetchAll();
 }
 
+function getVersion() {
+	$version = '???';
+
+	try {
+		$buildId = getBuildId();
+		$version = $buildId['tag'];
+	} catch (Exception $e) {}
+
+	return $version;
+}
+
+function getBuildId() {
+	$buildIdFile = __DIR__ . '/../.buildid';
+
+	if (file_exists($buildIdFile)) {
+		$buildId = parse_ini_file($buildIdFile, false, INI_SCANNER_RAW);
+
+		if (!$buildId) {
+			throw new Exception('buildid found, but could not be parsed');
+		}
+
+		return $buildId;
+	} else {
+		throw new Exception('buildid does not exist.');
+	}
+}
+
 function listMaintPeriods() {
 	$sql = 'SELECT s.id, s.title, s.content, COUNT(m.id) AS countServices FROM acceptable_downtime_sla s LEFT JOIN service_metadata m ON m.acceptableDowntimeSla = s.id GROUP BY s.id';
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
