@@ -13,6 +13,8 @@ body {
 #wrapper {
 	height: 100%;
 	background-color: #efefef;
+	display: flex;
+	flex-direction: column;
 }
 
 #header {
@@ -21,6 +23,7 @@ body {
 	font-weight: bold;
 	background-color: #444;
 	color: white;
+	overflow: hidden;
 }
 
 .claro .dijitDialogTitleBar {
