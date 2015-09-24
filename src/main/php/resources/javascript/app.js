@@ -179,9 +179,6 @@ function initGridClasses() {
 			{field:"icon", name: "Icon", width: "10%"},
 			{field:"title", name: "Title"},
 		],
-		filters: [
-			{title: "Nodes with Problems", filterFunc: filterNodesWithProblems}
-		],
 		buttons: [
 			{title: "Update", onClick: onClickClassesUpdate}
 		]
@@ -575,9 +572,9 @@ function loadDashboard(dashboard) {
 			window[renderFunction](widget, cp);
 		});
 
-		layoutBoxes();
-		
 		setContentElement(container);
+		
+		layoutBoxes();
 	});
 
 }
@@ -728,9 +725,9 @@ function setupRootContainer() {
 		if (registry.byId("navTree") == null) {
 			contentBody = new ContentPane({
 				id: "content",
-				content: "main content",
+				content: '<div style = "text-align: center; padding: 2em; ">Welcome to <strong>upsilon-web</strong></div>',
 				region: "center",
-				style: "padding: 0",
+				style: "padding: 0;",
 			});
 
 			store = new JsonRestStore({

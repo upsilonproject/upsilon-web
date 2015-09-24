@@ -109,11 +109,22 @@ function fetchServiceMetricResultGraph(metric, id, graphIndex) {
 
 
 function layoutBoxes() {
-	if (typeof(window.boxLayoutManager) == "undefined") {
-		window.boxLayoutManager = new Masonry('div.blockContainer', {itemSelector: 'div.block', columnWidth: 200, isFitWidth: true });
-	}
+	require([
+		"dojo/query"
+	], function(query) {
+		blocks = query("div.blockContainer");
 
-	window.boxLayoutManager.layout();
+		if (blocks.length > 0) {
+			if (typeof(window.boxLayoutManager) == "undefined") {
+				window.boxLayoutManager = new Masonry('div.blockContainer', {itemSelector: 'div.block', columnWidth: 200, isFitWidth: true });
+			}
+
+			console.log("blocks", blocks);
+
+			window.boxLayoutManager.layout();
+		}
+	});
+
 }
 
 function cookieOrDefault(cookieName, defaultValue) {
