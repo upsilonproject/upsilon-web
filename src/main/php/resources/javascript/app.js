@@ -207,6 +207,9 @@ function initGridServices() {
 			{field:"output", name: "Output", class: "code"},
 			{field:"karma", name: "Karma", class: karmaStyler}
 		],
+		filters: [
+			{title: "Services with Problems", filterFunc: filterServicesWithProblems}
+		]
 	});
 }
 
@@ -217,6 +220,17 @@ function filterCommandsNone() {
 function filterNodesWithProblems(rowData, rowId) {
 	console.log("filtering nodes with problems");;
 	return true;
+}
+
+function filterServicesWithProblems(rowData, rowId) {
+	switch(rowData[rowId]['karma']) {
+		case 'GOOD':
+			return false;
+			break;
+		case 'BAD':
+		default: 
+			return true;
+	}
 }
 
 function initGridNodes() {
