@@ -179,9 +179,6 @@ function initGridClasses() {
 			{field:"icon", name: "Icon", width: "10%"},
 			{field:"title", name: "Title"},
 		],
-		filters: [
-			{title: "Nodes with Problems", filterFunc: filterNodesWithProblems}
-		],
 		buttons: [
 			{title: "Update", onClick: onClickClassesUpdate}
 		]
@@ -210,6 +207,9 @@ function initGridServices() {
 			{field:"output", name: "Output", class: "code"},
 			{field:"karma", name: "Karma", class: karmaStyler}
 		],
+		filters: [
+			{title: "Services with Problems", filterFunc: filterServicesWithProblems}
+		]
 	});
 }
 
@@ -220,6 +220,17 @@ function filterCommandsNone() {
 function filterNodesWithProblems(rowData, rowId) {
 	console.log("filtering nodes with problems");;
 	return true;
+}
+
+function filterServicesWithProblems(rowData, rowId) {
+	switch(rowData[rowId]['karma']) {
+		case 'GOOD':
+			return false;
+			break;
+		case 'BAD':
+		default: 
+			return true;
+	}
 }
 
 function initGridNodes() {
@@ -575,9 +586,9 @@ function loadDashboard(dashboard) {
 			window[renderFunction](widget, cp);
 		});
 
-		layoutBoxes();
-		
 		setContentElement(container);
+		
+		layoutBoxes();
 	});
 
 }
@@ -728,9 +739,9 @@ function setupRootContainer() {
 		if (registry.byId("navTree") == null) {
 			contentBody = new ContentPane({
 				id: "content",
-				content: "main content",
+				content: '<div style = "text-align: center; padding: 2em; ">Welcome to <strong>upsilon-web</strong></div>',
 				region: "center",
-				style: "padding: 0",
+				style: "padding: 0;",
 			});
 
 			store = new JsonRestStore({
