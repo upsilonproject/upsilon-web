@@ -58,10 +58,6 @@ div.gridx {
 	height: 100%;
 }
 
-div.gridx * {
-	border: 0 !important;
-}
-
 .gridxHeaderRowInner tr td:hover { 
 	background-color: yellow;
 }
@@ -77,6 +73,11 @@ div.gridx * {
 
 .claro .dijitDialogPaneContent {
 	height: 100%;
+}
+
+.gridx .gridxBody .gridxCell.gridxCellFocus {
+	border: 1px solid red !important;
+	background-color: pink !beige;
 }
 
 div.box, div.block {
@@ -184,3 +185,5 @@ div#rootContainer {
 	color: gray;
 	font-family: monospace;
 }
+
+

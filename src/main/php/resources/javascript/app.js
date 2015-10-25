@@ -15,6 +15,8 @@ function onLoad() {
 		setupRootContainer();
 
 		reqUpdatePermissions();
+
+		loadHash();
 	} catch (err) {
 		displayError(err);
 	}
@@ -40,6 +42,7 @@ function applyPermissionsToToolbar() {
 		registry.byId("mniNodes").set("disabled", !permissions.viewNodes);
 		registry.byId("mniClasses").set("disabled", !permissions.viewClasses);
 		registry.byId("mniMaintPeriods").set("disabled", !permissions.viewMaintPeriods);
+		registry.byId("mniPreferences").set("disabled", !permissions.loggedIn);
 		registry.byId("mniLogout").set("disabled", !permissions.loggedIn);
 		registry.byId("mniLogin").set("disabled", permissions.loggedIn);
 
@@ -172,11 +175,13 @@ function onClickClassesUpdate(a, b, c, d) {
 }
 
 function initGridClasses() {
+	setIconSource("serviceIcons");
+
 	newGrid({
 		id: "gridClasses",
 		structure: [
 			{field:"id", name: "ID", width: "5%"},
-			{field:"icon", name: "Icon", width: "10%"},
+			{field:"icon", width: "5%", decorator: iconDecorator},
 			{field:"title", name: "Title"},
 		],
 		buttons: [
@@ -242,7 +247,7 @@ function loadUsergroups(usergroups) {
 	     "dojo/store/Memory",
 	     "dojo/domReady!" 
      ], function (registry, Store) {
-	    	setTitle("Usergroups");
+	    setTitle("Usergroups");
 
 		if (!registry.byId("gridUsergroups")) {
 			initGridUsergroups(); 
@@ -321,10 +326,116 @@ function mniClassesClicked() {
 }
 
 function mniNodesClicked() {
+	setHash("nodes");
+
 	var req = newJsonReq();
 	req.url = "json/listNodes",
 	req.load = loadListNodes,
 	req.get();
+}
+
+function renderButton(el){
+	ret = null;
+
+	ret2 = require([
+		"dijit/form/Button"
+	], function(Button) {
+		this.ret = new Button({id: el.id, label: el.caption});
+	});
+
+	return ret;
+}
+
+function renderInput(el) {
+	ret = null;
+
+	require([
+		"dijit/form/TextBox"
+	], function(TextBox) {
+		this.ret = new TextBox();	
+	});
+
+	return ret;
+}
+
+function renderElement(el) {
+	ret = null;
+
+	require([
+		"dojo/dom-construct"
+	], function(cons) {
+		this.ret = cons.create('div', { innerHTML: 'foo' });
+	});
+
+	return ret;
+}
+
+function renderFormElements(res, cp) {
+	console.log("render form elements", res);
+	res.forEach(function(el) {
+		if (el instanceof Array) {
+			renderFormElements(el, cp);
+			return;
+		}
+
+		switch(el.type) {
+			case "ElementButton": 
+				cp.addChild(renderButton(el));
+				break;
+			case 'ElementInput':
+				cp.addChild(renderInput(el));
+			default:
+		}
+	});
+}
+
+function getPreferencesForm() {
+	ret = null;
+
+	require([
+		"dijit/layout/ContentPane",
+	], function(cp) {
+		cp = new cp({ 
+			content: "foo"	
+		});
+
+		req = newJsonReq();
+		req.url = "ajax-form.php?action=getElements";
+		req.get(function(res) {
+			renderFormElements(res, cp)	
+		});
+
+		this.ret = cp;
+	});
+
+	return ret;
+}
+
+function loadHash() {
+	switch(window.location.hash) {
+		case "#preferences": mniPreferencesClicked(); break;
+		case "#nodes": mniNodesClicked(); break;
+	}
+}
+
+function setHash(hash) {
+	window.location.hash = hash;
+}
+
+function mniPreferencesClicked() {
+	setHash("preferences");
+
+	require([
+		"dijit/Dialog",
+	], function(Dialog) {
+		dlg = new Dialog({
+			title: "Preferences",
+			content: getPreferencesForm(),
+			style: "width: 800px"
+		});
+	});
+
+	dlg.show();
 }
 
 function mniLogoutClicked() {
@@ -382,6 +493,7 @@ function setupToolbar() {
 		menuSystem.addChild(new MenuSeparator());
 		menuSystem.addChild(new MenuItem({label: "Classic Console", onClick: gotoClassic}));
 		menuSystem.addChild(new MenuSeparator());
+		menuSystem.addChild(new MenuItem({id: "mniPreferences", label: "Preferences", onClick: mniPreferencesClicked, disabled: true}));
 		menuSystem.addChild(new MenuItem({id: "mniLogout", label: "Logout", onClick: mniLogoutClicked, disabled: true }));
 		menuSystem.addChild(new MenuItem({id: "mniLogin", label: "Login", onClick: showFormLogin, disabled: true }));
 		mainToolbar.addChild(new PopupMenuBarItem({label: "System", popup: menuSystem}));
@@ -476,8 +588,12 @@ function newJsonReq(url) {
 		url: getBasePath() + url,
 		handleAs: "json", 
 		error: displayError,
-		get: function() {
-			if (!this.url.endsWith(".php")) {
+		get: function(loadFunc) {
+			if (this.load == null) {
+				this.load = loadFunc
+			}
+
+			if (!this.url.indexOf(".php") == -1) {
 				this.url += ".php";
 			}
 
@@ -629,11 +745,27 @@ function loadGetMaintPeriods(maintPeriods) {
 	})
 }
 
+function iconDecorator(icon) {
+	console.log(icon);
+	if (icon == null) {
+		return '<div>&nbsp;</div>';
+	}
+
+	return '<div style = "text-align: center"><img src = "resources/images/' + window.iconSource + '/' + icon + '"/></div>';
+}
+
+function setIconSource(dir) {
+	window.iconSource = dir;
+}
+
 function loadGetCommands(commands) {
+	setIconSource("serviceIcons");
+
 	loadGridContentView("gridCommands", commands, "Commands", {
 		id: "gridCommands",
 		structure: [
 			{field:"id", name: "ID", width: "5%"},
+			{field:"icon", decorator: iconDecorator, width: '5%'},
 			{field:"commandIdentifier", name: "Identifier"},
 			{field:"serviceCount", name: "Services"},
 		],

@@ -1,2 +1,3 @@
 # it isn't Java, but this makes Travis use gradle.
+sudo: false
 language: java
