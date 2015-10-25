@@ -481,7 +481,7 @@ function enrichGroups($listGroups, $subGroupDepth = 1) {
 }
 
 function getGroups() {
-	$sql = 'SELECT g.title AS name, g.* FROM service_groups g WHERE g.parent IS NULL or g.parent = "" ORDER BY g.title';
+	$sql = 'SELECT g.title AS name, g.* FROM service_groups g ORDER BY g.title';
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->execute();
 
