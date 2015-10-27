@@ -15,8 +15,6 @@ use \libAllure\DatabaseFactory;
 use \libAllure\Session;
 use \libAllure\AuthBackend;
 
-var_dump($settings);
-
 class UserSettings extends Form {
         public function __construct() {
                 parent::__construct('userSettings', 'Settings');
@@ -30,7 +28,13 @@ class UserSettings extends Form {
                 }
 
                 $this->addElement(new ElementCheckbox('warnNotUsingHttps', 'Warn when not using HTTPS', $warn));
-                $this->addElement(new ElementInput('title', 'Site title', getSiteSetting('siteTitle', 'Upsilon')));
+                $this->addElement(new ElementInput('siteTitle', 'Site title', getSiteSetting('siteTitle', 'Upsilon')));
+
+				$this->addSection('AMQP');
+                $this->addElement(new ElementInput('amqpHost', 'AMQP Host', getSiteSetting('amqpHost', 'localhost')));
+                $this->addElement(new ElementInput('amqpPort', 'AMQP Port', getSiteSetting('amqpPort', 5672)));
+                $this->addElement(new ElementInput('amqpUser', 'AMQP User', getSiteSetting('amqpUser', 'guest')));
+                $this->addElement(new ElementInput('amqpPass', 'AMQP Pass', getSiteSetting('amqpPass', 'guest')));
 
                 $this->addDefaultButtons();
         }
@@ -38,6 +42,10 @@ class UserSettings extends Form {
         public function process() {
                 setSiteSetting('warnNotUsingHttps', $this->getElementValue('warnNotUsingHttps'));
                 setSiteSetting('siteTitle', $this->getElementValue('siteTitle'));
+                setSiteSetting('amqpHost', $this->getElementValue('amqpHost'));
+                setSiteSetting('amqpPort', $this->getElementValue('amqpPort'));
+                setSiteSetting('amqpUser', $this->getElementValue('amqpUser'));
+                setSiteSetting('amqpPass', $this->getElementValue('amqpPass'));
         }
 }
 
