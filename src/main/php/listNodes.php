@@ -7,6 +7,7 @@ use \libAllure\HtmlLinksCollection;
 
 $links = new HtmlLinksCollection();
 $links->add('listRemoteConfigurations.php', 'Remote configurations');
+$links->add('amqpSendPings.php', 'Send pings');
 
 $title = 'Nodes';
 require_once 'includes/widgets/header.php';

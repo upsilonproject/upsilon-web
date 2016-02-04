@@ -19,8 +19,14 @@
 
 namespace libAllure;
 
-if (!@include_once 'smarty/libs/Smarty.class.php') {
-	include_once 'Smarty/Smarty.class.php';
+if (defined(__FILE__)) { return; } else { define(__FILE__, true); }
+
+if (@include_once 'smarty3/Smarty.class.php') {
+} else if (@include_once 'smarty/Smarty.class.php') {
+} else if (@include_once 'smarty/libs/Smarty.class.php') {
+} else if (@include_once 'Smarty/Smarty.class.php') {
+} else {
+		throw new \Exception('No usable version of Smarty found.');
 }
 
 require_once 'libAllure/Inflector.php';
@@ -34,39 +40,28 @@ class Template extends \Smarty {
 	public function __construct($cacheDir, $templateDir = 'includes/templates/') {
 		parent::__construct();
 
-
 		if (strpos($cacheDir, '/') === FALSE) {
 			$this->compile_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $cacheDir;
 
 			if (!is_dir($this->compile_dir)) {
-				mkdir($this->compile_dir);
+				@mkdir($this->compile_dir) or user_error('Could not make template dir: ' . $this->compile_dir);
 			}
 		} else {
 			$this->compile_dir = $cacheDir;
 		}
 
 		$this->template_dir = $templateDir;
+		$this->addTemplateDir(__DIR__ . '/templates/'); 
 
+//		$this->registerFunction('getContent', 'tplGetContent');
 		$this->registerModifier('htmlify', array($this, 'htmlify'));
 		$this->registerModifier('externUrl', array($this, 'externUrl'));
 		$this->registerModifier('externUrlOr', array($this, 'externUrlOr'));
-		$this->registerModifier('gt', array($this, 'getText'));
-	}
-
-	public function registerModifier($content, $callback) {
-		if (method_exists($this, 'registerPlugin')) {
-			$this->registerPlugin('modifier', $content, $callback);
-		} else {
-			parent::register_modifier($content, $callback);
-		}
+		$this->registerModifier('inflectorQuantify', array('\libAllure\Inflector', 'quantify'));
 	}
 
 	public function addAutoClearVar($var) {
 		$this->autoClearVars[] = $var;
-	}
-
-	public function getText($input) {
-		return _($input);
 	}
 
 	public function htmlify($content, $paragraphs = true) {
@@ -134,10 +129,16 @@ class Template extends \Smarty {
 	}
 
 	public function registerFunction($alias, $function) {
-		if (method_exists($this, 'registerPlugin')) {
-			$this->registerPlugin('function', $alias, $function);
+		$this->registerPlugin('function', $alias, $function);
+	}
+
+	public function registerModifier($name, $callback) {
+		if (method_exists($this, 'register_modifier')) {
+				// Smarty 2 (ca 2009, Debian "stable"!)
+				$this->register_modifier($name, $callback);
 		} else {
-			$this->register_function($alias, $function);
+				// Smarty 3 
+				$this->registerPlugin('modifier', $name, $callback);
 		}
 	}
 
@@ -145,14 +146,6 @@ class Template extends \Smarty {
 		$this->assign($prefix . 'form', $f);
 		$this->assign($prefix . 'elements', $f->getElements());
 		$this->assign($prefix . 'scripts', $f->getScripts());
-	}
-
-	public function assignOr($key, &$val, $default) {
-		if (!isset($val) || empty($val)) {
-			$this->assign($key, $default);
-		} else {
-			$this->assign($key, $val);
-		}
 	}
 
 	public function displayForm(Form $f, $tplName = 'form.tpl') {
@@ -180,8 +173,14 @@ class Template extends \Smarty {
 		parent::display($template, $cacheId, $compileId);
 
 		foreach ($this->autoClearVars as $varName) {
-			if ($this->get_template_vars($varName)) {
-				$this->clear_assign($varName);
+		    if (method_exists($this, 'get_template_vars')) {
+					if ($this->get_template_vars($varName)) {
+						$this->clear_assign($varName);
+					}
+			} else if (method_exists($this, 'tpl_vars')) {
+					if ($this->tpl_vars($varName)) {
+						$this->clear_assign($varName);
+					}
 			}
 		}
 	}

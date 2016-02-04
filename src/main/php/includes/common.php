@@ -12,6 +12,8 @@ set_include_path(dirname(__FILE__) . '/libraries/' . PATH_SEPARATOR . get_includ
 
 require_once 'includes/functions.php';
 
+require_once 'includes/libraries/autoload.php';
+
 require_once 'libAllure/ErrorHandler.php';
 require_once 'libAllure/Session.php';
 require_once 'libAllure/AuthBackendDatabase.php';

@@ -8,5 +8,5 @@ build/
 .settings
 src/main/php/includes/libraries/smarty
 src/main/php/resources/dojo/
-
+composer.lock
 /vendor/

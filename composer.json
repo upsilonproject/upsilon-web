@@ -1,0 +1,15 @@
+{
+    "name": "root/upsilon-web",
+    "authors": [
+        {
+            "name": "jamesread",
+            "email": "contact@jwread.com"
+        }
+    ],
+	"config": {
+		"vendor-dir": "src/main/php/includes/libraries/"
+	},
+    "require": {
+		"videlalvaro/php-amqplib": "2.5.*"
+	}
+}
