@@ -25,6 +25,10 @@ task buildDojo(type: Exec) {
 	commandLine "./buildDojo.sh"
 }
 
+task phpUnit(type: Exec) {
+	commandLine "phpUnit src/test/php/*"
+}
+
 distZip {
 	from ("src/main/php") {
 		include "**"
