@@ -26,7 +26,7 @@ task buildDojo(type: Exec) {
 }
 
 task phpUnit(type: Exec) {
-	commandLine "phpUnit src/test/php/*"
+	commandLine "phpunit"
 }
 
 distZip {
