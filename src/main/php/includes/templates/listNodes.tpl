@@ -27,7 +27,7 @@
 	<tbody>
 		{foreach from = $listNodes item = itemNode}
 		<tr>
-			<td>{$itemNode.id}</td>
+			<td><a class = "node" href = "viewNode.php?id={$itemNode.id}">{$itemNode.id}</a></td>
 			<td><a class = "node" href = "viewNode.php?id={$itemNode.id}">{$itemNode.identifier}</a></td>
 			<td>{$itemNode.nodeType} (version {$itemNode.instanceApplicationVersion})</td>
 			<td>{$itemNode.serviceCount}</td>

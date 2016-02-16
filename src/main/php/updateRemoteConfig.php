@@ -7,6 +7,6 @@ $sql = 'UPDATE remote_configs SET mtime = now()';
 $stmt = stmt($sql);
 $stmt->execute();
 
-redirect('index.php');
+redirect('listRemoteConfigurations.php');
 
 ?>

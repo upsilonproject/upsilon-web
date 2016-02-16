@@ -23,10 +23,12 @@
 <script type = "text/javascript">
 setupSortableTables();
 setupEnhancedSelectBoxes();
-
+</script>
+<script type = "text/javascript">
 {literal}
-require(["dojo/parser"], function(parser) {
+require(["dojo/parser", "dojo/query"], function(parser, query) {
 	parser.parse();	
+	query(".navigationMenuItems").style('display', 'block');
 });
 {/literal}
 </script>

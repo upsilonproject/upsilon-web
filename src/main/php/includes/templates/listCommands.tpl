@@ -1,5 +1,5 @@
 <div class = "box">
-	<h2>Commands</h2>
+	<h2>Command Metadata</h2>
 
 	{if empty($listCommands)}
 		<p>There are 0 commands.</p>
@@ -9,8 +9,9 @@
 	<table>
 		<thead>
 			<tr>
-				<th colspan = "2">Command Identifier</th>
-				<th>Services</th>
+				<th>Command Identifier</th>
+				<th>Used by # Reporting Services</th>
+				<th>Used by # of Remote Config commands</th>
 			</tr>
 		</thead>
 
@@ -21,9 +22,11 @@
 					{if !empty($itemCommand.icon)}
 					<img src = "resources/images/serviceIcons/{$itemCommand.icon}" alt = "serviceIcon" class = "inlineIcon"/>
 					{/if}
+
+					<a href = "updateCommand.php?id={$itemCommand.id}">{$itemCommand.commandIdentifier}</a>
 				</td>
-				<td><a href = "updateCommand.php?id={$itemCommand.id}">{$itemCommand.commandIdentifier}</a></td>
 				<td>{$itemCommand.serviceCount}</td>
+				<td>{$itemCommand.remoteConfigCommandCount}</td>
 			</tr>	
 		{/foreach}
 		</tbody>

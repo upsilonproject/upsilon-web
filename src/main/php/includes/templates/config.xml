@@ -1,6 +1,22 @@
 <?xml version = "1.0"?>
 <config comment = "{$comment}, modified:{$mtime}">
+	<!-- services !-->
 {foreach from = $listServices item = itemService}
-	<service id = "{$itemService.identifier}" commandRef = "{$itemService.commandRef}" parent = "{$itemService.parent}" />
+	<service id = "{$itemService.name}" commandRef = "{$itemService.commandIdentifier}" parent = "{$itemService.parent}">
+	{foreach from = $itemService.arguments key = argumentKey item = argumentValue} 
+		<argument name = "{$argumentKey}">{$argumentValue}</argument>
+	{/foreach}
+	</service>
 {/foreach}
+
+	<!-- commands: used by services !-->
+{foreach from = $listCommandsUsed item = itemCommand}
+	<command id = "{$itemCommand.identifier}" exec = "{$itemCommand.command_line}" />
+{/foreach}
+
+	<!-- commands: not allocated !-->
+{foreach from = $listCommandsUnused item = itemCommand}
+	<command id = "{$itemCommand.identifier}" exec = "{$itemCommand.command_line}" />
+{/foreach}
+
 </config>

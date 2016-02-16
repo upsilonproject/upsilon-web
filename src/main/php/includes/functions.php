@@ -183,12 +183,18 @@ function getRelativeTimeSeconds($diff, $short = false) {
 }
 
 function getNodes() {
-	$sql = 'SELECT n.id, n.identifier, n.serviceType, n.lastUpdated, n.serviceCount, n.serviceType AS nodeType, n.instanceApplicationVersion FROM nodes n';
+	$sql = 'SELECT n.id, n.identifier, n.serviceType, n.lastUpdated, count(s.id) AS serviceCount, n.serviceType AS nodeType, n.instanceApplicationVersion FROM nodes n LEFT JOIN services s ON s.node = n.identifier GROUP BY n.id';
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->execute();
 
 	$nodes = $stmt->fetchAll();
 
+	$nodes = addStatusToNodes($nodes);
+
+	return $nodes;
+}
+
+function addStatusToNodes($nodes) {
 	foreach ($nodes as &$itemNode) {
 		$itemNode['lastUpdateRelative'] = getRelativeTime($itemNode['lastUpdated'], true);
 		$itemNode['karma'] = 'UNKNOWN';
@@ -204,7 +210,6 @@ function getNodes() {
 
 	return $nodes;
 }
-
 
 function isMobile() {
 	if (isset($_REQUEST['mobile'])) {
@@ -1244,7 +1249,7 @@ function getDashboards() {
 }
 
 function getCommands() {
-	$sql = 'SELECT c.id, c.commandIdentifier, c.icon, count(s.id) AS serviceCount FROM command_metadata c LEFT JOIN services s ON s.commandIdentifier = c.commandIdentifier GROUP BY c.id';
+	$sql = 'SELECT c.id, c.commandIdentifier, c.icon, count(s.id) AS serviceCount, count(ac.id) AS remoteConfigCommandCount FROM command_metadata c LEFT JOIN services s ON s.commandIdentifier = c.commandIdentifier LEFT JOIN remote_config_commands ac ON ac.metadata = c.id GROUP BY c.id';
 	$stmt = stmt($sql);
 	$stmt->execute();
 
@@ -1294,5 +1299,72 @@ function listMaintPeriods() {
 
 	return $listMaintPeriods;
 }
+
+if (!function_exists('array_column')) {
+	function array_column(array $arr, $valCol, $keyCol = null) {
+		$ret = array();
+
+		foreach ($arr as $val) {
+			if ($keyCol == null) {
+				$ret [] = $val[$valCol];
+			} else {
+				$ret[$val[$keyCol]] = $val[$valCol];
+			}
+		}
+
+		return $ret;
+	}
+}
+
+function getAllCommands() {
+	$sql = 'SELECT c.id, c.command_Line, c.identifier, c.command_line, count(s.id) AS instanceCount, c.metadata AS metadataId, m.commandIdentifier AS metadataIdentifier, m.icon FROM remote_config_commands c LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_services s ON s.command = c.id GROUP BY c.id';
+	$stmt = stmt($sql)->execute();
+
+	$commands = $stmt->fetchAll();
+
+	return $commands;
+}
+
+function getAllRemoteConfigServices() {
+	$sql = 'SELECT s.id, s.name, s.parent, c.id AS commandId, c.identifier AS commandIdentifier, count(a.id) AS instanceCount, m.icon FROM remote_config_services s LEFT JOIN remote_config_commands c ON s.command = c.id LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_allocated_services a ON a.service = s.id GROUP BY s.id';
+	$stmt = stmt($sql)->execute();
+
+	$services = $stmt->fetchAll();
+
+	return $services;
+}
+
+function deleteConfigServiceInstance($id) {
+	$sql = 'SELECT s.id, s.config FROM remote_config_allocated_services s WHERE s.id = :service LIMIT 1';
+	$stmt = db()->prepare($sql);
+	$stmt->bindValue(':service', $id);
+	$stmt->execute();
+
+	$service = $stmt->fetchRowNotNull();
+	$config = $service['config'];
+
+	$sql = 'DELETE FROM remote_config_allocated_services WHERE id = :service LIMIT 1';
+	$stmt = db()->prepare($sql);
+	$stmt->bindValue(':service', $id);
+	$stmt->execute();
+
+	return $config;
+}
+
+function getServiceArgumentValues($serviceId) {
+	$sql = 'SELECT a.name, v.value FROM remote_config_service_arg_values v LEFT JOIN remote_config_command_arguments a ON v.argument = a.id WHERE v.service = :serviceId';
+	$stmt = db()->prepare($sql);
+	$stmt->bindValue(':serviceId', $serviceId);
+	$stmt->execute();
+
+	$args = array();
+
+	foreach ($stmt->fetchAll() as $arg) {
+		$args[$arg['name']] = $arg['value'];
+	}
+
+	return $args;
+}
+
 
 ?>

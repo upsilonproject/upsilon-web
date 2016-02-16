@@ -5,22 +5,27 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire;
 
 class UpsilonMessage extends AMQPMessage {
+	private $headers = array();
 	public function __construct($type, $body = null) {
 		parent::__construct($body, array(
 			'reply_to' => 'upsilon-web-recv'
 		));
 
-		$headers = new Wire\AMQPTable(array(
-			'upsilon-msg-type' => 'REQ_NODE_SUMMARY'
-		));
-
-		$this->set('application_headers', $headers);
+		$this->headers['upsilon-msg-type'] = $type;
 	}
 
-	function publish() {
+	public function addHeader($key, $value) {
+		$this->headers[$key] = $value;
+	}
+
+	function publish($routingKey = 'upsilon.cmds') {
 		global $amqpChan;
 
-		$amqpChan->basic_publish($this, 'ex_upsilon', 'upsilon.cmds');
+		$headerTable = new Wire\AMQPTable($this->headers);
+
+		$this->set('application_headers', $headerTable);
+
+		$amqpChan->basic_publish($this, 'ex_upsilon', $routingKey);
 	}
 }
 

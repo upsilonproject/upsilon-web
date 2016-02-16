@@ -6,6 +6,7 @@
 			<th>Description</th>
 			<th><nobr>Last updated</nobr></th>
 			<th>Output</th>
+			<th>Remote config?</th>
 			<th>Karma</th>
 		</tr>
 	</thead>
@@ -18,6 +19,7 @@
 		</td>
 		<td>{$itemService.lastUpdated}</td>
 		<td><pre>{$itemService.output}</pre></td>
+		<td>{$itemService.remote_config_service_identifier} (<a href = "viewRemoteConfig.php?id={$itemService.remote_config}">{$itemService.remote_config}</a>)</td>
 		<td class = "{$itemService.karma|strtolower}">{$itemService.karma}</td>
 	</tr>
 {/foreach}

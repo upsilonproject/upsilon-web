@@ -1,10 +1,10 @@
 <div class = "box">
-	<h2>{'Users'|gt}</h2>
+	<h2>Users</h2>
 
 	<table>
 		<thead>
 		<tr>
-			<th>ID</th>
+			<th class = "small">ID</th>
 			<th>Username</th>
 		</tr>
 		</thead>

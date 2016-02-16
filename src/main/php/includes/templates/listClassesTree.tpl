@@ -2,7 +2,7 @@
 
 <thead>
 	<tr>
-		<th colspan = "2">Title</th>
+		<th>Title</th>
 		<th>Depth</th>
 	</tr>
 </thead>
@@ -12,10 +12,10 @@
 	<tr>
 		<td>
 			{if !empty($itemClass.icon)}
-			<img src = "resources/images/serviceIcons/{$itemClass.icon}" alt = "serviceIcon" style = "padding-top: 4px"/>
+			<img src = "resources/images/serviceIcons/{$itemClass.icon}" alt = "serviceIcon" class = "inlineIcon" />
 			{/if}
+			<a href = "listClasses.php?id={$itemClass.id}">{$itemClass.title}</a>
 		</td>
-		<td><a href = "listClasses.php?id={$itemClass.id}">{$itemClass.title}</a></td>
 		<td>{$itemClass.childrenCount}</td>
 	</tr>
 {/foreach}
