@@ -8,7 +8,7 @@ License:	GPLv2
 URL:		http://upsilon-project.co.uk
 Source0:	upsilon-web-%{buildid_tag}.zip
 
-Requires: httpd php php-pdo php-mysql php-mbstring mariadb-server
+Requires: httpd php php-pdo php-mysql php-mbstring php-bcmath mariadb-server
 
 %description
 Upsilon web

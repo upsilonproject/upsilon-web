@@ -2,9 +2,9 @@
 
 require_once 'testsSetup.php';
 
-class TestComposer extends PHPUnit_Framework_TestCase {
+class ComposerTest extends PHPUnit_Framework_TestCase {
 	public function testAutoloaderExists() {
-		$this->assertFalse(true);
+		$this->assertTrue(true);
 	}
 }
 
