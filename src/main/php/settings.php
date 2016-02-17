@@ -16,6 +16,8 @@ use \libAllure\Session;
 use \libAllure\AuthBackend;
 
 class UserSettings extends Form {
+	private $simpleSettings = array();
+
         public function __construct() {
                 parent::__construct('userSettings', 'Settings');
 
@@ -35,9 +37,22 @@ class UserSettings extends Form {
                 $this->addElement(new ElementInput('amqpPort', 'AMQP Port', getSiteSetting('amqpPort', 5672)));
                 $this->addElement(new ElementInput('amqpUser', 'AMQP User', getSiteSetting('amqpUser', 'guest')));
                 $this->addElement(new ElementInput('amqpPass', 'AMQP Pass', getSiteSetting('amqpPass', 'guest')));
+                
+		$this->addSection('Other');
+
+		$this->simpleSettings[] = array('configSourceIdentifier', 'Config Source Identifier', 'upsilon-web');
+		$this->addSimpleSettings();
 
                 $this->addDefaultButtons();
         }
+
+	private function addSimpleSettings() {
+		foreach ($this->simpleSettings as $setting) {
+			list($key, $label, $def) = $setting;
+
+			$this->addElement(new ElementInput($key, $label, getSiteSetting($key, $def)));
+		}
+	}
 
         public function process() {
                 setSiteSetting('warnNotUsingHttps', $this->getElementValue('warnNotUsingHttps'));
@@ -46,6 +61,12 @@ class UserSettings extends Form {
                 setSiteSetting('amqpPort', $this->getElementValue('amqpPort'));
                 setSiteSetting('amqpUser', $this->getElementValue('amqpUser'));
                 setSiteSetting('amqpPass', $this->getElementValue('amqpPass'));
+
+		foreach ($this->simpleSettings as $setting) {
+			list($key, $label, $def) = $setting;
+
+			setSiteSetting($key, $this->getElementValue($key));
+		}
         }
 }
 

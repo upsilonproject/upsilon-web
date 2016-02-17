@@ -45,4 +45,5 @@
 
 {if $isNighttime && $drawBigClock}<p style = "margin: 0; font-size:9em; font-weight: bold; background-color: white; color: black;">{$datetime}</p>{/if}
 <div id = "content">
+
 	

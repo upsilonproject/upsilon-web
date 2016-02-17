@@ -277,6 +277,14 @@ function setupEnhancedSelectBoxes() {
 function setupSortableTables() {
 	return;
 
+	require([
+		"dojo/query"
+	], function(query) {
+		query("table.dataTable").each(function(tbl) {
+			console.log("tbl", tbl);
+		});
+	});
+
 	$('table.dataTable').dataTable({
 		'sDom': 'flpitpil',
 		'aaSorting': [[ 1, 'desc ']],
@@ -447,3 +455,17 @@ function updateMetricList(ref) {
 	request("json/getServices", null, renderServiceList, ref, 1000);
 }
 
+function moveSelectOption(listOrigin, listDestination) {
+	require([
+		"dojo/dom"
+	], function(dom) {
+		var elListOrigin = dom.byId(listOrigin);
+		var elListDestination = dom.byId(listDestination);
+
+		if (elListOrigin.selectedIndex > -1) {
+			var selectedItem = elListOrigin.item(elListOrigin.selectedIndex);
+
+			elListDestination.add(selectedItem);
+		}	
+	});
+}

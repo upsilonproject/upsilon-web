@@ -12,14 +12,14 @@ class FormCreateRemoteConfig extends Form {
 	public function __construct() {
 		parent::__construct('formCreateRemoteConfig', 'Create remote config');
 
-		$this->addElement(new ElementInput('identifier', 'Identifier'));
+		$this->addElement(new ElementInput('name', 'Name'));
 		$this->addDefaultButtons();
 	}
 
 	public function process() {
-		$sql = 'INSERT INTO remote_configs (identifier) VALUES (:identifier)';
+		$sql = 'INSERT INTO remote_configs (name) VALUES (:name)';
 		$stmt = DatabaseFactory::getInstance()->prepare($sql);
-		$stmt->bindValue(':identifier', $this->getElementValue('identifier'));
+		$stmt->bindValue(':name', $this->getElementValue('name'));
 		$stmt->execute();
 	}
 }

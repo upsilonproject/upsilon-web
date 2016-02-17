@@ -1,7 +1,7 @@
 {if not empty($sub)}
 <div data-dojo-type = "dijit/DropDownMenu">
 {else}
-<div data-dojo-type = "dijit/MenuBar">
+<div data-dojo-type = "dijit/MenuBar" data-dojo-props = "passivePopupDelay: 1, popupDelay: 1">
 {/if}
 	{if not isset($skipTitle)}
 		<div data-dojo-type = "dijit/MenuItem">

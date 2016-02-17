@@ -47,15 +47,15 @@ if (Session::isLoggedIn()) {
 	$generalLinks = linksCollection();
 
 	global $links, $title;
-	$generalLinks->add('#', 'Actions');
+	$generalLinks->add('#', 'Actions &blacktriangledown;');
 
 	if (isset($links)) {
-		$generalLinks->addChildCollection('Actions', $links);
+		$generalLinks->addChildCollection('Actions &blacktriangledown;', $links);
 	} else {
 		$generalLinks->setEnabled(0, false);
 	}
 
-	$generalLinks->add('listDashboards.php', 'Dashboards');
+	$generalLinks->add('listDashboards.php', 'Dashboards &blacktriangledown;');
 
 	$dashboardLinks = linksCollection();
 	$listDashboards = getDashboards();
@@ -70,13 +70,13 @@ if (Session::isLoggedIn()) {
 
 	$dashboardLinks->add('listDashboards.php', 'All Dashboards');
 
-	$generalLinks->addChildCollection('Dashboards', $dashboardLinks);
+	$generalLinks->addChildCollection('Dashboards &blacktriangledown;', $dashboardLinks);
 	
-	$generalLinks->add('#', 'Services');
+	$generalLinks->add('#', 'Services &blacktriangledown;');
 
 	$generalLinksServices = linksCollection();
 	$generalLinksServices->add('viewServiceHud.php', 'Service HUD');
-	$generalLinksServices->add('listCommands.php', 'Commands');
+	$generalLinksServices->add('listCommands.php', 'Command Metadata');
 	$generalLinksServices->add('listGroups.php', 'Groups');
 	$generalLinksServices->add('#', 'List');
 
@@ -85,13 +85,17 @@ if (Session::isLoggedIn()) {
 	$generalLinksServicesList->add('viewList.php?problems', 'Services With Problems');
 	$generalLinksServicesList->add('viewList.php?ungrouped', 'Services Without Group');
 	$generalLinksServices->addChildCollection('List', $generalLinksServicesList);
-	
 	$generalLinksServices->add('listMaintPeriods.php', 'Maintenance Periods');
+	$generalLinksServices->addSeparator();
+	$generalLinksServices->add('listClasses.php', 'Classes');
 
-	$generalLinks->addChildCollection('Services', $generalLinksServices);
+	$generalLinks->addChildCollection('Services &blacktriangledown;', $generalLinksServices);
 
-	$generalLinks->add('listClasses.php', 'Classes');
-	$generalLinks->add('listNodes.php', 'Nodes');
+	$generalLinks->add('#', 'Nodes &blacktriangledown;');
+	$generalLinksNodes = linksCollection();
+	$generalLinksNodes->add('listNodes.php', 'List');
+	$generalLinksNodes->add('listRemoteConfigurations.php', 'Configurations');
+	$generalLinks->addChildCollection('Nodes &blacktriangledown;', $generalLinksNodes);
 
 	if (Session::getUser()->getData('experimentalFeatures')) {
 		$experimentalLinks = linksCollection();
@@ -115,13 +119,12 @@ if (Session::isLoggedIn()) {
 	$systemLinks->addSeparator();
 	$systemLinks->add('logout.php', 'Logout');
 
-	$generalLinks->add('#', 'System');
-	$generalLinks->addChildCollection('System', $systemLinks);
+	$generalLinks->add('#', 'System &blacktriangledown;');
+	$generalLinks->addChildCollection('System &blacktriangledown;', $systemLinks);
 }
 
 $tpl->assign('generalLinks', $generalLinks);
 
 $tpl->display('header.tpl');
-
 
 ?>

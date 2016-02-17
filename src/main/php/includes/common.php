@@ -32,7 +32,7 @@ require_once 'libAllure/Template.php';
 
 use \libAllure\Template;
 
-$tpl = new Template('upsilonGui');
+$tpl = new Template('upsilonWeb');
 
 use \libAllure\Database;
 use \libAllure\DatabaseFactory;

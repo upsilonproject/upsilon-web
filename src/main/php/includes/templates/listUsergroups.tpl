@@ -14,7 +14,7 @@
 			<tbody>
 			{foreach from = $listUsergroups item = itemUsergroup}
 			<tr>
-				<td><a href = "viewUsergroup.php?id={$itemUsergroup.id}">{$itemUsergroup.id}</a></td>
+				<td class = "small"><a href = "viewUsergroup.php?id={$itemUsergroup.id}">{$itemUsergroup.id}</a></td>
 				<td><a href = "viewUsergroup.php?id={$itemUsergroup.id}">{$itemUsergroup.title}</a></td>
 			</tr>
 			{/foreach}
