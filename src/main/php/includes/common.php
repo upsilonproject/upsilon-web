@@ -8,37 +8,25 @@ bindtextdomain('messages', 'includes/locale/nocache');
 bindtextdomain('messages', 'includes/locale/');
 textdomain('messages');
 
-set_include_path(dirname(__FILE__) . '/libraries/' . PATH_SEPARATOR . get_include_path());
+function addIncludePath($path) {
+	set_include_path($path . PATH_SEPARATOR . get_include_path());
+}
+
+add_include_path(dirname(__FILE__) . '/libraries/');
+add_include_path(dirname(__FILE__) . '/libraries/jwread/lib-allure/src/main/php/');
 
 require_once 'includes/functions.php';
-
 require_once 'includes/libraries/autoload.php';
 
-require_once 'libAllure/ErrorHandler.php';
-require_once 'libAllure/Session.php';
-require_once 'libAllure/AuthBackendDatabase.php';
-require_once 'libAllure/FormHandler.php';
-require_once 'libAllure/HtmlLinksCollection.php';
+\libAllure\ErrorHandler::getInstance()->beGreedy();
 
-use \libAllure\ErrorHandler;
-use \libAllure\Session;
-use \libAllure\AuthBackend;
-use \libAllure\AuthBackendDatabase;
-
-ErrorHandler::getInstance()->beGreedy();
-
-require_once 'libAllure/Database.php';
-require_once 'libAllure/Template.php';
-
-use \libAllure\Template;
-
-$tpl = new Template('upsilonWeb');
-
-use \libAllure\Database;
-use \libAllure\DatabaseFactory;
+$tpl = new \libAllure\Template('upsilonWeb');
 
 if ((@include 'includes/config.php') !== false) {
 	require_once 'includes/config.php';
+
+	use \libAllure\AuthBackend;
+	use \libAllure\AuthBackendDatabase;
 
 	$db = connectDatabase();
 
@@ -46,6 +34,7 @@ if ((@include 'includes/config.php') !== false) {
 	$backend->setSalt(null, CFG_PASSWORD_SALT);
 	$backend->registerAsDefault();
 
+	use \libAllure\Session;
 	Session::setCookieLifetimeInSeconds(31104000);
 	Session::start();
 
