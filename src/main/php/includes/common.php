@@ -8,7 +8,7 @@ bindtextdomain('messages', 'includes/locale/nocache');
 bindtextdomain('messages', 'includes/locale/');
 textdomain('messages');
 
-function addIncludePath($path) {
+function add_include_path($path) {
 	set_include_path($path . PATH_SEPARATOR . get_include_path());
 }
 
@@ -22,19 +22,19 @@ require_once 'includes/libraries/autoload.php';
 
 $tpl = new \libAllure\Template('upsilonWeb');
 
+use \libAllure\AuthBackend;
+use \libAllure\AuthBackendDatabase;
+use \libAllure\Session;
+
 if ((@include 'includes/config.php') !== false) {
 	require_once 'includes/config.php';
-
-	use \libAllure\AuthBackend;
-	use \libAllure\AuthBackendDatabase;
-
+		
 	$db = connectDatabase();
 
 	$backend = new AuthBackendDatabase();
 	$backend->setSalt(null, CFG_PASSWORD_SALT);
 	$backend->registerAsDefault();
 
-	use \libAllure\Session;
 	Session::setCookieLifetimeInSeconds(31104000);
 	Session::start();
 
