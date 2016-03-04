@@ -1,8 +1,8 @@
--- MySQL dump 10.14  Distrib 5.5.31-MariaDB, for Linux (x86_64)
+-- MySQL dump 10.14  Distrib 5.5.41-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: upsilon
 -- ------------------------------------------------------
--- Server version	5.5.31-MariaDB-log
+-- Server version	5.5.41-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -27,7 +27,7 @@ CREATE TABLE `acceptable_downtime_sla` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,7 +47,7 @@ CREATE TABLE `apiClients` (
   `drawBigClock` tinyint(4) NOT NULL,
   `redirect` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -62,7 +62,7 @@ CREATE TABLE `class_instance_parents` (
   `instance` int(11) DEFAULT NULL,
   `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -76,7 +76,7 @@ CREATE TABLE `class_instances` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -92,7 +92,7 @@ CREATE TABLE `class_service_assignments` (
   `service` varchar(128) DEFAULT NULL,
   `requirement` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -107,7 +107,7 @@ CREATE TABLE `class_service_requirements` (
   `title` varchar(32) DEFAULT NULL,
   `class` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -124,7 +124,7 @@ CREATE TABLE `classes` (
   `r` int(11) DEFAULT NULL,
   `icon` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -138,8 +138,9 @@ CREATE TABLE `command_metadata` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `commandIdentifier` varchar(255) DEFAULT NULL,
   `icon` varchar(255) DEFAULT NULL,
+  `executable` longtext,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -154,7 +155,7 @@ CREATE TABLE `dashboard` (
   `title` varchar(32) DEFAULT NULL,
   `servicesGrouped` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -171,7 +172,7 @@ CREATE TABLE `group_memberships` (
   `service` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `group` (`group`,`service`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -190,7 +191,7 @@ CREATE TABLE `groups` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`title`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -204,12 +205,13 @@ CREATE TABLE `nodes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `serviceType` varchar(32) DEFAULT NULL,
   `identifier` varchar(128) NOT NULL,
+  `alias` varchar(128) DEFAULT NULL,
   `serviceCount` int(11) DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
   `instanceApplicationVersion` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `identifier` (`identifier`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -224,7 +226,7 @@ CREATE TABLE `peers` (
   `child` int(11) NOT NULL,
   `parent` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -239,7 +241,7 @@ CREATE TABLE `permissions` (
   `key` varchar(32) DEFAULT NULL,
   `description` longtext,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -269,6 +271,100 @@ CREATE TABLE `privileges_u` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `remote_config_allocated_commands`
+--
+
+DROP TABLE IF EXISTS `remote_config_allocated_commands`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `remote_config_allocated_commands` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `command` int(11) NOT NULL,
+  `config` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `remote_config_allocated_nodes`
+--
+
+DROP TABLE IF EXISTS `remote_config_allocated_nodes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `remote_config_allocated_nodes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `config` int(11) NOT NULL,
+  `node` varchar(128) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `remote_config_allocated_services`
+--
+
+DROP TABLE IF EXISTS `remote_config_allocated_services`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `remote_config_allocated_services` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `service` int(11) NOT NULL,
+  `config` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `remote_config_command_arguments`
+--
+
+DROP TABLE IF EXISTS `remote_config_command_arguments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `remote_config_command_arguments` (
+  `command` int(11) NOT NULL,
+  `name` varchar(128) DEFAULT NULL,
+  `datatype` varchar(32) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `remote_config_commands`
+--
+
+DROP TABLE IF EXISTS `remote_config_commands`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `remote_config_commands` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `identifier` varchar(128) DEFAULT NULL,
+  `command_line` varchar(128) DEFAULT NULL,
+  `metadata` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `remote_config_service_arg_values`
+--
+
+DROP TABLE IF EXISTS `remote_config_service_arg_values`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `remote_config_service_arg_values` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `service` int(11) DEFAULT NULL,
+  `argument` int(11) NOT NULL,
+  `value` varchar(512) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `service` (`service`,`argument`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `remote_config_services`
 --
 
@@ -277,13 +373,12 @@ DROP TABLE IF EXISTS `remote_config_services`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `remote_config_services` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `identifier` varchar(128) DEFAULT NULL,
-  `config` int(11) DEFAULT NULL,
+  `name` varchar(128) NOT NULL,
   `parent` varchar(128) DEFAULT NULL,
-  `commandRef` varchar(128) DEFAULT NULL,
+  `command` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `identifier` (`identifier`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+  UNIQUE KEY `identifier` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -295,10 +390,10 @@ DROP TABLE IF EXISTS `remote_configs`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `remote_configs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `identifier` varchar(32) DEFAULT NULL,
+  `name` varchar(128) DEFAULT NULL,
   `mtime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -313,7 +408,7 @@ CREATE TABLE `rooms` (
   `filename` varchar(128) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -332,7 +427,7 @@ CREATE TABLE `service_check_results` (
   PRIMARY KEY (`id`),
   KEY `ix_service` (`service`),
   KEY `checked` (`checked`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -348,7 +443,7 @@ CREATE TABLE `service_group_memberships` (
   `service` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `group` (`group`,`service`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -367,7 +462,7 @@ CREATE TABLE `service_groups` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`title`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -396,7 +491,7 @@ CREATE TABLE `service_metadata` (
   `acceptableDowntimeSla` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `service` (`service`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -424,7 +519,7 @@ CREATE TABLE `services` (
   `commandIdentifier` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `identifier` (`identifier`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -514,7 +609,7 @@ CREATE TABLE `users` (
   `enableDebug` tinyint(4) DEFAULT '0',
   `experimentalFeatures` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -531,7 +626,7 @@ CREATE TABLE `widget_instance_arguments` (
   `instance` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `instance` (`instance`,`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -547,7 +642,7 @@ CREATE TABLE `widget_instances` (
   `dashboard` int(11) DEFAULT NULL,
   `options` longtext,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -561,7 +656,7 @@ CREATE TABLE `widgets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `class` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -573,4 +668,4 @@ CREATE TABLE `widgets` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-02 14:06:31
+-- Dump completed on 2016-03-04 16:41:00
