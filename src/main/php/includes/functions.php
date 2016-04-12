@@ -1409,4 +1409,12 @@ function allocateNodeToConfig($node, $config) {
 	$stmt->execute();	
 }
 
+function isUpgradeNeeded() {
+	require_once 'includes/classes/Upgrader.php';
+
+	$upgrader = new Upgrader();
+
+	return $upgrader->isUpgradeNeeded();
+}
+
 ?>

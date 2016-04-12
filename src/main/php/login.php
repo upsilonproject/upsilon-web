@@ -7,6 +7,10 @@ require_once 'libAllure/util/FormLogin.php';
 use \libAllure\util\FormLogin;
 use \libAllure\ElementCheckbox;
 
+if (isUpgradeNeeded() && !defined('UPGRADE_IN_PROGRESS')) {
+	redirect('upgrade.php', 'An upgrade is needed.');
+}
+
 handleApiLogin();
 
 $f = new FormLogin();

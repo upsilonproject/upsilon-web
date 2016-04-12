@@ -33,8 +33,8 @@ if (isset($title)) {
 $tpl->assign('loggedIn', Session::isLoggedIn());
 
 $tpl->assign('crypto', isUsingSsl());
-$tpl->assign('drawHeader', isset($_SESSION['drawHeader']) ? $_SESSION['drawHeader'] : true);
-$tpl->assign('drawNavigation', isset($_SESSION['drawNavigation']) ? $_SESSION['drawNavigation'] : true);
+$tpl->assign('drawHeader', defined('DRAW_HEADER') ? DRAW_HEADER : true);
+$tpl->assign('drawNavigation', defined('DRAW_NAVIGATION') ? DRAW_NAVIGATION : true);
 $tpl->assign('drawBigClock', isset($_SESSION['drawBigClock']) ? $_SESSION['drawBigClock'] : false);
 $tpl->assign('datetime', date('D H:i'));
 $tpl->assign('apiClient', isset($_SESSION['apiClient']) ? $_SESSION['apiClient'] : false);

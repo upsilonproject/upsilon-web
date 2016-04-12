@@ -28,7 +28,7 @@ use \libAllure\Session;
 
 if ((@include 'includes/config.php') !== false) {
 	require_once 'includes/config.php';
-		
+
 	$db = connectDatabase();
 
 	$backend = new AuthBackendDatabase();
@@ -37,7 +37,7 @@ if ((@include 'includes/config.php') !== false) {
 
 	Session::setCookieLifetimeInSeconds(31104000);
 	Session::start();
-
+		
 	if (!defined('ANONYMOUS_PAGE') && !Session::isLoggedIn()) {
 		if (isApiPage()) {
 			denyApiAccess();

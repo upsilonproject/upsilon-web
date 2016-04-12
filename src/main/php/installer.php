@@ -2,6 +2,8 @@
 
 define('ANONYMOUS_PAGE', true);
 define('INSTALLATION_IN_PROGRESS', true);
+define('DRAW_NAVIGATION', false);
+
 $title = 'Installer';
 
 require_once 'includes/widgets/header.php';
