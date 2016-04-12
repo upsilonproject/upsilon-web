@@ -211,20 +211,6 @@ function addStatusToNodes($nodes) {
 	return $nodes;
 }
 
-function isMobile() {
-	if (isset($_REQUEST['mobile'])) {
-		return true;
-	}
-
-	$ua = $_SERVER['HTTP_USER_AGENT'];
-
-	if (strpos($ua, 'HTC') || strpos($ua, 'Android')) {
-		return true;
-	}
-
-	return false;
-}
-
 function isJsonSubResultsValid($results) {
 	foreach ($results as $result) {
 		if (!is_array($result)) {
@@ -410,11 +396,19 @@ function getServicesBad() {
 	return $problemServices;
 }
 
-function getServices($groupId) {
-	$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.description, s.commandLine, s.output, s.karma, s.secondsRemaining, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id WHERE g.id = :groupId ORDER BY s.identifier';
-	$stmt = DatabaseFactory::getInstance()->prepare($sqlSubservices);
-	$stmt->bindValue(':groupId', $groupId);
-	$stmt->execute();
+function getServices($groupId = null) {
+	if ($groupId == null) {
+		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.description, s.commandLine, s.output, s.karma, s.secondsRemaining, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id ORDER BY s.identifier';
+		$stmt = DatabaseFactory::getInstance()->prepare($sqlSubservices);
+		$stmt->execute();
+
+	} else {
+		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.description, s.commandLine, s.output, s.karma, s.secondsRemaining, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id WHERE g.id = :groupId ORDER BY s.identifier';
+		$stmt = DatabaseFactory::getInstance()->prepare($sqlSubservices);
+		$stmt->bindValue(':groupId', $groupId);
+		$stmt->execute();
+
+	}
 
 	$listServices = $stmt->fetchAll();
 	$listServices = enrichServices($listServices);
@@ -475,7 +469,7 @@ function enrichGroups($listGroups, $subGroupDepth = 1) {
 				$itemGroup['listSubgroups'] = array();
 
 				foreach ($stmt->fetchAll() as $itemSubgroup) {
-					$itemSubgroup['listServices'] = getServices($itemSubgroup['title']);
+					$itemSubgroup['listServices'] = getServices($itemSubgroup['id']);
 
 					$itemGroup['listSubgroups'][] = $itemSubgroup;
 				}
@@ -552,6 +546,17 @@ function redirectApiClients() {
 					redirect($_SERVER['REQUEST_URI'], 'API login complete.');
 			}
 	}
+}
+
+function getServiceByIdentifier($identifier) {
+	$sql = 'SELECT s.id FROM services s WHERE s.identifier = :identifier';
+	$stmt = DatabaseFactory::getInstance()->prepare($sql);
+	$stmt->bindValue(':identifier', $identifier);
+	$stmt->execute();
+
+	$result = $stmt->fetchRowNotNull();
+
+	return getServiceById($result['id']);
 }
 
 function getServiceById($id, $parseOutput = false) {
@@ -719,6 +724,8 @@ function validateAcceptableDowntime($el) {
 }
 
 function deleteServiceByIdentifier($identifier) {
+	$service = getServiceByIdentifier($identifier);
+
 	$sql = 'DELETE FROM services WHERE identifier = :identifier';
 	$stmt = stmt($sql);
 	$stmt->bindValue(':identifier', $identifier);
@@ -733,6 +740,8 @@ function deleteServiceByIdentifier($identifier) {
 	$stmt = stmt($sql);
 	$stmt->bindValue(':serviceIdentifier', $identifier);
 	$stmt->execute();
+
+	return $service;
 }
 
 
@@ -1366,5 +1375,38 @@ function getServiceArgumentValues($serviceId) {
 	return $args;
 }
 
+function getServiceResults($serviceIdentifier) {
+	$sql = 'SELECT r.id, r.output, r.checked, r.karma, r.checked AS lastUpdated FROM service_check_results r WHERE r.service = :serviceIdentifier ORDER BY r.checked DESC LIMIT 10';
+	$stmt = DatabaseFactory::getInstance()->prepare($sql);
+	$stmt->bindValue(':serviceIdentifier', $serviceIdentifier);
+	$stmt->execute();
+
+	$listResults = $stmt->fetchAll();
+
+	if (!empty($listResults)) {
+		$k = sizeof($listResults) - 1;
+		$lastDate = strtotime($listResults[$k]['checked']);
+
+		for($i = 0; $i < sizeof($listResults); $i++) {
+			$currentDate = strtotime($listResults[$k]['checked']);
+			$listResults[$k--]['relative'] = getRelativeTimeSeconds($currentDate - $lastDate, true);
+			$lastDate = $currentDate;
+		}
+	}
+
+	foreach ($listResults as $result) {
+		invalidateOldServices($result);
+	}
+
+	return $listResults;
+}
+
+function allocateNodeToConfig($node, $config) {
+	$sql = 'INSERT INTO remote_config_allocated_nodes (node, config) VALUES (:node, :config)';
+	$stmt = db()->prepare($sql);
+	$stmt->bindValue(':node', $node);
+	$stmt->bindValue(':config', $config);
+	$stmt->execute();	
+}
 
 ?>

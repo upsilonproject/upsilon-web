@@ -11,7 +11,7 @@
 				<li>
 					<div class = "metricIndicatorContainer">
 					<span class = "metricIndicator {$itemService.karma|strtolower}">
-						{if !$mobile && !empty($itemService.icon)} 
+						{if !empty($itemService.icon)} 
 							<img src = "resources/images/serviceIcons/{$itemService.icon}" alt = "serviceIcon" style = "padding-top: 4px" /><br />
 						{/if}
 						{$itemService.lastChangedRelative}
@@ -24,7 +24,7 @@
 					</div>
 
 					<div class = "metricText">
-					{if isset($itemService.isOverdue) && !$mobile}
+					{if isset($itemService.isOverdue)}
 						{if $itemService.isOverdue}
 							<span class = "metricDetail"><em>overdue by {$itemService.estimatedNextCheckRelative}</em></span>
 						{else}
@@ -35,11 +35,11 @@
 					{if $drawNavigation}<a href = "viewService.php?id={$itemService.id}">{/if}
 						<span class = "metricTitle" title = "{$itemService.description}">{if empty($itemService.alias)}{$itemService.description|default:'nodesc'|truncate:18}{else}{$itemService.alias}{/if}{if empty($itemService.alias) && isset($itemService.executableShort)}cmd:{$itemService.executableShort|default:'nocmd'|truncate:16}{/if}</span>
 					{if $drawNavigation}</a>{/if}
-					{if not empty($itemService.output) && !$mobile}
+					{if not empty($itemService.output)}
 					<p class = "metricOutput"><small>{$itemService.output|truncate:32}</small></p>
 					{/if}
 
-					{if !$mobile && isset($itemService.listActions) && $itemService.listActions|@count > 0}
+					{if isset($itemService.listActions) && $itemService.listActions|@count > 0}
 						<small>
 						{foreach from = $itemService.listActions item = itemAction}
 							<a href = "{$itemAction->url}">{$itemAction->title}</a> 
@@ -47,7 +47,7 @@
 						</small>
 					{/if}
 
-					{if !$mobile && isset($itemService.listSubresults) && $itemService.listSubresults|@count > 0}
+					{if isset($itemService.listSubresults) && $itemService.listSubresults|@count > 0}
 					<ul class = "subresults">
 						{foreach from = $itemService.listSubresults item = itemSubresult}
 							<li><span class = "metricIndicator {$itemSubresult.karma|strtolower}">&nbsp;</span><span class = "metricTitle">{$itemSubresult.name|default:'ERR: Name not provided in subresult.'}</span></li>

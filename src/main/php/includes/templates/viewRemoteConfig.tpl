@@ -7,6 +7,7 @@
 
 <div class = "box">
 	<h2>Allocated Nodes</h2>
+	<p><a href = "createRemoteConfigNodeAllocation.php?id={$remoteConfig.id}">Allocate Node</a></p>
 	<table>
 		<thead>
 			<tr>
@@ -24,7 +25,7 @@
 				<td><a href = "viewNode.php?id={$node.nodeId}">{$node.identifier}</a></td>
 				<td>{$node.lastUpdated}</td>
 				<td>
-					<a href = "deleteRemoteConfigAllocatedNode.php?id={$node.id}">Delete</a>
+					<a href = "deleteRemoteConfigAllocatedNode.php?id={$node.id}">Unallocate</a>
 					<a href = "amqpSendRemoteConfig.php?node={$node.identifier}">Send</a>
 				</td>
 				<td class = "{$node.karma|strtolower} small">{$node.karma}</td>
@@ -36,8 +37,10 @@
 
 <div class = "box">	
 	<h2>Allocated Services</h2>
-	<p><a href = "createRemoteConfigServiceInstance.php?id={$remoteConfig.id}">Allocate Service</a></p>
-	<p><a href = "createRemoteConfigService.php?id={$remoteConfig.id}">Create Service</a></p>
+	<p>
+		<a href = "createRemoteConfigServiceInstance.php?id={$remoteConfig.id}">Allocate existing service</a> | 
+		<a href = "createRemoteConfigService.php?id={$remoteConfig.id}&config={$remoteConfig.id}">Create &amp; allocate service</a>
+	</p>
 	<table>
 		<thead>
 			<tr>
@@ -56,7 +59,7 @@
 					<img src = "resources/images/serviceIcons/{$service.icon}" alt = "serviceIcon" class = "inlineIcon"/>
 					{/if}
 
-					<a href = "updateRemoteConfigurationServiceInstance.php?id={$service.id}">{$service.name}</a>
+					<a href = "updateRemoteConfigurationService.php?id={$service.serviceId}">{$service.name}</a>
 				</td>
 				<td>
 					Service: 
@@ -77,6 +80,7 @@
 
 <div class = "box">
 	<h2>Manually Allocated Commands</h2>
+	<p>The config generator will automatically allocate used commands from allocated services. If you want to configure some services locally, you can manually allocate remote commands here.</p>
 	<p><a href = "createRemoteConfigCommandInstance.php?id={$remoteConfig.id}">Allocate Command</a></p>
 	<table>
 		<thead>
@@ -100,6 +104,7 @@
 				</td>
 				<td>
 					<a href = "updateRemoteConfigurationCommandInstance.php?id={$command.id}">Update</a>
+					<a href = "deleteRemoteConfigurationCommandInstance.php?id={$command.id}">Delete</a>
 				</td>
 			</tr>
 			{/foreach}

@@ -13,7 +13,7 @@ $stmt = DatabaseFactory::getInstance()->prepare($sql);
 $stmt->bindValue(':id', $id);
 $stmt->execute();
 
-redirect('listNodes.php', 'Remote config deleted.')
+redirect('listRemoteConfigurations.php', 'Remote config deleted.')
 
 
 ?>

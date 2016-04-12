@@ -9,7 +9,6 @@ class WidgetServicesFromGroup extends Widget {
 	public function __construct() {
 		$this->arguments['title'] = null;
 		$this->arguments['group'] = null;
-
 	}
 
 	public function init() {

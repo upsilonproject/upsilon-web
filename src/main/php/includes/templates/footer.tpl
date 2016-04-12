@@ -29,6 +29,8 @@ setupEnhancedSelectBoxes();
 require(["dojo/parser", "dojo/query"], function(parser, query) {
 	parser.parse();	
 	query(".navigationMenuItems").style('display', 'block');
+
+	query('.date').forEach(makeDateHumanReadable);
 });
 {/literal}
 </script>

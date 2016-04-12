@@ -34,8 +34,13 @@ function getConfigServices($config) {
 	return $services;
 }
 
-function getConfigCommandsUsedByServices() {
-	return array();
+function getConfigCommandsUsedByServices($configId) {
+	$sql = 'SELECT DISTINCT rcc.identifier, rcc.command_line FROM remote_configs rc LEFT JOIN remote_config_allocated_services als ON als.config = rc.id LEFT JOIN remote_config_services rcs ON als.service = rcs.id LEFT JOIN remote_config_commands rcc ON rcs.command = rcc.id WHERE rc.id = :configId';
+	$stmt = stmt($sql);
+	$stmt->bindValue(':configId', $configId);
+	$stmt->execute();
+
+	return $stmt->fetchAll();
 }
 
 function getConfigCommands($config) {
@@ -136,6 +141,23 @@ function getNodesUsingRemoteService($serviceId) {
 	$stmt->execute();
 
 	return $stmt->fetchAll();
+}
+
+function deleteRemoteConfigurationCommandInstance($commandInstanceId) {
+	$sql = 'SELECT alc.config FROM remote_config_allocated_commands alc WHERE alc.id = :commandInstance';
+	$stmt = stmt($sql);
+	$stmt->bindValue(':commandInstance', $commandInstanceId);
+	$stmt->execute();
+
+	$config = $stmt->fetchRowNotNull();
+	$config = $config['config'];
+
+	$sql = 'DELETE FROM remote_config_allocated_commands WHERE id = :commandInstance';
+	$stmt = stmt($sql);
+	$stmt->bindValue(':commandInstance', $commandInstanceId);
+	$stmt->execute();
+
+	return $config;
 }
 
 ?>

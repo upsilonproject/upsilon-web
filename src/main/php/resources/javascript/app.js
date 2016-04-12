@@ -101,8 +101,9 @@ function newGrid(configuration) {
 		"gridx/modules/extendedSelect/Row",
 		"gridx/modules/RowHeader",
 		"gridx/modules/IndirectSelect",
-		"dijit/form/Button"
-	], function (Grid, MemoryStore, Cache, scroller, resizer, filter, filterBar, bar, nestedSort, mfQuickFilter, summary, QuickFilter, extendedSelectRow, rowHeader, IndirectSelect, Button) {
+		"dijit/form/Button",
+	     	"dijit/registry"
+	], function (Grid, MemoryStore, Cache, scroller, resizer, filter, filterBar, bar, nestedSort, mfQuickFilter, summary, QuickFilter, extendedSelectRow, rowHeader, IndirectSelect, Button, registry) {
 		gridConfiguration = {
 			columnWidthAutoResize: true,
 			id: configuration.id,
@@ -111,7 +112,6 @@ function newGrid(configuration) {
 			structure: configuration.structure,
 			barTop: [ 
 				summary, 
-				{pluginClass: createButton, title: "All", filterFunc: filterReset},
 				{pluginClass: QuickFilter, style: 'text-align: right'}, 
 			],
 			modules: [
@@ -119,16 +119,22 @@ function newGrid(configuration) {
 			]	
 		};
 
-		if (typeof(configuration.filters) != "undefined") {
-			configuration.filters.forEach(function(e, i) {
-				gridConfiguration.barTop.splice(2, 0, {
-					pluginClass: createButton, title: e.title, onClick: function(fff) { 
-						console.log(fff)
-						config.grid.filter.setFilter(e.filterFunc);
-					}
-				});
-			})
-		}
+		if (typeof(configuration.filters) == "undefined") {
+			configuration.filters = [];
+		} 
+
+		configuration.filters.unshift({title: "All", filterFunc: filterReset});
+			
+		configuration.filters.forEach(function(e, i) {
+			gridConfiguration.barTop.splice(1, 0, {
+				pluginClass: createButton, title: e.title, onClick: function(fff) { 
+					grid = registry.byId(configuration.id)
+console.log("ff: ", e.filterFunc);
+					grid.filter.setFilter(e.filterFunc);
+				}
+			});
+		})
+		
 
 		if (typeof(configuration.buttons) != "undefined") {
 			configuration.buttons.forEach(function(e, i) {
@@ -222,9 +228,16 @@ function filterCommandsNone() {
 	return false;
 }
 
+function filterKarmaGood(karma) {
+	return karma == "GOOD";
+}
+
+function filterKarmaBad(karma) {
+	return !filterKarmaGood(karma);
+}
+
 function filterNodesWithProblems(rowData, rowId) {
-	console.log("filtering nodes with problems");;
-	return true;
+	return (filterKarmaBad(rowData.item.karma));
 }
 
 function filterServicesWithProblems(rowData, rowId) {
@@ -495,11 +508,11 @@ function setupToolbar() {
 		menuServices.addChild(new MenuItem({id: "mniCommands", label: "Commands", onClick: mniCommandsClicked }));
 		menuServices.addChild(new MenuItem({label: "Groups", onClick: mniGroupsClicked, disabled: true }));
 		menuServices.addChild(new MenuItem({id: "mniMaintPeriods", label: "Maintenence Periods", onClick: mniMaintPeriodsClicked, disabled: true }));
-		mainToolbar.addChild(new PopupMenuBarItem({label: "Services", popup: menuServices}));
+		mainToolbar.addChild(new PopupMenuBarItem({label: "Services &blacktriangledown;", popup: menuServices}));
 
-		mainToolbar.addChild(new MenuBarItem({id: "mniNodes", label: "Nodes", onClick: mniNodesClicked, disabled: true})); 
+		mainToolbar.addChild(new MenuBarItem({id: "mniNodes", label: "Nodes &blacktriangledown;", onClick: mniNodesClicked, disabled: true})); 
 
-		mainToolbar.addChild(new MenuBarItem({id: "mniClasses", label: "Classes", onClick: mniClassesClicked, disabled: true})); 
+		mainToolbar.addChild(new MenuBarItem({id: "mniClasses", label: "Classes &blacktriangledown;", onClick: mniClassesClicked, disabled: true})); 
 
 		menuSystem = new DropDownMenu();
 		menuSystem.addChild(new MenuItem({id: "mniUsers", label: "Users", onClick: mniUsersClicked, disabled: false }));
@@ -510,7 +523,7 @@ function setupToolbar() {
 		menuSystem.addChild(new MenuItem({id: "mniPreferences", label: "Preferences", onClick: mniPreferencesClicked, disabled: true}));
 		menuSystem.addChild(new MenuItem({id: "mniLogout", label: "Logout", onClick: mniLogoutClicked, disabled: true }));
 		menuSystem.addChild(new MenuItem({id: "mniLogin", label: "Login", onClick: showFormLogin, disabled: true }));
-		mainToolbar.addChild(new PopupMenuBarItem({label: "System", popup: menuSystem}));
+		mainToolbar.addChild(new PopupMenuBarItem({label: "System &blacktriangledown;", popup: menuSystem}));
 	});
 }
 

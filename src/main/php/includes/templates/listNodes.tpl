@@ -31,7 +31,7 @@
 			<td><a class = "node" href = "viewNode.php?id={$itemNode.id}">{$itemNode.identifier}</a></td>
 			<td>{$itemNode.nodeType} (version {$itemNode.instanceApplicationVersion})</td>
 			<td>{$itemNode.serviceCount}</td>
-			<td>{$itemNode.lastUpdated} {$itemNode.lastUpdateRelative}</td>
+			<td><span class = "date">{$itemNode.lastUpdated}</span></td>
 			<td class = "{$itemNode.karma|strtolower}">{$itemNode.karma}</td>
 		</tr>
 		{/foreach}

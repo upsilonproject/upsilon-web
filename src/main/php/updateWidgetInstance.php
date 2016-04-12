@@ -74,8 +74,7 @@ class FormUpdateWidgetInstance extends Form {
 
 
 $fh = new FormHandler('FormUpdateWidgetInstance');
-$fh->constructForm();
-$fh->setRedirect('viewDashboard.php?id=' . $fh->getForm()->rowWidgetInstance['dashboard']);
+$fh->setRedirect("index.php");
 $fh->handle();
 
 ?>

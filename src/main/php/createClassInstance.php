@@ -47,6 +47,9 @@ class FormCreateClassInstance extends Form {
 		$stmt->bindValue(':instance', $instanceId);
 		$stmt->bindValue(':parent', $this->getElementValue('class'));
 		$stmt->execute();
+
+		global $fh;
+		$fh->setRedirect('listClasses.php?id=' . $this->getElementValue('class'));
 	}
 }
 
@@ -56,7 +59,6 @@ if (isset($_REQUEST['parent'])) {
 	$fh->setConstructorArgument(0, $_REQUEST['parent']);
 }
 
-$fh->setRedirect('listClasses.php');
 $fh->handle();
 
 

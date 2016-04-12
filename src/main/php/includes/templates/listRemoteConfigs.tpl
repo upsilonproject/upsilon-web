@@ -70,6 +70,10 @@
 
 <div class = "box">
 	<h2>Commands (Available)</h2>
+
+	<p>
+		<a href = "createRemoteConfigCommand.php">Create</a>
+	</p>
 	
 	<table>
 		<thead>
@@ -86,7 +90,9 @@
 		<tbody>
 		{foreach from = $listCommands item = command}
 			<tr>
-				<td>{$command.id}</td>
+				<td>
+					<a href = "updateRemoteConfigurationCommand.php?id={$command.id}">{$command.id}</a>
+				</td>
 				<td>
 					{if !empty($command.icon)}
 					<img src = "resources/images/serviceIcons/{$command.icon}" alt = "serviceIcon" class = "inlineIcon"/>

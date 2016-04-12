@@ -8,8 +8,6 @@ use \libAllure\HtmlLinksCollection;
 
 global $tpl, $title;
 
-$tpl->assign('mobile', isMobile());
-
 if (Session::isLoggedIn()) {
 	$dtBegin = Session::getUser()->getData('daytimeBegin');
 	$dtEnd = Session::getUser()->getData('daytimeEnd');

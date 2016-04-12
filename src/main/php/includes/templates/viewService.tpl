@@ -9,8 +9,8 @@
 	<div style = "float: left; vertical-align: top;">
 		<h3>Basics</h3>
 		<p><strong>Identifier:</strong> {$itemService.identifier}</p>
-		<p><strong>Last Check:</strong> {$itemService.lastUpdated} <span class = "subtle">{$itemService.lastUpdatedRelative}</span></p>
-		<p><strong>Estimated Next Check:</strong> {$itemService.estimatedNextCheck} <span class = "subtle">{$itemService.estimatedNextCheckRelative}</span></p>
+		<p><strong>Last Check:</strong> <span class = "date">{$itemService.lastUpdated}</span></p>
+		<p><strong>Estimated Next Check:</strong> <span class = "date">{$itemService.estimatedNextCheck}</span></p>
 
 		<p>
 			<strong>Karma:</strong> <span class = "metricIndicator {$itemService.karma|strtolower}">{$itemService.karma} ({$itemService.consecutiveCount} in a row)</span>
@@ -92,7 +92,7 @@
 		<tbody>
 			{foreach from = $listResults item = itemResult}
 			<tr>
-				<td>{$itemResult.checked} &nbsp;&nbsp;<span class = "metricOutput">{$itemResult.relative}</span></td>
+				<td><span class = "date">{$itemResult.checked}</span></td>
 				<td><pre>{$itemResult.output|htmlspecialchars|wordwrap}</pre></td>
 				<td class = "{$itemResult.karma|strtolower}">{$itemResult.karma}</td>
 			</tr>

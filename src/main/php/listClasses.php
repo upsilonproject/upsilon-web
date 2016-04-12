@@ -16,7 +16,7 @@ $links->add('createClass.php?parent=' . $id, 'Create Class');
 $links->add('createClassRequirement.php?id=' . $id, 'Create Requirement');
 $links->add('updateClass.php?id=' . $id, 'Update class');
 $links->add('deleteClass.php?id=' . $id, 'Delete class');
-$links->add('createClassInstance.php?', 'Create class instance');
+$links->add('createClassInstance.php?parent=' . $id, 'Create class instance');
 
 $title = 'Classes';
 require_once 'includes/widgets/header.php';

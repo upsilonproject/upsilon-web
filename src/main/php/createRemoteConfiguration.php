@@ -13,6 +13,14 @@ class FormCreateRemoteConfig extends Form {
 		parent::__construct('formCreateRemoteConfig', 'Create remote config');
 
 		$this->addElement(new ElementInput('name', 'Name'));
+
+		$node = san()->filterString('node');
+
+		if ($node != null) {
+			$this->addElementReadOnly('Node', $node, 'node');
+			$this->getElement('name')->setValue('Config for ' . $node);
+		}
+
 		$this->addDefaultButtons();
 	}
 
@@ -21,6 +29,17 @@ class FormCreateRemoteConfig extends Form {
 		$stmt = DatabaseFactory::getInstance()->prepare($sql);
 		$stmt->bindValue(':name', $this->getElementValue('name'));
 		$stmt->execute();
+
+		$configId = DatabaseFactory::getInstance()->lastInsertId();
+
+		$node = $this->getElementValue('node');
+
+		if (!empty($node)) {
+			allocateNodeToConfig($node, $configId);
+		}
+
+		global $fh;
+		$fh->setRedirect('viewRemoteConfig.php?id=' . $configId);
 	}
 }
 

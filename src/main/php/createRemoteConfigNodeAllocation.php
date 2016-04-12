@@ -27,11 +27,7 @@ class FormRemoteConfigNodeAllocation extends \libAllure\Form {
 	}
 
 	public function process() {
-		$sql = 'INSERT INTO remote_config_allocated_nodes (node, config) VALUES (:node, :config)';
-		$stmt = db()->prepare($sql);
-		$stmt->bindValue(':node', $this->getElementValue('node'));
-		$stmt->bindValue(':config', $this->getElementValue('id'));
-		$stmt->execute();	
+		allocateNodeToConfig($this->getElementValue('node'), $this->getElementValue('id'));
 	}
 }
 

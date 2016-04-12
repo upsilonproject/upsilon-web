@@ -5,6 +5,64 @@ window.karmaColors["STALLED"] = '#000099';
 window.karmaColors["WARNING"] = '#ffa500';
 window.karmaColors["UNKNOWN"] = '#666';
 
+function makeDateHumanReadable(element) {
+	elementUnixTimestamp = Date.parse(element.textContent) / 1000
+	nowUnixTimestamp = Date.now() / 1000
+
+	if (isNaN(elementUnixTimestamp)) {
+		return;
+	}
+
+
+	if ((nowUnixTimestamp - elementUnixTimestamp) > 3600) {
+		dojo.addClass(element.parentElement, "old");
+	} else {
+		dojo.addClass(element.parentElement, "good");
+	}
+
+	description = secondsToString(nowUnixTimestamp - elementUnixTimestamp)
+
+	dojo.addClass(element, "tooltip")
+
+	new dijit.Tooltip({
+		connectId: element,
+		label: description,
+		showDelay: 0
+	});
+}
+
+function secondsToString(seconds) {
+	seconds = Math.round(seconds)
+
+	var numyears = Math.floor(seconds / 31536000);
+	var numdays = Math.floor((seconds % 31536000) / 86400); 
+	var numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);
+	var numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
+	var numseconds = (((seconds % 31536000) % 86400) % 3600) % 60;
+
+	ret = "";
+
+	if (numyears > 0) {
+		ret += numyears + " years "
+	}
+
+	if (numdays > 0) {
+		ret += numdays + " days "
+	}
+
+	if (numhours > 0) {
+		ret += numhours + " hours "
+	}
+
+	if (numminutes > 0) {
+		ret += numminutes + " minutes "
+	}
+
+	ret += numseconds + " seconds ago"
+
+	return ret;
+}
+
 function rawPlot(plot, ctx) {
     var data = plot.getData();
     var axes = plot.getAxes();

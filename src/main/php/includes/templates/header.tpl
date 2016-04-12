@@ -4,14 +4,14 @@
 <head>
 	<title>{$siteTitle} &raquo; {$title|default:'Untitled page'}</title>
 
-	{if $mobile}
-	<link rel = "alternative stylesheet" type = "text/css" href = "resources/stylesheets/mobile.css" title = "mobile" />
-	{else}
 	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/main.css" />
-	{/if}
+	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/mobile.css" title = "mobile" media = "(max-device-width: 480px)" />
+
 	<link rel = "{if $isNighttime}stylesheet{/if}" type = "text/css" href = "resources/stylesheets/main-nighttime.css" title = "nighttime" />
 
 	<link rel = "shortcut icon" href = "resources/images/icons/logo96pxdarkbg.png" title = "Shortcut icon" type = "image/png" />
+
+	<meta name="viewport" content="width=device-width" />
 
 	<script src="resources/javascript/masonry.js"></script>
 	<script src="resources/dojo/dojo/dojo.js"></script>
@@ -21,7 +21,7 @@
 
 	</head>
 
-<body class = "{if $mobile}mobile{else}full{/if} claro">
+<body class = "claro">
 <div id = "header">
 	{if $drawHeader}
 	<div class = "title">

@@ -42,23 +42,7 @@ function getServiceMetadata($identifier) {
 
 $tpl->assign('metadata', getServiceMetadata($service['identifier']));
 
-$sql = 'SELECT r.id, r.output, r.checked, r.karma FROM service_check_results r WHERE r.service = :serviceIdentifier ORDER BY r.checked DESC LIMIT 10';
-$stmt = DatabaseFactory::getInstance()->prepare($sql);
-$stmt->bindValue(':serviceIdentifier', $service['identifier']);
-$stmt->execute();
-
-$listResults = $stmt->fetchAll();
-
-if (!empty($listResults)) {
-	$k = sizeof($listResults) - 1;
-	$lastDate = strtotime($listResults[$k]['checked']);
-
-	for($i = 0; $i < sizeof($listResults); $i++) {
-		$currentDate = strtotime($listResults[$k]['checked']);
-		$listResults[$k--]['relative'] = getRelativeTimeSeconds($currentDate - $lastDate, true);
-		$lastDate = $currentDate;
-	}
-}
+$listResults = getServiceResults($service['identifier']);
 
 $tpl->assign('listResults', $listResults);
 

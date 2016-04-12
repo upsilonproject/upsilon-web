@@ -142,6 +142,10 @@ ul.metricList > li:last-child {
 	background-color: orange;
 }
 
+.stale {
+	border-bottom: 1px solid orange;
+}
+
 .skipped {
 	background-color: lightskyblue;
 }
@@ -509,4 +513,8 @@ img.inlineIcon {
 ul {
 	list-style: none;
 	padding-left: 0;
+}
+
+.tooltip {
+	border-bottom: 1px dashed gray;
 }
