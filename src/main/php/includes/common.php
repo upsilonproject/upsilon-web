@@ -1,5 +1,7 @@
 <?php
 
+@include_once 'includes/init.php';
+
 date_default_timezone_set('Europe/London');
 
 putenv("LANG=en_GB");
