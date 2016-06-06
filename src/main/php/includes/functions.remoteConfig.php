@@ -12,7 +12,7 @@ function getConfigById($configId) {
 }
 
 function getConfigNodes($config) {
-	$sql = 'SELECT a.id, n.id AS nodeId, n.identifier, n.lastUpdated FROM remote_config_allocated_nodes a LEFT JOIN nodes n ON a.node = n.identifier WHERE a.config = :config';
+	$sql = 'SELECT a.id, n.id AS nodeId, n.identifier, n.lastUpdated, n.configs FROM remote_config_allocated_nodes a LEFT JOIN nodes n ON a.node = n.identifier WHERE a.config = :config';
 	$stmt = db()->prepare($sql);
 	$stmt->bindValue(':config', $config);
 	$stmt->execute();
@@ -20,6 +20,16 @@ function getConfigNodes($config) {
 	$nodes = $stmt->fetchAll();
 
 	$nodes = addStatusToNodes($nodes);
+
+	foreach ($nodes as $index => $node) {
+			$reportedConfigs = parseReportedConfigs($node['configs']);
+
+			if (isset($reportedConfigs[$config])) {
+				$nodes[$index]['reported'] = $reportedConfigs[$config];
+			} else {
+				$nodes[$index]['reported'] = null;
+			}
+	}
 
 	return $nodes;
 }

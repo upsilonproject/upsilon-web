@@ -18,7 +18,7 @@ $stmt = $db->prepare($sql);
 $stmt->bindValue(':nodeId', $id);
 $stmt->execute();
 
-$node = $stmt->fetchRow(); 
+$node = $stmt->fetchRow();
 
 $links = new HtmlLinksCollection();
 $links->add('deleteNode.php?id=' . $node['id'], 'Delete');
@@ -31,7 +31,10 @@ $stmt = stmt($sql);
 $stmt->bindValue(':nodeIdentifier', $node['identifier']);
 $stmt->execute();
 
-$tpl->assign('remoteConfigs', $stmt->fetchAll());
+$remoteConfigs = $stmt->fetchAll();
+$remoteConfigs = associateRemoteAndReportedConfigs($node['configs'], $remoteConfigs); 
+
+$tpl->assign('remoteConfigs', $remoteConfigs);
 
 $tpl->assign('itemNode', $node);
 $tpl->display('viewNode.tpl');

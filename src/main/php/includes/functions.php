@@ -5,6 +5,8 @@ use \libAllure\Session;
 use \libAllure\Sanitizer;
 use \libAllure\HtmlLinksCollection;
 
+require_once 'includes/classes/SessionOptions.php';
+
 function isUsingSsl() {
 	if (!isset($_SERVER['HTTPS'])) {
 		$_SERVER['HTTPS'] = 'off';
@@ -238,7 +240,7 @@ function parseOutputJson(&$service) {
 			$service['listSubresults'] = $json['subresults'];
 				
 			foreach ($service['listSubresults'] as $key => $result) {
-				if (!isset($result['karma'])) {
+				if (!isset($result['karma']) || $service['karma'] == 'OLD') {
 					$service['listSubresults'][$key]['karma'] = $service['karma'];
 				}
 
@@ -258,7 +260,6 @@ function parseOutputJson(&$service) {
 				if (isset($result['title'])) {
 					$service['listSubresults'][$key]['name'] = san()->escapeStringForHtml($result['title']);
 				}
-
 			}
 		}
 
@@ -421,6 +422,12 @@ function castService(&$service) {
 	var_dump($service['castServiceCritical']);
 }
 
+function enrichService($service, $parseOutput = true, $parseMetadata = true, $invalidateOldServices = true, $parseAcceptableDowntime = true, $castServices = false) {
+	$services = enrichServices(array($service), $parseOutput, $parseMetadata, $invalidateOldServices, $parseAcceptableDowntime, $castServices);
+
+	return $services[0];
+}
+
 function enrichServices($listServices, $parseOutput = true, $parseMetadata = true, $invalidateOldServices = true, $parseAcceptableDowntime = true, $castServices = false) {
 	foreach ($listServices as $k => $itemService) {
 		$listServices[$k]['stabilityProbibility'] = 0;
@@ -432,9 +439,9 @@ function enrichServices($listServices, $parseOutput = true, $parseMetadata = tru
 		$listServices[$k]['listActions'] = array();
 
 		$parseAcceptableDowntime && parseAcceptableDowntime($listServices[$k]);
+		$invalidateOldServices && invalidateOldServices($listServices[$k]);
 		$parseOutput && parseOutputJson($listServices[$k]);
 		$parseMetadata && parseMetadata($listServices[$k]);
-		$invalidateOldServices && invalidateOldServices($listServices[$k]);
 		$castServices && castService($listServices[$k]);
 
 		$listServices[$k]['output'] = htmlspecialchars($listServices[$k]['output']);
@@ -446,7 +453,6 @@ function enrichServices($listServices, $parseOutput = true, $parseMetadata = tru
 
 function array2dFetchKey($array, $key) {
 	$ret = array();
-
 	foreach ($array as $item) {
 		if (is_array($item) && isset($item[$key])) {
 			$ret[] = $item[$key];
@@ -456,14 +462,14 @@ function array2dFetchKey($array, $key) {
 	return $ret;
 }
 
-function enrichGroups($listGroups, $subGroupDepth = 1) {
+function enrichGroupListingsWithServiceMemberships($listGroups, $subGroupDepth = 1) {
 	foreach ($listGroups as &$itemGroup) {
 		$itemGroup['listServices'] = getServices($itemGroup['id']);
 
 		if ($subGroupDepth > 0) {
 				$sql = 'SELECT g.* FROM service_groups g WHERE g.parent = :name';
 				$stmt = DatabaseFactory::getInstance()->prepare($sql);
-				$stmt->bindValue(':name', $itemGroup['title']);
+				$stmt->bindValue(':name', $itemGroup['name']);
 				$stmt->execute();
 
 				$itemGroup['listSubgroups'] = array();
@@ -479,13 +485,28 @@ function enrichGroups($listGroups, $subGroupDepth = 1) {
 	return $listGroups;
 }
 
-function getGroups() {
-	$sql = 'SELECT g.title AS name, g.* FROM service_groups g ORDER BY g.title';
+function enrichGroupListingsWithNodeMemberships($listGroups) {
+	foreach ($listGroups as &$itemGroup) {
+		$itemGroup['listNodes'] = array();
+	}
+
+	return $listGroups;
+}
+
+function getGroups($includeServices = true, $includeNodes = true) {
+	$sql = 'SELECT g.id, g.title AS name, g.description, p.id AS parentId, p.title AS parentName, count(m.id) AS serviceCount, count(n.id) AS nodeCount FROM service_groups g LEFT JOIN service_group_memberships m ON g.title = m.group LEFT JOIN service_groups p ON g.parent = p.title LEFT JOIN node_group_memberships mn ON g.id = mn.gid LEFT JOIN nodes n ON mn.node = n.id GROUP BY g.id ORDER BY g.title ASC';
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->execute();
 
 	$listGroups = $stmt->fetchAll();
-	$listGroups = enrichGroups($listGroups);
+	
+	if ($includeServices) {
+		$listGroups = enrichGroupListingsWithServiceMemberships($listGroups);
+	}
+
+	if ($includeNodes) {
+		$listGroups = enrichGroupListingsWithNodeMemberships($listGroups);
+	}
 
 	return $listGroups;
 }
@@ -496,7 +517,8 @@ function getGroup($id) {
 	$stmt->bindValue(':id', $id);
 	$stmt->execute();
 
-	$itemGroup = enrichGroups(array($stmt->fetchRowNotNull()));
+	$itemGroup = enrichGroupListingsWithServiceMemberships(array($stmt->fetchRowNotNull()));
+	$itemGroup = enrichGroupListingsWithNodeMemberships(array($itemGroup[0]));
 
 	return $itemGroup[0];
 }
@@ -516,9 +538,11 @@ function handleApiLogin() {
 			$user = \libAllure\User::getUser($username);
 			$_SESSION['user'] = $user;
 			$_SESSION['username'] = $username;
-			$_SESSION['drawHeader'] = $apiClient['drawHeader'];
-			$_SESSION['drawNavigation'] = $apiClient['drawNavigation'];
-			$_SESSION['drawBigClock'] = $apiClient['drawBigClock'];
+
+			sessionOptions()->drawHeaders = $apiClient['drawHeader'];
+			sessionOptions()->drawNavigation = $apiClient['drawNavigation'];
+			sessionOptions()->drawBigClock = $apiClient['drawBigClock'];
+
 			$_SESSION['apiClient'] = $apiClient['identifier'];
 			$_SESSION['apiClientRedirect'] = $apiClient['redirect'];
 
@@ -560,20 +584,19 @@ function getServiceByIdentifier($identifier) {
 }
 
 function getServiceById($id, $parseOutput = false) {
-		$sql = 'SELECT s.id, s.description, s.identifier, s.commandLine, s.karma, s.node, s.output, s.lastUpdated, s.estimatedNextCheck, s.consecutiveCount, s.commandIdentifier FROM services s WHERE s.id = :serviceId';
+		$sql = 'SELECT s.id, s.description, s.identifier, s.executable, s.commandLine, s.karma, s.node, s.output, s.lastChanged, s.lastUpdated, s.estimatedNextCheck, s.consecutiveCount, s.commandIdentifier FROM services s WHERE s.id = :serviceId';
 		$stmt = DatabaseFactory::getInstance()->prepare($sql);
 		$stmt->bindValue(':serviceId', $id);
 		$stmt->execute();
 
 		if ($stmt->numRows() == 0) {
 			throw new Exception("Service not found");
-
 		}
 
 		$service = $stmt->fetchRowNotNull();
+		$service = enrichService($service);
+
 		$parseOutput && parseOutputJson($service);
-		$service['estimatedNextCheckRelative'] = getRelativeTime($service['estimatedNextCheck'], true);
-		$service['lastUpdatedRelative'] = getRelativeTime($service['lastUpdated'], true);
 
 		return $service;
 }
@@ -845,14 +868,6 @@ function deleteUsergroupById($id) {
 	$stmt = stmt($sql);
 	$stmt->bindValue(':id', $id);
 	$stmt->execute();
-}
-
-function getServiceGroups() {
-	$sql = 'SELECT g.id, g.title, g.description, p.id AS parentId, p.title AS parentName, count(m.id) AS serviceCount FROM service_groups g LEFT JOIN service_group_memberships m ON g.title = m.group LEFT JOIN service_groups p ON g.parent = p.title GROUP BY g.id ORDER BY g.title ASC';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->execute();
-
-	return $stmt->fetchAll();
 }
 
 function createGroup($title) {
@@ -1415,6 +1430,69 @@ function isUpgradeNeeded() {
 	$upgrader = new Upgrader();
 
 	return $upgrader->isUpgradeNeeded();
+}
+
+function associateRemoteAndReportedConfigs($configString, $remoteConfigs) {
+	$reportedConfigs = parseReportedConfigs($configString);
+
+	foreach ($remoteConfigs as $index => $remoteConfig) {
+		$remoteConfigs[$index]['reported'] = null;
+
+		foreach ($reportedConfigs as $reportedConfig) {
+			if ($remoteConfig['id'] == $reportedConfig['remoteId']) {
+				$remoteConfigs[$index]['reported'] = $reportedConfig;
+			}
+
+			break;
+		}
+	}
+
+	return $remoteConfigs;
+}
+
+function parseReportedConfigs($configString) {
+	$configs = array();
+
+	$configString = str_replace(array('[', ']', ','), '', $configString);
+
+	$configLines = explode(" ", $configString);
+
+	foreach ($configLines as $line) {
+		$lineElements = explode(":", $line);
+
+		if (count($lineElements) == 4) {
+			$configs[$lineElements[1]] = array(
+				'sourceTag' => $lineElements[0],
+				'remoteId' => $lineElements[1],
+				'updated' => $lineElements[2],
+				'errors' => $lineElements[3] == "true",
+				'karma' => 'GOOD',
+				'status' => '???',
+			);
+		}
+	}
+
+	return $configs;
+}
+
+function deleteNodeById() {
+	$sql = 'DELETE FROM nodes WHERE id = :id ';
+	$stmt = DatabaseFactory::getInstance()->prepare($sql);
+	$stmt->bindValue(':id', $id);
+	$stmt->execute();
+
+	$sql = 'DELETE FROM';
+}
+
+function sessionOptions() {
+	if (!isset($_SESSION['options'])) {
+		$_SESSION['options'] = new SessionOptions();
+	} 
+
+	global $tpl;
+	$tpl->assign('sessionOptions', $_SESSION['options']);
+
+	return $_SESSION['options'];
 }
 
 ?>

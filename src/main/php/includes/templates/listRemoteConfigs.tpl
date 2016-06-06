@@ -1,7 +1,10 @@
 <div class = "box">
 	<h2>Remote Node Configurations</h2>
 
-	<p><a href = "amqpSendPings.php">Request Node Summaries</a></p>
+	<p>
+		<a href = "amqpSendPings.php">Request Node Summaries</a>
+		<a href = "createRemoteConfiguration.php">Create</a>
+	</p>
 	
 	<table>
 		<thead>

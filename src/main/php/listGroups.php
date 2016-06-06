@@ -13,7 +13,7 @@ require_once 'includes/widgets/header.php';
 
 use \libAllure\DatabaseFactory;
 
-$tpl->assign('listGroups', getServiceGroups());
+$tpl->assign('listGroups', getGroups(false, false));
 $tpl->display('listGroups.tpl');
 
 require_once 'includes/widgets/footer.php';

@@ -18,7 +18,7 @@ class WidgetProblemServices extends Widget {
                 if (empty($this->problemServices)) {
                         echo '<p>No services with problems!</p>';
                 } else {
-			$tpl->assign('url', 'json/getServices');
+			$tpl->assign('url', 'json/getServices?status=!GOOD');
 			$tpl->assign('callback', 'renderServiceList');
 			$tpl->assign('queryParams', json_encode(array()));
 			$tpl->assign('repeat', 60000);

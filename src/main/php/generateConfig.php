@@ -5,7 +5,6 @@ set_include_path(get_include_path() . PATH_SEPARATOR . '../');
 require_once 'includes/common.php';
 require_once 'includes/functions.remoteConfig.php';
 
-
 $nodeConfig = getConfigById(san()->filterString('id'));
 
 $tpl->assign('comment', 'Generated config: ' . $nodeConfig['name']);

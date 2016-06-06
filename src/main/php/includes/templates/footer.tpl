@@ -31,8 +31,14 @@ require(["dojo/parser", "dojo/query"], function(parser, query) {
 	query(".navigationMenuItems").style('display', 'block');
 
 	query('.date').forEach(makeDateHumanReadable);
+
+	{/literal}{if $apiClient}
+	showFullscreenButton();
+	{/if}{literal}
+
 });
 {/literal}
+
 </script>
 
 </body>

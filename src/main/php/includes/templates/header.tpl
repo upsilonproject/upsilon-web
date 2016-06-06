@@ -23,7 +23,7 @@
 
 <body class = "claro">
 <div id = "header">
-	{if $drawHeader}
+	{if $sessionOptions->drawHeader}
 	<div class = "title">
 		<h1>
 			<a href = "index.php">{$siteTitle}</a>
@@ -33,7 +33,7 @@
 	</div>
 	{/if}
 </div>
-	{if $drawNavigation}
+	{if $sessionOptions->drawNavigation}
 	<div class = "navigationMenuItems">
 		<div>
 		{if $generalLinks->hasLinks()}
@@ -43,7 +43,7 @@
 	</div>
 	{/if}
 
-{if $isNighttime && $drawBigClock}<p style = "margin: 0; font-size:9em; font-weight: bold; background-color: white; color: black;">{$datetime}</p>{/if}
+{if $isNighttime && $sessionOPtions->drawBigClock}<p style = "margin: 0; font-size:9em; font-weight: bold; background-color: white; color: black;">{$datetime}</p>{/if}
 <div id = "content">
 
 	

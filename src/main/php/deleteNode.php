@@ -9,10 +9,7 @@ use \libAllure\DatabaseFactory;
 
 $id = Sanitizer::getInstance()->filterUint('id');
 
-$sql = 'DELETE FROM nodes WHERE id = :id ';
-$stmt = DatabaseFactory::getInstance()->prepare($sql);
-$stmt->bindValue(':id', $id);
-$stmt->execute();
+deleteNodeById($id);
 
 redirect('index.php');
 

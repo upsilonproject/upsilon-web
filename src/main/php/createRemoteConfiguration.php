@@ -32,10 +32,12 @@ class FormCreateRemoteConfig extends Form {
 
 		$configId = DatabaseFactory::getInstance()->lastInsertId();
 
-		$node = $this->getElementValue('node');
+		if (san()->filterString('node') != null) {
+			$node = $this->getElementValue('node');
 
-		if (!empty($node)) {
-			allocateNodeToConfig($node, $configId);
+			if (!empty($node)) {
+				allocateNodeToConfig($node, $configId);
+			}
 		}
 
 		global $fh;

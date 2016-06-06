@@ -17,6 +17,7 @@ $f = new FormLogin();
 $f->setTitle('Upsilon Login');
 
 if ($f->validate()) {
+	$_SESSION['options'] = new SessionOptions();
 	header('Location: index.php');
 }
 

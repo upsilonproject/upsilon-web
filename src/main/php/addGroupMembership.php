@@ -25,7 +25,7 @@ class FormAddMembership extends Form {
 		$stmt = db()->prepare($sql);
 		$stmt->execute();
 
-		$el = new ElementSelect('serviceId[]', 'Service');
+		$el = new ElementSelect('serviceId', 'Service');
 		$el->setSize(10);
 		$el->multiple = true;
 
@@ -76,7 +76,7 @@ class FormAddMembership extends Form {
 		$stmt = DatabaseFactory::getInstance()->prepare($sql);
 		$stmt->bindValue(':group', $this->getElementValue('group'));
 
-		$services = $this->getElementValue('serviceId[]');
+		$services = $this->getElementValue('serviceId');
 
 		foreach ($services as $service) {
 			$stmt->bindValue(':service', $service);
@@ -107,8 +107,7 @@ if (empty($groups)) {
 	redirect('listGroups.php', 'You need to create some groups.');
 }
 
-$f = new FormAddMembership();
-$fh = new FormHandler($f);
+$fh = new FormHandler('FormAddMembership');
 $fh->handle();
 
 ?>

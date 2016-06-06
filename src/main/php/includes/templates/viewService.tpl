@@ -9,7 +9,7 @@
 	<div style = "float: left; vertical-align: top;">
 		<h3>Basics</h3>
 		<p><strong>Identifier:</strong> {$itemService.identifier}</p>
-		<p><strong>Last Check:</strong> <span class = "date">{$itemService.lastUpdated}</span></p>
+		<p><span><strong>Last Check:</strong> <span class = "date">{$itemService.lastUpdated}</span></span> <a href = "amqpExecuteSingle.php?serviceId={$itemService.id}">Execute Now</a></p>
 		<p><strong>Estimated Next Check:</strong> <span class = "date">{$itemService.estimatedNextCheck}</span></p>
 
 		<p>

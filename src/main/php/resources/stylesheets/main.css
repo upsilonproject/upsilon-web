@@ -518,3 +518,27 @@ ul {
 .tooltip {
 	border-bottom: 1px dashed gray;
 }
+
+form.inline {
+	display: inline;
+	border: 0;
+}
+
+form.unstyled {
+	border: 0;
+}
+
+a.actionButton {
+	border: 1px solid black;
+	padding: .5em;
+	display: block;
+	min-height: 5em;
+	text-align: center;
+	vertical-align: middle;
+}
+
+button#fullscreen {
+	padding: .5em;
+	margin: 1em;
+	float: right;
+}

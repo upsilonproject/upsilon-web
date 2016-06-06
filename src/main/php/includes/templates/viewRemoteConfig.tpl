@@ -15,7 +15,8 @@
 				<th>Identifier</th>
 				<th>Last Updated</th>
 				<th>Actions</th>
-				<th>Status</th>
+				<th>Config status</th>
+				<th>Node Status</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -26,8 +27,9 @@
 				<td>{$node.lastUpdated}</td>
 				<td>
 					<a href = "deleteRemoteConfigAllocatedNode.php?id={$node.id}">Unallocate</a>
-					<a href = "amqpSendRemoteConfig.php?node={$node.identifier}">Send</a>
+					<a href = "amqpSendRemoteConfig.php?configId={$remoteConfig.id}&amp;node={$node.identifier}">Send</a>
 				</td>
+				<td class = "{if empty($node.reported)}bad{else}good{/if}">{if empty($node.reported)}NOT REPORTED{else}REPORTED{/if}</td>
 				<td class = "{$node.karma|strtolower} small">{$node.karma}</td>
 			</tr>
 		{/foreach}

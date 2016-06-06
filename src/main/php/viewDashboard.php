@@ -21,6 +21,7 @@ require_once 'includes/widgets/header.php';
 $tpl->assign('itemDashboard', $itemDashboard);
 $tpl->assign('listInstances', $itemDashboard->getWidgetInstances());
 $tpl->assign('hiddenWidgets', $itemDashboard->getHiddenWidgetInstances());
+$tpl->assign('sessionOptions', sessionOptions());
 $tpl->display('dashboard.tpl');
 
 require_once 'includes/widgets/footer.php';

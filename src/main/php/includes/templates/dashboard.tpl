@@ -12,7 +12,7 @@
 		{foreach from = $listInstances item = widget}
 			{if $widget.instance->isShown()}
 			<div class = "block">
-				{if $drawNavigation}
+				{if $sessionOptions->drawNavigation}
 				<div style = "float: right" data-dojo-type = "dijit/form/DropDownButton">
 					<span>Widget</span>
 
