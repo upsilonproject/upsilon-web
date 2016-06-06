@@ -36,6 +36,16 @@ class Upgrader {
 			return true;
 		}
 	}
+
+	public function canStartUpgrade() {
+		foreach ($this->getTasks() as $task) {
+			if (!$task->isPossible()) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }
 
 abstract class UpgradeTask {
@@ -44,6 +54,10 @@ abstract class UpgradeTask {
 	public abstract function perform();
 	public function getName() {
 		return get_class($this);
+	}
+
+	public function getDescription() {
+		return '<strong>No description.</strong>';
 	}
 }
 
@@ -60,7 +74,41 @@ abstract class DatabaseUpgradeTask extends UpgradeTask {
 			return true;
 		}
 	}
+
+	protected function doesTableExist($tbl) {
+		try {
+			$sql = 'DESC ' . $tbl;
+			$stmt = stmt($sql);
+			$stmt->execute();
+
+			if ($stmt->numRows() == false) {
+				return false;
+			}
+		} catch (Exception $e) {
+			return false;
+		}
+
+		return true;
+	}
 }
+
+class NodeGroupMembershipTableExists extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->doesTableExist('node_group_memberships');
+	}
+
+	public function isPossible() {
+		return true;
+	}
+
+	public function perform() {
+		$sql = 'CREATE TABLE node_group_memberships (id int not null primary key auto_increment, gid int not null, node int not null)';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+Upgrader::registerTask(new NodeGroupMembershipTableExists());
 
 /**
 class UsersNeedCake extends DatabaseUpgradeTask {
@@ -82,4 +130,31 @@ class UsersNeedCake extends DatabaseUpgradeTask {
 
 Upgrader::registerTask(new UsersNeedCake());
 */
+
+class HttpdCanNetworkConnect extends UpgradeTask {
+	public function isNecessary() {
+		if (trim(`getenforce`) == 'Enforcing') {
+			if (stripos(`getsebool httpd_can_network_connect`, '--> on') !== FALSE) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public function isPossible() {
+		return false;
+	}
+
+	public function getDescription() {
+		return 'The webserver needs to be able to network connect to talk to the AMQP server. On Red Hat based machines, the sebool httpd_can_network_connect needs to be turned on.';
+	}
+
+	public function perform() {}
+}
+
+upgrader::registerTask(new HttpdCanNetworkConnect());
+
 ?>

@@ -6,6 +6,7 @@
 		<thead>
 			<tr>
 				<th>Name</th>
+				<th>Description</th>
 				<th>Status</th>
 			</tr>
 		</thead>
@@ -13,6 +14,7 @@
 	{foreach from = $upgradeTasks item = task}
 			<tr>
 				<td>{$task->getName()}</td>
+				<td>{$task->getDescription()}</td>
 				<td class = "{if $task->isPossible()}good{else}bad{/if}">{if $task->isPossible()}Ready{else}Not possible{/if}</td>
 			</tr>
 	{/foreach}
@@ -20,6 +22,10 @@
 	</table>
 
 	<p>
-	<a href = "upgrade.php?doUpgrade">Start Upgrade</a>
+		{if $canStartUpgrade}
+		<a href = "upgrade.php?doUpgrade">Start Upgrade</a>
+		{else}
+		<strong>The upgrade cannot be run automatically.</strong>
+		{/if}
 	</p>
 </div>
