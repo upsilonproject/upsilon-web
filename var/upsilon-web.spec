@@ -1,12 +1,14 @@
+%include SPECS/.upsilon-web.rpmmacro
+
 Name:		upsilon-web
-Version:	%{buildid_version}
-Release:	%{buildid_timestamp}%{?dist}
+Version:	%{version}
+Release:	%{timestamp}%{?dist}
 Summary:	Upsilon web
 
 Group:		Applications/System
 License:	GPLv2
 URL:		http://upsilon-project.co.uk
-Source0:	upsilon-web-%{buildid_tag}.zip
+Source0:	upsilon-web-%{tag}.zip
 
 Requires: httpd php php-pdo php-mysql php-mbstring php-bcmath mariadb-server php-Smarty
 
@@ -14,7 +16,7 @@ Requires: httpd php php-pdo php-mysql php-mbstring php-bcmath mariadb-server php
 Upsilon web
 
 %prep
-%setup -q -n upsilon-web-%{buildid_tag}
+%setup -q -n upsilon-web-%{tag}
 
 %build 
 mkdir -p %{buildroot}/usr/share/upsilon-web/

@@ -8,6 +8,10 @@ def generateBuildId() {
 		commandLine "buildid", "-n"
 	}
 
+	exec { 
+		commandLine "buildid", "-qf", "rpmmacro", "-W", ".upsilon-web.rpmmacro
+	}
+
 	Properties buildid = new Properties()
 	buildid.load(new File(".buildid").newReader());
 
@@ -47,6 +51,7 @@ distZip {
 
 	from (".") {
 		include ".buildid"
+		include ".upsilon-web.rpmmacro"
 		include "README.md" 
 		into "upsilon-web-${version}/"
 	}
