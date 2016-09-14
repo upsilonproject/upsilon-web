@@ -4,6 +4,7 @@ Name:		upsilon-web
 Version:	%{version_formatted_short}
 Release:	%{timestamp}.%{?dist}
 Summary:	Upsilon web
+BuildArch: 	noarch
 
 Group:		Applications/System
 License:	GPLv2
