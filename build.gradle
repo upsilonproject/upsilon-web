@@ -9,7 +9,7 @@ def generateBuildId() {
 	}
 
 	exec { 
-		commandLine "buildid", "-qf", "rpmmacro", "-W", ".upsilon-web.rpmmacro
+		commandLine "buildid", "-qf", "rpmmacro", "-W", ".upsilon-web.rpmmacro"
 	}
 
 	Properties buildid = new Properties()
