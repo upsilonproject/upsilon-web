@@ -38,7 +38,7 @@ node {
     checkout scm                                                                   
                                                                                    
     stage "Compile"                                                                
-    sh "${gradle}/bin/gradle setupLibraries buildDojo distZip"                                              
+    sh "${gradle}/bin/gradle setupLibraries buildDojo phpUnit distZip"                                              
                                                                                    
     stash includes:"build/distributions/*.zip", name: "binaries"                   
 }                                                                                  
