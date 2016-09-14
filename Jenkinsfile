@@ -38,7 +38,7 @@ node {
     checkout scm                                                                   
                                                                                    
     stage "Compile"                                                                
-    sh "${gradle}/bin/gradle distZip"                                              
+    sh "${gradle}/bin/gradle setupLibraries buildDojo distZip"                                              
                                                                                    
     stash includes:"build/distributions/*.zip", name: "binaries"                   
 }                                                                                  
