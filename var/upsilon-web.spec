@@ -1,14 +1,14 @@
 %include SPECS/.upsilon-web.rpmmacro
 
 Name:		upsilon-web
-Version:	%{version}
+Version:	%{version_formatted_short}
 Release:	%{timestamp}%{?dist}
 Summary:	Upsilon web
 
 Group:		Applications/System
 License:	GPLv2
 URL:		http://upsilon-project.co.uk
-Source0:	upsilon-web-%{tag}.zip
+Source0:	upsilon-web.zip
 
 Requires: httpd php php-pdo php-mysql php-mbstring php-bcmath mariadb-server php-Smarty
 
