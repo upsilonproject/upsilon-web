@@ -2,7 +2,7 @@
 
 Name:		upsilon-web
 Version:	%{version_formatted_short}
-Release:	%{timestamp}%{?dist}
+Release:	%{timestamp}.%{?dist}
 Summary:	Upsilon web
 
 Group:		Applications/System
