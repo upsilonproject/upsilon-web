@@ -5,8 +5,28 @@ window.karmaColors["STALLED"] = '#000099';
 window.karmaColors["WARNING"] = '#ffa500';
 window.karmaColors["UNKNOWN"] = '#666';
 
+function pad(number) {
+	if (number < 10) {
+		return '0' + number;
+	}
+
+	return number;
+}
+
+
+Date.prototype.toLocalIsoLikeString = function() {
+	return this.getFullYear() + 
+	'-' + pad(this.getMonth()) +
+	'-' + pad(this.getDate()) +
+	' ' + pad(this.getHours()) +
+	':' + pad(this.getMinutes()) +
+	':' + pad(this.getSeconds()) +
+	' (local)';
+}
+
 function makeDateHumanReadable(element) {
-	elementUnixTimestamp = Date.parse(element.textContent) / 1000
+	utcDate = Date.parse(element.textContent + " UTC")
+	elementUnixTimestamp = utcDate / 1000
 	nowUnixTimestamp = Date.now() / 1000
 
 	if (isNaN(elementUnixTimestamp)) {
@@ -23,6 +43,8 @@ function makeDateHumanReadable(element) {
 	description = secondsToString(nowUnixTimestamp - elementUnixTimestamp)
 
 	dojo.addClass(element, "tooltip")
+
+	element.textContent = utcDate.toLocalIsoLikeString();
 
 	new dijit.Tooltip({
 		connectId: element,
