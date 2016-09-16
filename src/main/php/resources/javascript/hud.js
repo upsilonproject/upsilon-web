@@ -14,13 +14,13 @@ function pad(number) {
 }
 
 
-Date.prototype.toLocalIsoLikeString = function() {
-	return this.getFullYear() + 
-	'-' + pad(this.getMonth()) +
-	'-' + pad(this.getDate()) +
-	' ' + pad(this.getHours()) +
-	':' + pad(this.getMinutes()) +
-	':' + pad(this.getSeconds()) +
+function toLocalIsoLikeString(d) {
+	return d.getFullYear() + 
+	'-' + pad(d.getMonth()) +
+	'-' + pad(d.getDate()) +
+	' ' + pad(d.getHours()) +
+	':' + pad(d.getMinutes()) +
+	':' + pad(d.getSeconds()) +
 	' (local)';
 }
 
@@ -44,7 +44,7 @@ function makeDateHumanReadable(element) {
 
 	dojo.addClass(element, "tooltip")
 
-	element.textContent = utcDate.toLocalIsoLikeString();
+	element.textContent = toLocalIsoLikeString(utcDate);
 
 	new dijit.Tooltip({
 		connectId: element,
