@@ -163,7 +163,7 @@ upgrader::registerTask(new HttpdCanNetworkConnect());
 
 class NodesTableHasConfigsColumn extends DatabaseUpgradeTask {
 	public function isNecessary() {
-		return $this->doesFieldExistInTable('configs', 'nodes');
+		return !$this->doesFieldExistInTable('configs', 'nodes');
 	}
 
 	public function perform() {
