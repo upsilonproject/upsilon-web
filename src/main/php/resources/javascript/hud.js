@@ -20,7 +20,6 @@ function toLocalIsoLikeString(d) {
 	'-' + pad(d.getDate()) +
 	' ' + pad(d.getHours()) +
 	':' + pad(d.getMinutes()) +
-	':' + pad(d.getSeconds()) +
 	' (local)';
 }
 
@@ -41,6 +40,7 @@ function makeDateHumanReadable(element) {
 	}
 
 	description = secondsToString(nowUnixTimestamp - elementUnixTimestamp)
+	description += "\nOriginal: " + utcDate.toString()
 
 	dojo.addClass(element, "tooltip")
 
