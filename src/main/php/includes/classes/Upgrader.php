@@ -75,6 +75,10 @@ abstract class DatabaseUpgradeTask extends UpgradeTask {
 		}
 	}
 
+	public function isPossible() {
+		return true;
+	}
+
 	protected function doesTableExist($tbl) {
 		try {
 			$sql = 'DESC ' . $tbl;
@@ -156,5 +160,19 @@ class HttpdCanNetworkConnect extends UpgradeTask {
 }
 
 upgrader::registerTask(new HttpdCanNetworkConnect());
+
+class NodesTableHasConfigsColumn extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return $this->doesFieldExistInTable('configs', 'nodes');
+	}
+
+	public function perform() {
+		$sql = 'ALTER TABLE nodes ADD configs varchar(255) ';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+upgrader::registerTask(new NodesTableHasConfigsColumn());
 
 ?>
