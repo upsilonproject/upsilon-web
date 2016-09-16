@@ -16,6 +16,7 @@ function add_include_path($path) {
 
 add_include_path(dirname(__FILE__) . '/libraries/');
 add_include_path(dirname(__FILE__) . '/libraries/jwread/lib-allure/src/main/php/');
+add_include_path('/etc/upsilon-web/');
 
 require_once 'includes/functions.php';
 require_once 'includes/libraries/autoload.php';
@@ -28,9 +29,9 @@ use \libAllure\AuthBackend;
 use \libAllure\AuthBackendDatabase;
 use \libAllure\Session;
 
-if ((@include 'includes/config.php') !== false) {
-	require_once 'includes/config.php';
+@include_once 'config.php';
 
+if (isEssentialConfigurationProvided()) {
 	$db = connectDatabase();
 
 	$backend = new AuthBackendDatabase();
@@ -48,7 +49,7 @@ if ((@include 'includes/config.php') !== false) {
 		}
 	}
 } else if (!defined('INSTALLATION_IN_PROGRESS')) {
-	redirect('installer.php', 'No config file found. Assuming installation.');
+	redirect('installer.php', 'Initial config not valid, assuming installation.');
 }
 
 ?>

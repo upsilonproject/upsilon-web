@@ -10,7 +10,7 @@ require_once 'includes/widgets/header.php';
 require_once 'includes/classes/Installer.php';
 require_once 'includes/classes/FormInstallationQuestions.php';
 
-if (file_exists('includes/config.php')) {
+if (isEssentialConfigurationProvided()) {
 	        $tpl->error('You config file <strong>includes/config.php</strong> already exists. This means upsilon is probably already installed. Either <a href = "login.php">Login</a> or delete the config file to do a reinstallation.');
 }  
 

@@ -1495,4 +1495,23 @@ function sessionOptions() {
 	return $_SESSION['options'];
 }
 
+function definedOrException($key) {
+	if (!defined($key)) {
+		throw new Exception("Constant not defined: $key");
+	}
+}
+
+function isEssentialConfigurationProvided() {
+	try {
+		definedOrException('CFG_DB_DSN');
+		definedOrException('CFG_DB_USER');
+		definedOrException('CFG_DB_PASS');
+		definedOrException('CFG_PASSWORD_SALT');
+	} catch (Exception $e) {
+		return false;
+	}
+
+	return true;
+}
+
 ?>
