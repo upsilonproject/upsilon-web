@@ -164,6 +164,10 @@ a:hover {
 	text-decoration: underline;
 }
 
+a:focus {
+	background-color: purple;
+}
+
 table {
 	width: 100%;
 	background-color: white;
