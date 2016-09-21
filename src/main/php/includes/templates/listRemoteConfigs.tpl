@@ -34,7 +34,7 @@
 </div>
 
 <div class = "box">
-	<h2>Service Instances</h2>
+	<h2>Services</h2>
 	
 	<table>
 		<thead>
@@ -63,7 +63,7 @@
 				</td>
 				<td><a href = "updateRemoteConfigurationCommand.php?id={$service.commandId}">{$service.commandIdentifier}</a></td>
 				<td>{$service.parent}</a>
-				<td>{$service.instanceCount}</td>
+				<td>{if $service.instanceCount == 0}<em>Not allowed to a node config</em>{else}{$service.instanceCount}{/if}</td>
 				<td>-</td>
 			</tr>
 		{/foreach}
@@ -105,8 +105,8 @@
 				</td>
 				<td><a href = "updateCommand.php?id={$command.metadataId}">{$command.metadataIdentifier}</a></td>
 				<td>{$command.command_line}</td>
-				<td>{$command.instanceCount}</td>
-				<td>-</td>
+				<td>{if $command.instanceCount == 0}<em>0 services using this command</em>{else}{$command.instanceCount}{/if}</td>
+				<td><a href = "createRemoteConfigService.php?commandId={$command.id}">Create service...</a></td>
 			</tr>
 		{/foreach}
 		</tbody>

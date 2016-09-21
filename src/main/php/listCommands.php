@@ -4,7 +4,7 @@ $title = _('Commands');
 require_once 'includes/common.php';
 
 $links = linksCollection();
-$links->add('createCommand.php', 'Create command');
+$links->add('createCommand.php', 'Create command metadata');
 
 require_once 'includes/widgets/header.php';
 

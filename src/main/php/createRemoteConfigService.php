@@ -3,8 +3,9 @@
 $title = 'Create remote config service';
 require_once 'includes/common.php';
 
-$sql = 'INSERT INTO remote_config_services () VALUES () ';
+$sql = 'INSERT INTO remote_config_services (command) VALUES (:commandId) ';
 $stmt = stmt($sql);
+$stmt->bindValue(':commandId', san()->filterUint('commandId'));
 $stmt->execute();
 
 $serviceId = insertId();
