@@ -33,6 +33,8 @@ cp setup/schema.sql %{buildroot}/usr/share/doc/upsilon-web/
 mkdir -p %{buildroot}/etc/httpd/conf.d
 cp setup/upsilon-apache.conf %{buildroot}/etc/httpd/conf.d/upsilon-web.conf
 
+mkdir -p %{buildroot}/etc/upsilon-web/
+
 %post 
 service httpd restart
 
@@ -43,6 +45,7 @@ service httpd restart
 /usr/share/upsilon-web/*
 /usr/share/upsilon-web/.buildid
 /etc/httpd/conf.d/upsilon-web.conf
+/etc/upsilon-web/
 
 %changelog
 * Thu Mar 05 2015 James Read <contact@jwread.com> 1.5.0-1
