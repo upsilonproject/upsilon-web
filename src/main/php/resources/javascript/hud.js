@@ -24,7 +24,7 @@ function toLocalIsoLikeString(d) {
 }
 
 function makeDateHumanReadable(element) {
-	utcDate = Date.parse(element.textContent + " UTC")
+	utcDate = new Date(element.textContent + " UTC")
 	elementUnixTimestamp = utcDate / 1000
 	nowUnixTimestamp = Date.now() / 1000
 

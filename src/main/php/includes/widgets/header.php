@@ -74,7 +74,7 @@ if (Session::isLoggedIn()) {
 	$generalLinksServices->add('viewServiceHud.php', 'Service HUD');
 	$generalLinksServices->add('listCommands.php', 'Command Metadata');
 	$generalLinksServices->add('listGroups.php', 'Groups');
-	$generalLinksServices->add('#', 'List');
+	$generalLinksServices->add('#', 'Results');
 
 	$generalLinksServicesList = linksCollection();
 	$generalLinksServicesList->add('viewList.php', 'Full list');
