@@ -48,7 +48,7 @@
 			<tr>
 				<th class = "small">ID</th>
 				<th>Identifier</th>
-				<th>Command<th>
+				<th>Command</th>
 				<th>Results</th>
 				<th>Actions</th>
 			</tr>
