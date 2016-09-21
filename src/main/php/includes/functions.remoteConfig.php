@@ -35,7 +35,7 @@ function getConfigNodes($config) {
 }
 
 function getConfigServices($config) {
-	$sql = 'SELECT a.id, s.id AS serviceId, s.name, c.identifier AS commandIdentifier, s.parent, cm.icon FROM remote_config_allocated_services a LEFT JOIN remote_config_services s ON a.service = s.id LEFT JOIN remote_config_commands c ON s.command = c.id LEFT JOIN command_metadata cm ON c.metadata = cm.id LEFT JOIN remote_configs rc ON a.config = rc.id WHERE rc.id = :config';
+	$sql = 'SELECT a.id, s.id AS serviceId, sr.id AS serviceResultsId, s.name, c.id AS commandId, c.identifier AS commandIdentifier, s.parent, cm.icon FROM remote_config_allocated_services a LEFT JOIN remote_config_services s ON a.service = s.id LEFT JOIN remote_config_commands c ON s.command = c.id LEFT JOIN command_metadata cm ON c.metadata = cm.id LEFT JOIN remote_configs rc ON a.config = rc.id LEFT JOIN services sr ON sr.identifier = s.name WHERE rc.id = :config';
 	$stmt = stmt($sql);
 	$stmt->bindValue(':config', $config);
 	$stmt->execute();

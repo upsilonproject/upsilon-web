@@ -24,7 +24,7 @@
 			<tr>
 				<td>{$node.id}</td>
 				<td><a href = "viewNode.php?id={$node.nodeId}">{$node.identifier}</a></td>
-				<td>{$node.lastUpdated}</td>
+				<td><span class = "date">{$node.lastUpdated}</span></td>
 				<td>
 					<a href = "deleteRemoteConfigAllocatedNode.php?id={$node.id}">Unallocate</a>
 					<a href = "amqpSendRemoteConfig.php?configId={$remoteConfig.id}&amp;node={$node.identifier}">Send</a>
@@ -48,6 +48,8 @@
 			<tr>
 				<th class = "small">ID</th>
 				<th>Identifier</th>
+				<th>Command<th>
+				<th>Results</th>
 				<th>Actions</th>
 			</tr>
 		</thead>
@@ -64,12 +66,20 @@
 					<a href = "updateRemoteConfigurationService.php?id={$service.serviceId}">{$service.name}</a>
 				</td>
 				<td>
+                    <a href = "updateRemoteConfigurationCommand.php?id={$service.commandId}">{$service.commandIdentifier}</a>
+				</td>
+				<td>
+					{if empty($service.serviceResultsId)}
+						<em>None found</em>
+					{else}
+						<a href = "viewService.php?id={$service.serviceResultsId}">View</a>
+					{/if}
+				</td>
+				<td>
 					Service: 
 					<a href = "updateRemoteConfigurationService.php?id={$service.serviceId}">Update</a>
-					&nbsp;
-					&nbsp;
-					&nbsp;
-					&nbsp;
+					&nbsp; &nbsp; &nbsp; &nbsp;                                 
+
 					Allocation: 
 					<a href = "updateRemoteConfigurationServiceInstance.php?id={$service.id}">Update</a>
 					<a href = "deleteRemoteConfigurationServiceInstance.php?id={$service.id}">Delete</a>
