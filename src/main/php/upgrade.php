@@ -20,7 +20,7 @@ if (!$upgrader->isUpgradeNeeded()) {
 if (isset($_REQUEST['doUpgrade'])) {
 	$upgrader->doUpgrade();
 
-	$tpl->assign('message', 'Finished running upgrade tasks');
+	$tpl->assign('message', 'Finished running upgrade tasks.<br /><br /><a href = "login.php">Proceed to login</a>');
 	$tpl->display('message.tpl');
 
 	require_once 'includes/widgets/footer.php';
