@@ -39,8 +39,8 @@ function makeDateHumanReadable(element) {
 		dojo.addClass(element.parentElement, "good");
 	}
 
-	description = secondsToString(nowUnixTimestamp - elementUnixTimestamp)
-	description += "\nOriginal: " + utcDate.toString()
+	description = "<strong>" + secondsToString(nowUnixTimestamp - elementUnixTimestamp) + "</strong>";
+	description += "<br />Original: " + utcDate.toString()
 
 	dojo.addClass(element, "tooltip")
 

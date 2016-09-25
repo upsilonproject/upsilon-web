@@ -11,6 +11,10 @@ input, button, select, option {
 	font-family: sans-serif;
 }
 
+input:focus {
+	border: 2px inset purple;
+}
+
 div.serviceDetail, div.box, div.block {
 	display: block;
 	text-align: left;
@@ -166,6 +170,7 @@ a:hover {
 
 a:focus {
 	background-color: purple;
+	color: white;
 }
 
 table {
@@ -433,7 +438,7 @@ table.dataTable th:hover, p.collapseable:hover {
 	float: right;	
 }
 
-input[type="buton"], button, a[role="button"] {
+input[type="button"], button, a[role="button"] {
 	border: 1px solid #666;
 	padding: .2em;
 	display: inline-block;
@@ -445,12 +450,16 @@ input[type="buton"], button, a[role="button"] {
 	min-width: 2em;
 }
 
-input[type="buton"]:hover, button:hover, a[role="button"]:hover {
+input[type="button"]:hover, button:hover, a[role="button"]:hover {
 	text-decoration: none;
 	background-color: #444;
 	border: 1px solid black;
 	color: white;
 	cursor: pointer;
+}
+
+input[type="button"]:focus, button:focus {
+	border: 1px solid purple;
 }
 
 fieldset button[style != "nonFormButton"] {

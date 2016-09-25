@@ -22,7 +22,7 @@ class FormUpdateWidgetInstance extends Form {
 
 		$this->addElementsWidgetOptions($this->widgetInstance);
 
-		$this->addDefaultButtons();
+		$this->addDefaultButtons('Save widget');
 	}
 
 	private function addElementsWidgetOptions() {
