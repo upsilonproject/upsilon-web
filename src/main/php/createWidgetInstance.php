@@ -19,7 +19,7 @@ class FormCreateWidgetInstance extends Form {
 		$this->addElement(new ElementHidden('dashboard', 'Dashboard', $this->id));
 		$this->addelement($this->getElementClass());
 
-		$this->addDefaultButtons();
+		$this->addDefaultButtons('Add');
 	}
 
 	private function getElementClass() {
