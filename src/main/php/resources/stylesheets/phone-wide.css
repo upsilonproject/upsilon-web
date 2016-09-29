@@ -1,0 +1,33 @@
+.media-width-prio-low {
+	display: none;
+	visibility: collapse;
+}
+
+body {
+	background-color: red;
+}
+
+div.loginFormContainer {
+	width: auto;
+}
+
+label {
+	text-align: left;
+}
+
+div.block {
+	min-width: inherit;
+	width: auto;
+}
+
+table {
+	width: auto;
+}
+
+#content {
+	padding: 0;	
+}
+
+div.box {
+	margin: 0;
+}

@@ -72,13 +72,15 @@ if (Session::isLoggedIn()) {
 	$generalLinks->add('#', 'Services &blacktriangledown;');
 
 	$generalLinksServices = linksCollection();
-	$generalLinksServices->add('viewList.php', 'Service Definitions');
-	$generalLinksServices->add('#', 'Searches');
+	$generalLinksServices->add('listServiceDefinitions.php', 'Service Definitions');
+	$generalLinksServices->add('#', 'Results');
 
 	$generalLinksServicesList = linksCollection();
+	$generalLinksServicesList->add('viewList.php', 'All Service Results');
+	$generalLinksServicesList->addSeparator();
 	$generalLinksServicesList->add('viewList.php?problems', 'Services With Problems');
 	$generalLinksServicesList->add('viewList.php?ungrouped', 'Services Without Group');
-	$generalLinksServices->addChildCollection('Searches', $generalLinksServicesList);
+	$generalLinksServices->addChildCollection('Results', $generalLinksServicesList);
 
 	$generalLinksServices->add('listGroups.php', 'Groups');
 	$generalLinksServices->addSeparator();

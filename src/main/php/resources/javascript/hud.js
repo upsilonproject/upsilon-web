@@ -196,7 +196,7 @@ function layoutBoxes() {
 
 		if (blocks.length > 0) {
 			if (typeof(window.boxLayoutManager) == "undefined") {
-				window.boxLayoutManager = new Masonry('div.blockContainer', {itemSelector: 'div.block', columnWidth: 200, isFitWidth: true });
+				window.boxLayoutManager = new Masonry('div.blockContainer', {itemSelector: 'div.block', gutter: 10, isFitWidth: true });
 			}
 
 			console.log("blocks", blocks);

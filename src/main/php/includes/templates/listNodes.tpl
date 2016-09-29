@@ -13,13 +13,16 @@
 	<p>Visit the wiki to understand how to <a href = "http://upsilon-project.co.uk/site/index.php/SetupNodeDatabase">configure your node to write to a database</a>.</p>
 {else}
 <table class = "hover dataTable">
+	<colgroup>
+		<col style = "background-color: red" class = "media-width-prio-low" />
+	</colgroup>
 	<thead>
 		<tr>
-			<th>id</th>
+			<th class = "media-width-prio-low">id</th>
 			<th>Title</th>
 			<th>Type</th>
-			<th>Service count</th>
-			<th>Last updated</th>
+			<th class = "media-width-prio-low">Service count</th>
+			<th class = "media-width-prio-low">Last updated</th>
 			<th>Status</th>
 		</tr>
 	</thead>
@@ -27,11 +30,11 @@
 	<tbody>
 		{foreach from = $listNodes item = itemNode}
 		<tr>
-			<td><a class = "node" href = "viewNode.php?id={$itemNode.id}">{$itemNode.id}</a></td>
+			<td class = "media-width-prio-low"><a class = "node" href = "viewNode.php?id={$itemNode.id}">{$itemNode.id}</a></td>
 			<td><a class = "node" href = "viewNode.php?id={$itemNode.id}">{$itemNode.identifier}</a></td>
 			<td>{$itemNode.nodeType} (version {$itemNode.instanceApplicationVersion})</td>
-			<td>{$itemNode.serviceCount}</td>
-			<td><span class = "date">{$itemNode.lastUpdated}</span></td>
+			<td class = "media-width-prio-low">{$itemNode.serviceCount}</td>
+			<td class = "media-width-prio-low"><span class = "date">{$itemNode.lastUpdated}</span></td>
 			<td class = "{$itemNode.karma|strtolower}">{$itemNode.karma}</td>
 		</tr>
 		{/foreach}
