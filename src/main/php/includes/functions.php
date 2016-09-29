@@ -1475,7 +1475,7 @@ function parseReportedConfigs($configString) {
 	return $configs;
 }
 
-function deleteNodeById() {
+function deleteNodeById($id) {
 	$sql = 'DELETE FROM nodes WHERE id = :id ';
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->bindValue(':id', $id);
