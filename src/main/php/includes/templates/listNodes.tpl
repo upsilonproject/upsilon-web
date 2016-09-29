@@ -13,9 +13,6 @@
 	<p>Visit the wiki to understand how to <a href = "http://upsilon-project.co.uk/site/index.php/SetupNodeDatabase">configure your node to write to a database</a>.</p>
 {else}
 <table class = "hover dataTable">
-	<colgroup>
-		<col style = "background-color: red" class = "media-width-prio-low" />
-	</colgroup>
 	<thead>
 		<tr>
 			<th class = "media-width-prio-low">id</th>

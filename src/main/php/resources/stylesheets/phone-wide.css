@@ -3,10 +3,6 @@
 	visibility: collapse;
 }
 
-body {
-	background-color: red;
-}
-
 div.loginFormContainer {
 	width: auto;
 }
@@ -30,4 +26,11 @@ table {
 
 div.box {
 	margin: 0;
+	border-left: 0;
+	border-right: 0;
+}
+
+.claro .dijitMenuBar {
+	border-left: 0;
+	border-right: 0;
 }
