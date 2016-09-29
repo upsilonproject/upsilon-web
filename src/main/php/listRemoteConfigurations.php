@@ -21,8 +21,6 @@ $title = 'Remote configurations';
 require_once 'includes/widgets/header.php';
 
 $tpl->assign('listRemoteConfigs', $configs);
-$tpl->assign('listCommands', getAllCommands());
-$tpl->assign('listServices', getAllRemoteConfigServices());
 $tpl->display('listRemoteConfigs.tpl');
 
 require_once 'includes/widgets/footer.php';
