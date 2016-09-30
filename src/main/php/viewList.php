@@ -84,7 +84,7 @@ $filters->addInt('maintPeriod', 'Maintenance Period');
 $filters->addString('name');
 
 $qb = new \libAllure\QueryBuilder();
-$qb->from('services')->fields('id', 'identifier', 'output', 'description', 'lastUpdated', 'karma', 'secondsRemaining');
+$qb->from('services')->fields('id', 'identifier', 'output', 'description', 'lastUpdated', 'karma', 'secondsRemaining', 'node');
 
 if ($filters->isUsed('problems')) {
 	$qb->whereNotEquals('karma', 'good');

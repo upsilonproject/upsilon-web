@@ -41,7 +41,7 @@
 		<td><input type = "checkbox" name = "services[]" value = "{$itemService.identifier}" /></td>
 		<td>
 			{if empty($itemService.remote_config_id)}
-				<em>Configured locally</em>
+				<em>Configured locally on </em><a href = "viewNode.php?id={$itemService.node}">{$itemService.node}</a>
 			{else}
 				<a href = "updateRemoteConfigurationService.php?id={$itemService.remote_config_service_id}">{$itemService.remote_config_service_identifier}</a>
 				from <a href = "viewRemoteConfig.php?id={$itemService.remote_config_id}">{$itemService.remote_config_name}</a>
