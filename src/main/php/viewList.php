@@ -44,6 +44,18 @@ if ($filters->isUsed('node')) {
 	$qb->whereEquals('node', $filters->getValue('node'));
 }
 
+$qb->leftJoin('remote_config_allocated_nodes', 'rn')->on('s.node', 'rn.node');
+$qb->leftJoin('remote_config_allocated_services', 'ras')->on('ras.config', 'rn.config');
+$qb->leftJoin('remote_config_services', 'rs')->on('ras.service', 'rs.id')->on('rs.name', 'identifier');
+$qb->leftJoin('remote_configs', 'rc')->on('rn.config', 'rc.id')->onImpl(null, null, 'not(isnull(rs.id))');
+$qb->fields(array('rc.id', 'remote_config_id'));
+$qb->fields(array('rs.id', 'remote_config_service_id'));
+$qb->fields(array('rs.name', 'remote_config_service_identifier'));
+$qb->fields(array('rc.name', 'remote_config_name'));
+$qb->groupBy('s.id');
+
+print_r($qb->build());
+
 $stmt = DatabaseFactory::getInstance()->prepare($qb->build());
 $stmt->execute();
 $listServices = $stmt->fetchAll();
