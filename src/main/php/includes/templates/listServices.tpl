@@ -1,5 +1,5 @@
 <div class = "box">
-<h2>List services ({$listServices|@count})</h2>
+<h2>Service Results ({$listServices|@count})</h2>
 	{if isset($filters)}
 		<strong>Filters: </strong>
 		<form class = "inline">
@@ -12,6 +12,15 @@
 
 			{if $filter.type == "string" || $filter.type == "int"}
 				<input name = "{$filter.name}" value = "{$filter.value}"></input>
+			{/if}
+
+			{if $filter.type == "select"}
+				<select name = "{$filter.name}">
+					<option value = "">-- Any node</option>
+				{foreach from = $filter.options item = option}
+					<option {if $filter.value == $option.name}selected{/if} value = "{$option.name}">{$option.name}</option>
+				{/foreach}
+				</select>
 			{/if}
 
 			&nbsp;&nbsp;&nbsp;&nbsp;
