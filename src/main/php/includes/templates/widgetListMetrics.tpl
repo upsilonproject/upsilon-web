@@ -1,9 +1,13 @@
 <div>
+	{if $lastUpdatedShort}
+	<div style = "float: right"><span class = "date relative">{$service.lastUpdated}</span></div>
+	{/if}
+
 	{if $serviceDetail}
 	<h2>Details</h2>
 	<p><strong>Service:</strong> {if $sessionOptions->drawNavigation}<a href = "viewService.php?id={$service.id}">{/if}{$service.identifier}{if $sessionOptions->drawNavigation}</a>{/if}<p>
 	<p><strong>Karma:</strong> <span class = "metricIndicator {$service.karma|strtolower}">{$service.karma}</span></p>
-	<p><strong>Last Updated:</strong> {$service.lastUpdatedRelative}</p>
+	<p><strong>Last Updated:</strong> <span><span class = "date">{$service.lastUpdated}</span></span></p>
 
 	{/if}
 	{if isset($service.listSubresults)} 

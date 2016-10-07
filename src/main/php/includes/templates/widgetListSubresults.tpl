@@ -1,5 +1,4 @@
 <div>
-	{if $serviceDetail}
 	<h2>Details</h2>
 	<p><strong>Service:</strong> {if $sessionOptions->drawNavigation}<a href = "viewService.php?id={$service.id}">{/if}{$service.identifier}{if $sessionOptions->drawNavigation}</a>{/if}<p>
 	<p><strong>Karma:</strong> <span class = "metricIndicator {$service.karma|strtolower}">{$service.karma}</span></p>
