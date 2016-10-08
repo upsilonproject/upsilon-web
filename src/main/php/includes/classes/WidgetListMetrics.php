@@ -10,6 +10,7 @@ class WidgetListMetrics extends Widget {
 		parent::__construct();
 		$this->arguments['service'] = null;
 		$this->arguments['serviceDetail'] = null;
+		$this->arguments['lastUpdatedShort'] = null;
 		$this->arguments['metricsTitle'] = null;
 	}
 
@@ -31,6 +32,7 @@ class WidgetListMetrics extends Widget {
 			$tpl->display('message.tpl');
 		} else {
 			$tpl->assign('service', $this->service);
+			$tpl->assign('lastUpdatedShort', $this->getARgumentValue('lastUpdatedShort'));
 			$tpl->assign('serviceDetail', $this->getArgumentValue('serviceDetail'));
 			$tpl->assign('metricsTitle', $this->getArgumentValue('metricsTitle'));
 			$tpl->display('widgetListMetrics.tpl');
@@ -39,6 +41,8 @@ class WidgetListMetrics extends Widget {
 
 	public function getArgumentFormElement($name) {
 		switch ($name) {
+		case 'lastUpdatedShort':
+			return new ElementCheckbox('lastUpdatedShort', 'Last Updated (short display)');
 		case 'serviceDetail':
 			return new ElementCheckbox('serviceDetail', 'Service detail');
 		default:

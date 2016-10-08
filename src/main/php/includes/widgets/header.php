@@ -64,6 +64,7 @@ if (Session::isLoggedIn()) {
 		$dashboardLinks->addSeparator();
 	}
 
+	$dashboardLinks->add('viewServiceDashboard.php', 'Service Dashboard');
 	$dashboardLinks->add('listDashboards.php', 'All Dashboards');
 
 	$generalLinks->addChildCollection('Dashboards &blacktriangledown;', $dashboardLinks);
@@ -71,16 +72,21 @@ if (Session::isLoggedIn()) {
 	$generalLinks->add('#', 'Services &blacktriangledown;');
 
 	$generalLinksServices = linksCollection();
-	$generalLinksServices->add('viewServiceHud.php', 'Service HUD');
-	$generalLinksServices->add('listCommands.php', 'Command Metadata');
-	$generalLinksServices->add('listGroups.php', 'Groups');
+	$generalLinksServices->add('listServiceDefinitions.php', 'Service Definitions');
 	$generalLinksServices->add('#', 'Results');
 
 	$generalLinksServicesList = linksCollection();
-	$generalLinksServicesList->add('viewList.php', 'Full list');
+	$generalLinksServicesList->add('viewList.php', 'All Service Results');
+	$generalLinksServicesList->addSeparator();
 	$generalLinksServicesList->add('viewList.php?problems', 'Services With Problems');
 	$generalLinksServicesList->add('viewList.php?ungrouped', 'Services Without Group');
-	$generalLinksServices->addChildCollection('List', $generalLinksServicesList);
+	$generalLinksServices->addChildCollection('Results', $generalLinksServicesList);
+
+	$generalLinksServices->add('listGroups.php', 'Groups');
+	$generalLinksServices->addSeparator();
+	$generalLinksServices->add('listCommandDefinitions.php', 'Command Definitions');
+	$generalLinksServices->add('listCommands.php', 'Command Metadata');
+	$generalLinksServices->addSeparator();
 	$generalLinksServices->add('listMaintPeriods.php', 'Maintenance Periods');
 	$generalLinksServices->addSeparator();
 	$generalLinksServices->add('listClasses.php', 'Classes');

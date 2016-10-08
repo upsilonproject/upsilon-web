@@ -4,8 +4,12 @@
 <head>
 	<title>{$siteTitle} &raquo; {$title|default:'Untitled page'}</title>
 
+	<link rel="stylesheet" href="resources/dojo/dijit/themes/claro/claro.css" />
+
 	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/main.css" />
-	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/mobile.css" title = "mobile" media = "(max-device-width: 480px)" />
+	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/phone-thin.css" title = "mobile" media = "(max-width: 300px)" />
+	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/phone-wide.css" title = "mobile" media = "(max-width: 400px)" />
+	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/tablet.css" title = "mobile" media = "(max-width: 400px)" />
 
 	<link rel = "{if $isNighttime}stylesheet{/if}" type = "text/css" href = "resources/stylesheets/main-nighttime.css" title = "nighttime" />
 
@@ -17,7 +21,6 @@
 	<script src="resources/dojo/dojo/dojo.js"></script>
 	<script src="resources/javascript/hud.js"></script>
 
-	<link rel="stylesheet" href="resources/dojo/dijit/themes/claro/claro.css" />
 
 	</head>
 

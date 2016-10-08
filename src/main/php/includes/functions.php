@@ -565,7 +565,7 @@ function redirectApiClients() {
 				case 'mobile':
 					redirect('viewMobileStats.php', 'View Mobile Stats');
 				case 'hud':
-					redirect('viewServiceHud.php', 'API Login complete. Redirecting to Service HUD.');
+					redirect('viewServiceDashboard.php', 'API Login complete. Redirecting to Service HUD.');
 				default:
 					redirect($_SERVER['REQUEST_URI'], 'API login complete.');
 			}
@@ -1475,7 +1475,7 @@ function parseReportedConfigs($configString) {
 	return $configs;
 }
 
-function deleteNodeById() {
+function deleteNodeById($id) {
 	$sql = 'DELETE FROM nodes WHERE id = :id ';
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->bindValue(':id', $id);

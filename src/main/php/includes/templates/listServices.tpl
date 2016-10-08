@@ -1,26 +1,6 @@
 <div class = "box">
-<h2>List services ({$listServices|@count})</h2>
-	{if isset($filters)}
-		<strong>Filters: </strong>
-		<form class = "inline">
-	{foreach from = $filters item = filter}
-			<span class = "{if $filter.isUsed}good{else}unknown{/if}">{$filter.label}</span>
-
-			{if $filter.type == "bool"}
-				<input type = "checkbox" {if $filter.isUsed}checked{/if} name = "{$filter.name}">
-			{/if}
-
-			{if $filter.type == "string" || $filter.type == "int"}
-				<input name = "{$filter.name}" value = "{$filter.value}"></input>
-			{/if}
-
-			&nbsp;&nbsp;&nbsp;&nbsp;
-	{/foreach}
-			<button type = "submit">Update</button>
-		</form>
-		<br />
-	{/if}
-	<hr />
+<h2>Service Results ({$listServices|@count})</h2>
+	{include "filters.tpl"}
 <form action = "workWithGroup.php" class = "unstyled">
 	{include file = "selectedServiceActions.tpl"}
 <table class = "dataTable hover">
@@ -41,7 +21,7 @@
 		<td><input type = "checkbox" name = "services[]" value = "{$itemService.identifier}" /></td>
 		<td>
 			{if empty($itemService.remote_config_id)}
-				<em>Configured locally</em>
+				<em>Configured locally on </em><a href = "viewNode.php?identifier={$itemService.node}">{$itemService.node}</a>
 			{else}
 				<a href = "updateRemoteConfigurationService.php?id={$itemService.remote_config_service_id}">{$itemService.remote_config_service_identifier}</a>
 				from <a href = "viewRemoteConfig.php?id={$itemService.remote_config_id}">{$itemService.remote_config_name}</a>

@@ -84,7 +84,7 @@ class Widget {
 		$el = new ElementSelect('group', 'Group');
 
 		foreach (getGroups() as $group) {
-			$el->addOption($group['title'], $group['id']);
+			$el->addOption($group['name'], $group['id']);
 		}
 
 
