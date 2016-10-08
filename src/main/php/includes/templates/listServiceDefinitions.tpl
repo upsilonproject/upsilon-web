@@ -1,6 +1,7 @@
 <div class = "box">
 	<h2>Services</h2>
 	
+	{include "filters.tpl"}
 	<table>
 		<thead>
 			<tr>
