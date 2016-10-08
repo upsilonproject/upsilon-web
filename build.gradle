@@ -1,11 +1,13 @@
-apply plugin: 'distribution'
-
-delete "src/main/php/includes/libraries/Smarty"
-delete "src/main/php/resources/dojo"
+#!groovy
 
 plugins {
 	id "com.github.jamesread.buildid" version "1.10"
 }
+
+apply plugin: 'distribution'
+
+delete "src/main/php/includes/libraries/Smarty"
+delete "src/main/php/resources/dojo"
 
 version = buildid.newBuild().get("tag")
 
