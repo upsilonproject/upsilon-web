@@ -9,7 +9,10 @@ apply plugin: 'distribution'
 delete "src/main/php/includes/libraries/Smarty"
 delete "src/main/php/resources/dojo"
 
-version = buildid.newBuild().get("tag")
+buildid.newBuild()
+buildid.writeRpmMacro()
+
+String version = buildid.get("tag")
 
 task setupLibraries(type: Exec) {
 	commandLine "./setupLibraries.sh"
@@ -41,7 +44,7 @@ distZip {
 
 	from (".") {
 		include ".buildid"
-		include ".upsilon-web.rpmmacro"
+		include ".buildid.rpmmacro"
 		include "README.md" 
 		into "upsilon-web-${version}/"
 	}
