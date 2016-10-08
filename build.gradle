@@ -1,7 +1,7 @@
 #!groovy
 
 plugins {
-	id "com.github.jamesread.buildid" version "1.10"
+	id "com.github.jamesread.buildid" version "1.12"
 }
 
 apply plugin: 'distribution'
