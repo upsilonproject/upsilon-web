@@ -3,23 +3,11 @@ apply plugin: 'distribution'
 delete "src/main/php/includes/libraries/Smarty"
 delete "src/main/php/resources/dojo"
 
-def generateBuildId() {
-	exec {
-		commandLine "buildid", "-n"
-	}
-
-	exec { 
-		commandLine "buildid", "-qf", "rpmmacro", "-W", ".upsilon-web.rpmmacro"
-	}
-
-	Properties buildid = new Properties()
-	buildid.load(new File(".buildid").newReader());
-
-	return buildid
+plugins {
+	id "com.github.jamesread.buildid" version "1.10"
 }
 
-Properties buildid = generateBuildId()
-version = buildid.get("tag")
+version = buildid.newBuild().get("tag")
 
 task setupLibraries(type: Exec) {
 	commandLine "./setupLibraries.sh"
