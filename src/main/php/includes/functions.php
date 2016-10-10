@@ -203,13 +203,13 @@ function findLatestNodeVersion($nodes) {
 	foreach ($nodes as $node) {
 		$matches = array();
 
-		preg_match_all('/(?<major>[\d]+)\.(?<minor>[\d]+)\.(?<revision>[\d]+)\-(?<timestamp>[\d]+)/i', $node['instanceApplicationVersion'], $matches);
+		preg_match_all('/(?<major>[\d]+)\.(?<minor>[\d]+)\.(?<revision>[\d]+)\-\d+\-(?<timestamp>[\d]+)/i', $node['instanceApplicationVersion'], $matches);
 
 		if (isset($matches['timestamp'])) {
 			$timestamp = intval(current($matches['timestamp']));
 
-			if (intval($timestamp) > $latestTimestamp) {
-				$latestTimetstamp = $timestamp;
+			if ($timestamp > $latestTimestamp) {
+				$latestTimestamp = $timestamp;
 				$latestValue = $node['instanceApplicationVersion'];
 			}
 		}
