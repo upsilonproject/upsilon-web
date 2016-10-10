@@ -196,7 +196,31 @@ function getNodes() {
 	return $nodes;
 }
 
+function findLatestNodeVersion($nodes) {
+	$latestTimestamp = 0;
+	$latestValue = '';
+
+	foreach ($nodes as $node) {
+		$matches = array();
+
+		preg_match_all('/(?<major>[\d]+)\.(?<minor>[\d]+)\.(?<revision>[\d]+)\-(?<timestamp>[\d]+)/i', $node['instanceApplicationVersion'], $matches);
+
+		if (isset($matches['timestamp'])) {
+			$timestamp = intval(current($matches['timestamp']));
+
+			if (intval($timestamp) > $latestTimestamp) {
+				$latestTimetstamp = $timestamp;
+				$latestValue = $node['instanceApplicationVersion'];
+			}
+		}
+	}
+
+	return $latestValue;
+}
+
 function addStatusToNodes($nodes) {
+	$latestVersion = findLatestNodeVersion($nodes);
+
 	foreach ($nodes as &$itemNode) {
 		$itemNode['lastUpdateRelative'] = getRelativeTime($itemNode['lastUpdated'], true);
 		$itemNode['karma'] = 'UNKNOWN';
@@ -204,9 +228,15 @@ function addStatusToNodes($nodes) {
 		$diff = time() - strtotime($itemNode['lastUpdated']);
 
 		if ($diff > 1200) {
-			$itemNode['karma'] = 'BAD';
+			$itemNode['karma'] = 'OLD';
 		} else {
 			$itemNode['karma'] = 'GOOD';
+		}
+
+		if ($itemNode['instanceApplicationVersion'] == $latestVersion) {
+			$itemNode['versionKarma'] = 'GOOD';
+		} else {
+			$itemNode['versionKarma'] = 'OLD';
 		}
 	}
 

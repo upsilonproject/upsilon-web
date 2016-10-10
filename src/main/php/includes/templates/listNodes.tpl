@@ -29,7 +29,7 @@
 		<tr>
 			<td class = "media-width-prio-low"><a class = "node" href = "viewNode.php?id={$itemNode.id}">{$itemNode.id}</a></td>
 			<td><a class = "node" href = "viewNode.php?id={$itemNode.id}">{$itemNode.identifier}</a></td>
-			<td>{$itemNode.nodeType} (version {$itemNode.instanceApplicationVersion})</td>
+			<td class = "{$itemNode.versionKarma|strtolower}">{$itemNode.nodeType} (version {$itemNode.instanceApplicationVersion})</td>
 			<td class = "media-width-prio-low">{$itemNode.serviceCount}</td>
 			<td class = "media-width-prio-low"><span class = "date">{$itemNode.lastUpdated}</span></td>
 			<td class = "{$itemNode.karma|strtolower}">{$itemNode.karma}</td>
