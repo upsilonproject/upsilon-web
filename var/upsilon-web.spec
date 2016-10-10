@@ -1,4 +1,4 @@
-%include SPECS/.upsilon-web.rpmmacro
+%include SPECS/.buildid.rpmmacro
 
 Name:		upsilon-web
 Version:	%{version_formatted_short}

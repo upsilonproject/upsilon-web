@@ -1,25 +1,18 @@
+#!groovy
+
+plugins {
+	id "com.github.jamesread.buildid" version "1.12"
+}
+
 apply plugin: 'distribution'
 
 delete "src/main/php/includes/libraries/Smarty"
 delete "src/main/php/resources/dojo"
 
-def generateBuildId() {
-	exec {
-		commandLine "buildid", "-n"
-	}
+buildid.newBuild()
+buildid.writeRpmMacro()
 
-	exec { 
-		commandLine "buildid", "-qf", "rpmmacro", "-W", ".upsilon-web.rpmmacro"
-	}
-
-	Properties buildid = new Properties()
-	buildid.load(new File(".buildid").newReader());
-
-	return buildid
-}
-
-Properties buildid = generateBuildId()
-version = buildid.get("tag")
+String version = buildid.get("tag")
 
 task setupLibraries(type: Exec) {
 	commandLine "./setupLibraries.sh"
@@ -51,7 +44,7 @@ distZip {
 
 	from (".") {
 		include ".buildid"
-		include ".upsilon-web.rpmmacro"
+		include ".buildid.rpmmacro"
 		include "README.md" 
 		into "upsilon-web-${version}/"
 	}
