@@ -200,6 +200,10 @@ function findLatestNodeVersion($nodes) {
 	$latestTimestamp = 0;
 	$latestValue = '';
 
+	if (!isset($nodes[0]['instanceApplicationVersion'])) {
+		return;
+	}
+
 	foreach ($nodes as $node) {
 		$matches = array();
 
@@ -233,10 +237,12 @@ function addStatusToNodes($nodes) {
 			$itemNode['karma'] = 'GOOD';
 		}
 
-		if ($itemNode['instanceApplicationVersion'] == $latestVersion) {
-			$itemNode['versionKarma'] = 'GOOD';
-		} else {
-			$itemNode['versionKarma'] = 'OLD';
+		if (isset($itemNode['instanceApplicationVersion'])) {
+			if ($itemNode['instanceApplicationVersion'] == $latestVersion) {
+				$itemNode['versionKarma'] = 'GOOD';
+			} else {
+				$itemNode['versionKarma'] = 'OLD';
+			}
 		}
 	}
 
