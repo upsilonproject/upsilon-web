@@ -115,6 +115,7 @@ if (Session::isLoggedIn()) {
 	$systemLinks->add('listUsergroups.php', 'Usergroups');
 	$systemLinks->add('listUsers.php', 'Users');
 	$systemLinks->add('listApiClients.php', 'API Clients');
+	$systemLinks->add('updateCatalog.php', 'Perform catalog update');
 	$systemLinks->add('settings.php', 'Settings');
 	$systemLinks->addSeparator();
 	$systemLinks->add('html5app.html', 'HTML5 Console (testing)');
