@@ -10,7 +10,7 @@ $config = generateConfigFromId($configId);
 $msg = new UpsilonMessage('UPDATED_NODE_CONFIG', $config);
 $msg->addHeader('node-identifier', san()->filterString('node'));
 $msg->addHeader('remote-config-id', $configId);
-$msg->addHeader('remote-config-source-identifier', getSiteSetting('configSourceIdentifier'));
+$msg->addHeader('remote-config-source-identifier', getSiteSetting('configSourceIdentifier') . '-' . $configId);
 $msg->publish();
 
 
