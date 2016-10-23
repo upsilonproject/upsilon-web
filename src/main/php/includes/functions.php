@@ -7,6 +7,25 @@ use \libAllure\HtmlLinksCollection;
 
 require_once 'includes/classes/SessionOptions.php';
 
+function loggerFields() {
+	return array('userId', 'usergroupId', 'serviceResultId', 'nodeId', 'nodeConfigId', 'serviceDefinitionId', 'commandDefinitionId', 'classId', 'dashboardId', 'serviceGroupId');
+}
+
+function logger($message, $keys = array()) {
+	$sql = 'INSERT INTO logs (message, timestamp, userId, usergroupId, serviceResultId, nodeId, nodeConfigId, serviceDefinitionId, commandDefinitionId, classId, dashboardId, serviceGroupId) VALUES (:message, now(), :userId, :usergroupId, :serviceResultId, :nodeId, :nodeConfigId, :serviceDefinitionId, :commandDefinitionId, :classId, :dashboardId, :serviceGroupId)';
+	$stmt = stmt($sql);
+	
+	foreach (loggerFields() as $arg) {
+		if (isset($keys[$arg])) {
+			$stmt->bindValue($arg, $keys[$arg]);
+		} else {
+			$stmt->bindValue($arg, null);
+		}
+	}
+
+	$stmt->execute();
+}
+
 function isUsingSsl() {
 	if (!isset($_SERVER['HTTPS'])) {
 		$_SERVER['HTTPS'] = 'off';
