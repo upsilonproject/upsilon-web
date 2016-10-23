@@ -245,7 +245,7 @@ class LoggerTable extends DatabaseUpgradeTask {
 	}
 
 	public function perform() {
-		$sql = 'CREATE TABLE logs (id int not null primary key auto_increment, userId int, usergroupId int, serviceResultId int, nodeId int, nodeConfigId int, serviceDefinitionId int, commandDefinitionId int, classId int, dashboardId int, serviceGroupId int)';
+		$sql = 'CREATE TABLE logs (id int not null primary key auto_increment, message longtext, timestamp datetime, userId int, usergroupId int, serviceResultId int, nodeId int, nodeConfigId int, serviceDefinitionId int, commandDefinitionId int, classId int, dashboardId int, serviceGroupId int)';
 		$stmt = stmt($sql);
 		$stmt->execute();
 	}

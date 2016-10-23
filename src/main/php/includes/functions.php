@@ -14,6 +14,7 @@ function loggerFields() {
 function logger($message, $keys = array()) {
 	$sql = 'INSERT INTO logs (message, timestamp, userId, usergroupId, serviceResultId, nodeId, nodeConfigId, serviceDefinitionId, commandDefinitionId, classId, dashboardId, serviceGroupId) VALUES (:message, now(), :userId, :usergroupId, :serviceResultId, :nodeId, :nodeConfigId, :serviceDefinitionId, :commandDefinitionId, :classId, :dashboardId, :serviceGroupId)';
 	$stmt = stmt($sql);
+	$stmt->bindValue(':message', $message);
 	
 	foreach (loggerFields() as $arg) {
 		if (isset($keys[$arg])) {

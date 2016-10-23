@@ -8,7 +8,7 @@ $stmt->execute();
 $logs = stmt->fetchAll();
 
 foreach ($logs as $log) {
-	$log['message'] = str_replace($log['message'], ':userId', '<a href = "viewUser.php?id=' . $log['userId'] . '">' . $log['username'] . '</a>');
+	$log['message'] = str_replace($log['message'], '_userId_', '<a href = "viewUser.php?id=' . $log['userId'] . '">' . $log['username'] . '</a>');
 }
 
 $tpl->assign('listLogs', $logs);
