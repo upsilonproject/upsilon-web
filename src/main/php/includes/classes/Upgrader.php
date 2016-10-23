@@ -255,7 +255,7 @@ upgrader::registerTask(new LoggerTable());
 
 class ServiceAssociationIncludeNode extends DatabaseUpgradeTask {
 	public function isNecessary() {
-		return !$this->tableHasUniqueKey('services', 'unx_sid');
+		return !$this->tableHasUniqueKey('services', 'unq_sid');
 	}
 
 	public function perform() {
