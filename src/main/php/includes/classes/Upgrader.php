@@ -253,4 +253,23 @@ class LoggerTable extends DatabaseUpgradeTask {
 
 upgrader::registerTask(new LoggerTable());
 
+class ServiceAssociationIncludeNode extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->tableHasUniqueKey('unx_sid');
+	}
+
+	public function perform() {
+		$sql = 'ALTER TABLE services DROP KEY identifier ';
+		stmt($sql)->execute()
+
+		$sql = 'ALTER TABLE services ADD UNIQUE unq_sid (identifier, node)';
+		stmt($sql)->execute();
+
+		$sql = 'ALTER TABLE service_check_results ADD node varchar(128)';
+		stmt($sql)->execute();
+	}
+}
+
+upgrader::registerTask(new ServiceAssociationIncudeNode());
+
 ?>
