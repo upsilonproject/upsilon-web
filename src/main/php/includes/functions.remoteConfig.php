@@ -1,7 +1,7 @@
 <?php
 
 function getConfigById($configId) {
-	$sql = 'SELECT r.id, r.name, r.mtime FROM remote_configs r WHERE r.id = :id';
+	$sql = 'SELECT r.id, r.name, r.mtime, unix_timestamp(r.mtime) AS modifiedTimestamp FROM remote_configs r WHERE r.id = :id';
 	$stmt = stmt($sql);
 	$stmt->bindValue(':id', $configId);
 	$stmt->execute();
@@ -11,10 +11,12 @@ function getConfigById($configId) {
 	return $config;
 }
 
-function getConfigNodes($config) {
+function getConfigNodes($configId) {
+	$config = getConfigById($configId);
+
 	$sql = 'SELECT a.id, n.id AS nodeId, n.identifier, n.lastUpdated, n.configs FROM remote_config_allocated_nodes a LEFT JOIN nodes n ON a.node = n.identifier WHERE a.config = :config';
 	$stmt = db()->prepare($sql);
-	$stmt->bindValue(':config', $config);
+	$stmt->bindValue(':config', $configId);
 	$stmt->execute();
 
 	$nodes = $stmt->fetchAll();
@@ -24,10 +26,22 @@ function getConfigNodes($config) {
 	foreach ($nodes as $index => $node) {
 			$reportedConfigs = parseReportedConfigs($node['configs']);
 
-			if (isset($reportedConfigs[$config])) {
-				$nodes[$index]['reported'] = $reportedConfigs[$config];
+			$nodes[$index]['reportVersion'] = null;
+
+			if (isset($reportedConfigs[$configId])) {
+				$nodes[$index]['reported'] = $reportedConfigs[$configId];
+				$nodes[$index]['reportStatus'] = 'REPORTED';
+				$nodes[$index]['reportVersion'] = date(DATE_RFC2822, $reportedConfigs[$configId]['updated'] / 1000);
+
+				if (strtotime($config['mtime']) > strtotime($reportedConfigs[$configId]['updated'])) {
+					$nodes[$index]['reportKarma'] = 'OLD';
+				} else {
+					$nodes[$index]['reportKarma'] = 'GOOD';
+				}
 			} else {
 				$nodes[$index]['reported'] = null;
+				$nodes[$index]['reportStatus'] = 'NOT REPORTED';
+				$nodes[$index]['reportKarma'] = 'BAD';
 			}
 	}
 

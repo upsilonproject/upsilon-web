@@ -243,6 +243,8 @@ function addStatusToNodes($nodes) {
 			} else {
 				$itemNode['versionKarma'] = 'OLD';
 			}
+		} else {
+			$itemNode['versionKarma'] = 'UNKNOWN';
 		}
 	}
 
@@ -1386,7 +1388,7 @@ function getAllCommands() {
 }
 
 function getAllRemoteConfigServices() {
-	$sql = 'SELECT s.id, s.name, s.parent, c.id AS commandId, c.identifier AS commandIdentifier, count(a.id) AS instanceCount, m.icon FROM remote_config_services s LEFT JOIN remote_config_commands c ON s.command = c.id LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_allocated_services a ON a.service = s.id GROUP BY s.id';
+	$sql = 'SELECT s.id, s.name, s.parent, c.id AS commandId, c.identifier AS commandIdentifier, count(a.id) AS instanceCount, m.icon FROM remote_config_services s LEFT JOIN remote_config_commands c ON s.command = c.id LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_allocated_services a ON a.service = s.id GROUP BY s.id ORDER BY s.name';
 	$stmt = stmt($sql)->execute();
 
 	$services = $stmt->fetchAll();
