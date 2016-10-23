@@ -52,7 +52,7 @@ function getServicesConfiguredForNode($node) {
 }
 
 function getServicesReportedForNode($node) {
-	$sql = 'SELECT s.id, s.identifier, s.lastUpdated, s.output, s.karma FROM services s WHERE s.node = :node';
+	$sql = 'SELECT s.id, s.identifier, s.lastUpdated, s.output, s.karma, s.node FROM services s WHERE s.node = :node';
 
 	$stmt = stmt($sql);
 	$stmt->bindValue(':node', $node);
@@ -103,6 +103,7 @@ function getServicesForNode($node) {
 		$row['lastUpdated'] = null;
 		$row['output'] = null;
 		$row['karma'] = null;
+		$row['node'] = null;
 
 		$ret[] = $row;
 	}
