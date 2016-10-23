@@ -37,6 +37,7 @@ mkdir -p %{buildroot}/etc/upsilon-web/
 
 %post 
 service httpd restart
+rm -rf /var/lib/php/session/*
 
 %files
 %doc /usr/share/doc/upsilon-web/README.md
