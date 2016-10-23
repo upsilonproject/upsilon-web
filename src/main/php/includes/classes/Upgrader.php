@@ -241,7 +241,7 @@ upgrader::registerTask(new CommandMetadataUnique());
 
 class LoggerTable extends DatabaseUpgradeTask {
 	public function isNecessary() {
-		return $this->tableExists('logs');
+		return !$this->doesTableExist('logs');
 	}
 
 	public function perform() {
