@@ -270,6 +270,6 @@ class ServiceAssociationIncludeNode extends DatabaseUpgradeTask {
 	}
 }
 
-upgrader::registerTask(new ServiceAssociationIncudeNode());
+upgrader::registerTask(new ServiceAssociationIncludeNode());
 
 ?>
