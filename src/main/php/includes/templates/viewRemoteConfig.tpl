@@ -3,6 +3,9 @@
 	<p>This is a remote config. Once you're happy with it, you need to send it over the message bus to the specific node by clicking here: 
 		<a href = "generateConfig.php?id={$remoteConfig.id}">View</a>
 	</p>
+	<p>
+		<strong>Updated:</strong> <span><span class = "date">{$remoteConfig.mtime}</span><span> ({$remoteConfig.modifiedTimestamp})
+	</p>
 </div>
 
 <div class = "box">
@@ -29,7 +32,7 @@
 					<a href = "deleteRemoteConfigAllocatedNode.php?id={$node.id}">Unallocate</a>
 					<a href = "amqpSendRemoteConfig.php?configId={$remoteConfig.id}&amp;node={$node.identifier}">Send</a>
 				</td>
-				<td class = "{if empty($node.reported)}bad{else}good{/if}">{if empty($node.reported)}NOT REPORTED{else}REPORTED{/if}</td>
+				<td class = "{$node.reportKarma|strtolower}">{$node.reportStatus} {if not empty($node.reportVersion)}Version: <span class = "date">{$node.reportVersion}</span>{/if}</td>
 				<td class = "{$node.karma|strtolower} small">{$node.karma}</td>
 			</tr>
 		{/foreach}

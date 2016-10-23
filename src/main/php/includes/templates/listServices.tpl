@@ -8,9 +8,9 @@
 		<tr>
 			<th>Actions</th>
 			<th>Source</th>
-			<th>Name</th>
+			<th>Results</th>
 			<th><nobr>Last updated</nobr></th>
-			<th>Output</th>
+			<th>Last Output</th>
 			<th>Karma</th>
 		</tr>
 	</thead>

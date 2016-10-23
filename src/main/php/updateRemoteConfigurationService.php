@@ -17,6 +17,8 @@ class UpdateRemoteConfigService extends Form {
 
 		$id = san()->filterUint('id');
 
+		$this->addElementReadOnly('id', $id, 'id');
+		
 		$sql = 'SELECT s.* FROM remote_config_services s WHERE s.id = :id';
 		$stmt = stmt($sql);
 		$stmt->bindValue(':id', $id);
@@ -26,28 +28,18 @@ class UpdateRemoteConfigService extends Form {
 		$this->remoteService = $service;
 		$this->serviceId = $id;
 
-		$this->addElementReadOnly('Useful info', $this->getUsefulInfo($id));
-		$this->addElementReadOnly('Service ID', $id, 'id');
 		$this->addElement(new ElementInput('name', 'Name', $service['name']));
 		$this->addElement(new ElementInput('parent', 'Parent', $service['parent']));
 		$this->addElementCommand($service['command']);
 
-		$this->addSection('Command argument values');
 		$this->addArgumentElements($service['command']);
 
-		$this->addDefaultButtons();
+		$this->addDefaultButtons('Save');
 	}
 
 	private function getUsefulInfo($id) {
 		$ret = array();
 
-		$nodes = getNodesUsingRemoteService($id);
-
-		foreach ($nodes as $node) {
-			$ret[] = '<a href = "viewNode.php?id=' . $node['id'] . '">' . $node['identifier'] . '</a> ';
-		}
-
-		return implode($ret, ', ') . '<br />';
 	}
 
 	private function addElementCommand($command) {
@@ -64,15 +56,22 @@ class UpdateRemoteConfigService extends Form {
 	public function addArgumentElements($commandId) {
 		$this->arguments = array();
 
+		if (empty($commandId)) {
+			$this->addElementReadOnly('Note', 'Command is not yet set. Once it has been and saved, command arguments can be set here.');
+			return;
+		}
+
 		$sql = 'SELECT a.id, a.name FROM remote_config_command_arguments a WHERE a.command = :commandId';
 		$stmt = db()->prepare($sql);
 		$stmt->bindValue(':commandId', $commandId);
 		$stmt->execute();
 
+		$this->addSection('Command argument values');
 		if ($stmt->numRows() == 0) {
 			$this->addElementReadOnly('', 'This check command does not have any arguments.');
 		} else { 
 			foreach ($stmt->fetchAll() as $argument) {
+				var_dump($argument);
 				$this->arguments[$argument['name']] = $argument['id'];
 
 				$el = new ElementInput($argument['name'], $argument['name']);
@@ -80,10 +79,12 @@ class UpdateRemoteConfigService extends Form {
 				$this->addElement($el);
 			}
 
+var_dump(getServiceArgumentValues($this->serviceId));
 			foreach (getServiceArgumentValues($this->serviceId) as $argumentName => $argumentValue) {
 				try {
 					$this->getElement($argumentName)->setValue($argumentValue);
-				} catch (Exception $e) {}
+				} catch (Exception $e) {
+				}
 			}
 		}
 	}
@@ -114,8 +115,21 @@ class UpdateRemoteConfigService extends Form {
 	}
 }
 
-$fh = new FormHandler('UpdateRemoteConfigService');
-$fh->setRedirect('updateRemoteConfigurationService.php?id=' . san()->filterUint('id'));
-$fh->handle();
+
+$f = new UpdateRemoteConfigService();
+
+if ($f->validate()) {
+	$f->process();
+	redirect('updateRemoteConfigurationService.php?id=' . san()->filterUint('id'));
+}
+
+require_once 'includes/widgets/header.php';
+
+$tpl->assign('listNodes', getNodesUsingRemoteService(san()->filterUint('id')));
+$tpl->assign('service', $f->remoteService);
+$tpl->display('updateServiceOverview.tpl');
+
+$tpl->assignForm($f);
+$tpl->display('form.tpl');
 
 ?>
