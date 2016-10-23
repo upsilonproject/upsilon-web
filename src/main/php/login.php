@@ -17,6 +17,7 @@ $f = new FormLogin();
 $f->setTitle('Upsilon Login');
 
 if ($f->validate()) {
+	logger('User _userId_, logged in', array('userId' => \libAllure\Session::getUser()->getUsername()));
 	$_SESSION['options'] = new SessionOptions();
 	header('Location: index.php');
 }
