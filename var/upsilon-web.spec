@@ -1,4 +1,4 @@
-%include SPECS/.upsilon-web.rpmmacro
+%include SPECS/.buildid.rpmmacro
 
 Name:		upsilon-web
 Version:	%{version_formatted_short}
@@ -37,6 +37,7 @@ mkdir -p %{buildroot}/etc/upsilon-web/
 
 %post 
 service httpd restart
+rm -rf /var/lib/php/session/*
 
 %files
 %doc /usr/share/doc/upsilon-web/README.md

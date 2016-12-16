@@ -39,12 +39,19 @@ function makeDateHumanReadable(element) {
 		dojo.addClass(element.parentElement, "good");
 	}
 
-	description = "<strong>" + secondsToString(nowUnixTimestamp - elementUnixTimestamp) + "</strong>";
+
+
+	if (dojo.hasClass(element, "relative")) {
+	description = "<strong>" + toLocalIsoLikeString(utcDate) + "</strong>";
+		element.textContent = secondsToString(nowUnixTimestamp - elementUnixTimestamp);
+	} else {
+		description = "<strong>" + secondsToString(nowUnixTimestamp - elementUnixTimestamp) + "</strong>";
+		element.textContent = toLocalIsoLikeString(utcDate);
+	}
+
 	description += "<br />Original: " + utcDate.toString()
 
 	dojo.addClass(element, "tooltip")
-
-	element.textContent = toLocalIsoLikeString(utcDate);
 
 	new dijit.Tooltip({
 		connectId: element,
@@ -196,7 +203,7 @@ function layoutBoxes() {
 
 		if (blocks.length > 0) {
 			if (typeof(window.boxLayoutManager) == "undefined") {
-				window.boxLayoutManager = new Masonry('div.blockContainer', {itemSelector: 'div.block', columnWidth: 200, isFitWidth: true });
+				window.boxLayoutManager = new Masonry('div.blockContainer', {itemSelector: 'div.block', gutter: 10, isFitWidth: true });
 			}
 
 			console.log("blocks", blocks);

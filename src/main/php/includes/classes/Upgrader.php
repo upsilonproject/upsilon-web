@@ -75,6 +75,19 @@ abstract class DatabaseUpgradeTask extends UpgradeTask {
 		}
 	}
 
+	protected function tableHasUniqueKey($table, $name) {
+		$sql = 'SHOW CREATE TABLE ' . $table;
+		$stmt = stmt($sql);
+		$res = $stmt->execute()->fetchRow();
+		$res = $res['Create Table'];
+
+		if (stripos($res, "UNIQUE KEY `" . $name . "`") === FALSE) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	public function isPossible() {
 		return true;
 	}
@@ -174,5 +187,89 @@ class NodesTableHasConfigsColumn extends DatabaseUpgradeTask {
 }
 
 upgrader::registerTask(new NodesTableHasConfigsColumn());
+
+class RemoteConfigCommandsUnique extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		if ($this->tableHasUniqueKey('remote_config_commands', 'identifier')) {
+			return false;
+		} else {
+			return true;
+		}
+
+		var_dump($res);
+
+		return true;
+	}
+
+	public function perform() {
+		$sql = 'ALTER TABLE remote_config_commands ADD UNIQUE(identifier) ';
+		stmt($sql)->execute();
+	}
+	
+	public function isPossible() {
+		return true;
+	}
+}
+
+upgrader::registerTask(new RemoteConfigCommandsUnique());
+
+class RemoteConfigCommandArgumentsUnique extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->tableHasUniqueKey('remote_config_command_arguments', 'unq_cmd_arg');
+	}
+
+	public function perform() {
+		$sql = 'ALTER TABLE remote_config_command_arguments ADD UNIQUE unq_cmd_arg (command, name)';
+		stmt($sql)->execute();
+	}
+}
+
+upgrader::registerTask(new RemoteConfigCommandArgumentsUnique());
+
+class CommandMetadataUnique extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->tableHasUniqueKey('command_metadata', 'unq_cmd');
+	}
+
+	public function perform() {
+		$sql = 'ALTER TABLE command_metadata ADD UNIQUE unq_cmd (commandIdentifier)';
+		stmt($sql)->execute();
+	}
+}
+
+upgrader::registerTask(new CommandMetadataUnique());
+
+class LoggerTable extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->doesTableExist('logs');
+	}
+
+	public function perform() {
+		$sql = 'CREATE TABLE logs (id int not null primary key auto_increment, message longtext, timestamp datetime, userId int, usergroupId int, serviceResultId int, nodeId int, nodeConfigId int, serviceDefinitionId int, commandDefinitionId int, classId int, dashboardId int, serviceGroupId int)';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+upgrader::registerTask(new LoggerTable());
+
+class ServiceAssociationIncludeNode extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->tableHasUniqueKey('services', 'unq_sid');
+	}
+
+	public function perform() {
+		$sql = 'ALTER TABLE services DROP KEY identifier ';
+		stmt($sql)->execute();
+
+		$sql = 'ALTER TABLE services ADD UNIQUE unq_sid (identifier, node)';
+		stmt($sql)->execute();
+
+		$sql = 'ALTER TABLE service_check_results ADD node varchar(128)';
+		stmt($sql)->execute();
+	}
+}
+
+upgrader::registerTask(new ServiceAssociationIncludeNode());
 
 ?>

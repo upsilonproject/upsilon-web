@@ -4,11 +4,7 @@ $title = 'View remote config';
 require_once 'includes/common.php';
 require_once 'includes/functions.remoteConfig.php';
 
-$sql = 'SELECT rc.* FROM remote_configs rc WHERE rc.id = :id';
-$stmt = stmt($sql);
-$stmt->bindValue(':id', san()->filterUint('id'));
-$stmt->execute();
-$remoteConfig = $stmt->fetchRowNOtNull();
+$remoteConfig = getConfigById(san()->filterUint('id'));
 
 use \libAllure\HtmlLinksCollection;
 

@@ -7,6 +7,26 @@ use \libAllure\HtmlLinksCollection;
 
 require_once 'includes/classes/SessionOptions.php';
 
+function loggerFields() {
+	return array('userId', 'usergroupId', 'serviceResultId', 'nodeId', 'nodeConfigId', 'serviceDefinitionId', 'commandDefinitionId', 'classId', 'dashboardId', 'serviceGroupId');
+}
+
+function logger($message, $keys = array()) {
+	$sql = 'INSERT INTO logs (message, timestamp, userId, usergroupId, serviceResultId, nodeId, nodeConfigId, serviceDefinitionId, commandDefinitionId, classId, dashboardId, serviceGroupId) VALUES (:message, now(), :userId, :usergroupId, :serviceResultId, :nodeId, :nodeConfigId, :serviceDefinitionId, :commandDefinitionId, :classId, :dashboardId, :serviceGroupId)';
+	$stmt = stmt($sql);
+	$stmt->bindValue(':message', $message);
+	
+	foreach (loggerFields() as $arg) {
+		if (isset($keys[$arg])) {
+			$stmt->bindValue($arg, $keys[$arg]);
+		} else {
+			$stmt->bindValue($arg, null);
+		}
+	}
+
+	$stmt->execute();
+}
+
 function isUsingSsl() {
 	if (!isset($_SERVER['HTTPS'])) {
 		$_SERVER['HTTPS'] = 'off';
@@ -196,7 +216,35 @@ function getNodes() {
 	return $nodes;
 }
 
+function findLatestNodeVersion($nodes) {
+	$latestTimestamp = 0;
+	$latestValue = '';
+
+	if (!isset($nodes[0]['instanceApplicationVersion'])) {
+		return;
+	}
+
+	foreach ($nodes as $node) {
+		$matches = array();
+
+		preg_match_all('/(?<major>[\d]+)\.(?<minor>[\d]+)\.(?<revision>[\d]+)\-\d+\-(?<timestamp>[\d]+)/i', $node['instanceApplicationVersion'], $matches);
+
+		if (isset($matches['timestamp'])) {
+			$timestamp = intval(current($matches['timestamp']));
+
+			if ($timestamp > $latestTimestamp) {
+				$latestTimestamp = $timestamp;
+				$latestValue = $node['instanceApplicationVersion'];
+			}
+		}
+	}
+
+	return $latestValue;
+}
+
 function addStatusToNodes($nodes) {
+	$latestVersion = findLatestNodeVersion($nodes);
+
 	foreach ($nodes as &$itemNode) {
 		$itemNode['lastUpdateRelative'] = getRelativeTime($itemNode['lastUpdated'], true);
 		$itemNode['karma'] = 'UNKNOWN';
@@ -204,9 +252,19 @@ function addStatusToNodes($nodes) {
 		$diff = time() - strtotime($itemNode['lastUpdated']);
 
 		if ($diff > 1200) {
-			$itemNode['karma'] = 'BAD';
+			$itemNode['karma'] = 'OLD';
 		} else {
 			$itemNode['karma'] = 'GOOD';
+		}
+
+		if (isset($itemNode['instanceApplicationVersion'])) {
+			if ($itemNode['instanceApplicationVersion'] == $latestVersion) {
+				$itemNode['versionKarma'] = 'GOOD';
+			} else {
+				$itemNode['versionKarma'] = 'OLD';
+			}
+		} else {
+			$itemNode['versionKarma'] = 'UNKNOWN';
 		}
 	}
 
@@ -1350,7 +1408,7 @@ function getAllCommands() {
 }
 
 function getAllRemoteConfigServices() {
-	$sql = 'SELECT s.id, s.name, s.parent, c.id AS commandId, c.identifier AS commandIdentifier, count(a.id) AS instanceCount, m.icon FROM remote_config_services s LEFT JOIN remote_config_commands c ON s.command = c.id LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_allocated_services a ON a.service = s.id GROUP BY s.id';
+	$sql = 'SELECT s.id, s.name, s.parent, c.id AS commandId, c.identifier AS commandIdentifier, count(a.id) AS instanceCount, m.icon FROM remote_config_services s LEFT JOIN remote_config_commands c ON s.command = c.id LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_allocated_services a ON a.service = s.id GROUP BY s.id ORDER BY s.name';
 	$stmt = stmt($sql)->execute();
 
 	$services = $stmt->fetchAll();
@@ -1475,7 +1533,7 @@ function parseReportedConfigs($configString) {
 	return $configs;
 }
 
-function deleteNodeById() {
+function deleteNodeById($id) {
 	$sql = 'DELETE FROM nodes WHERE id = :id ';
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->bindValue(':id', $id);

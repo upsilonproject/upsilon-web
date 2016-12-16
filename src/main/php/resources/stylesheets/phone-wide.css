@@ -1,0 +1,36 @@
+.media-width-prio-low {
+	display: none;
+	visibility: collapse;
+}
+
+div.loginFormContainer {
+	width: auto;
+}
+
+label {
+	text-align: left;
+}
+
+div.block {
+	min-width: inherit;
+	width: auto;
+}
+
+table {
+	width: auto;
+}
+
+#content {
+	padding: 0;	
+}
+
+div.box {
+	margin: 0;
+	border-left: 0;
+	border-right: 0;
+}
+
+.claro .dijitMenuBar {
+	border-left: 0;
+	border-right: 0;
+}
