@@ -6,13 +6,12 @@
 
 		action: "release",
 
-/*
+
 		layerOptimize: "shrinksafe", // shrinksafe
 		optimize: "shrinksafe", // shrinksafe
 		cssOptimize: "comments",
 		mini: true,
 		stripConsole: "warn",
-*/
 
 		selectorEngine: "lite",
 		insertAbsMids: false,
