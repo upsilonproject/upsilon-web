@@ -63,7 +63,7 @@
 				</td>
 				<td><a href = "updateRemoteConfigurationCommand.php?id={$service.commandId}">{$service.commandIdentifier}</a></td>
 				<td>{$service.parent}</a>
-				<td>{if $service.instanceCount == 0}<em>Not allowed to a node config</em>{else}{$service.instanceCount}{/if}</td>
+				<td>{if $service.instanceCount == 0}<em>Not allocated to a node config</em>{else}{$service.instanceCount}{/if}</td>
 				<td>-</td>
 			</tr>
 		{/foreach}
