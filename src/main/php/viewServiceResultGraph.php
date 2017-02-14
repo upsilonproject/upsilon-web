@@ -6,18 +6,6 @@ require_once 'includes/common.php';
 use \libAllure\DatabaseFactory;
 use \libAllure\Sanitizer;
 
-function getServiceResults($identifier) {
-	$sql = 'SELECT r.id, r.karma, r.checked AS date, r.output FROM service_check_results r LEFT JOIN services s ON r.service = s.identifier WHERE s.id = :id ORDER BY r.checked DESC LIMIT 30';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	
-	$stmt->bindValue(':id', $identifier);
-	$stmt->execute();
-
-	$results = $stmt->fetchAll();
-
-	return $results;
-}
-
 function extractNagiosMetric($service, $field) {
 	$listMetrics = explode(",", $service['output']);
 
@@ -56,7 +44,7 @@ if (empty($field)) {
 $metrics = array();
 
 foreach ($_REQUEST['services'] as $service) {
-	$results = getServiceResults($service);
+	$results = getServiceResults($service, $_REQUEST['node']);
 	$results = array_reverse($results);
 
 	$metrics[] = array(

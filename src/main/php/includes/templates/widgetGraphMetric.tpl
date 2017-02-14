@@ -2,13 +2,17 @@
 
 	</div>
 	<script type = "text/javascript">
-datasets = []
+dataset = {
+	node: "{$itemService['node']}",
+	services: []
+}
 
 {foreach from = $listServiceId item = serviceId}
-datasets.push({$serviceId});
+dataset.services.push("{$serviceId}");
 {/foreach}
 
-	fetchServiceMetricResultGraph('{$metric}', datasets, '{$instanceGraphIndex}');
+
+	fetchServiceMetricResultGraph('{$metric}', dataset, '{$instanceGraphIndex}');
 
 	{literal}
 pm = window.plotMarkings[{/literal}{$instanceGraphIndex}{literal}] = [];

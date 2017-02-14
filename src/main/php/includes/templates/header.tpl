@@ -2,7 +2,7 @@
 
 <html>
 <head>
-	<title>{$siteTitle} &raquo; {$title|default:'Untitled page'}</title>
+	<title>{$pageTitle} &laquo; {$siteTitle}</title>
 
 	<link rel="stylesheet" href="resources/dojo/dijit/themes/claro/claro.css" />
 
@@ -31,7 +31,7 @@
 		<h1>
 			<a href = "index.php">{$siteTitle}</a>
 			&raquo;
-			<span class = "pageTitle">{$title|default:'Untitled page'}</span>
+			<span class = "navTitle">{$navTitle}</span>
 		</h1>
 	</div>
 	{/if}

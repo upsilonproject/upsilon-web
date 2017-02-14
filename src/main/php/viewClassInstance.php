@@ -23,6 +23,7 @@ $itemClassInstance = getClassInstance(san()->filterUint('id'));
 $links = linksCollection();
 $links->add('updateClassInstance.php?instance=' . $itemClassInstance['id'], 'Update instance');
 $links->add('deleteClassInstance.php?instance=' . $itemClassInstance['id'], 'Delete instance');
+$links->add('addGroupMembership.php?classInstance=' . $itemClassInstance['id'], 'Add to Group');
 
 $tpl->assign('title', 'View Service Instance');
 require_once 'includes/widgets/header.php';

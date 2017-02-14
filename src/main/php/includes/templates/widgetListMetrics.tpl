@@ -10,12 +10,21 @@
 	<p><strong>Last Updated:</strong> <span><span class = "date">{$service.lastUpdated}</span></span></p>
 
 	{/if}
-	{if isset($service.listSubresults)} 
+	{if isset($service.listMetrics)} 
 
-	<h2>{$subresultsTitle|default:'Subresults'}</h2>
+	<h2>{$metricsTitle|default:'Metrics'}</h2>
 	<ul class = "subresults">
-	{foreach from = $service.listSubresults item = subResult}
-		<li><span class = "metricIndicator {$subResult.karma|strtolower}">&nbsp;</span>{$subResult.name} {if not empty($subResult.comment)}<span class = "subtle">({$subResult.comment})</span>{/if}</li>
+	{foreach from = $service.listMetrics item = itemMetric}
+		<li>
+			<span class = "metricIndicator {$itemMetric.karma|strtolower}">&nbsp;</span>
+				{if not empty($itemMetric.caption)}
+					{$itemMetric.caption}
+				{else}
+					{$itemMetric.name}
+				{/if}
+				: {$itemMetric.value} 
+			{if not empty($itemMetric.comment)}<span class = "subtle">({$itemMetric.comment})</span>{/if}
+		</li>
 	{/foreach}
 	</ul>
 	{else}

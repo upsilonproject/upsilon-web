@@ -24,10 +24,35 @@ if (Session::isLoggedIn()) {
 
 $tpl->assign('siteTitle', getSiteSetting('siteTitle', 'Upsilon'));
 
-if (isset($title)) {
-	$tpl->assign('title', $title);
+if (!empty($nav)) {
+	$navTitle = '';
+
+	for ($i = 0; $i < sizeof($nav); $i++) {
+		$arg = $nav[$i];
+
+		if (is_array($arg)) {
+			$navTitle .= '<a href = "' . key($arg) . '">' . current($arg) . '</a>';
+		} else {
+			$navTitle .= ' ' . $arg . ' ';
+		}
+
+		if ($i +1 < sizeof($nav)) {
+			$navTitle .= ' &raquo; ';
+		}
+	}
+
+	$tpl->assign('navTitle', $navTitle);
+
+	end($nav);
+	$tpl->assign('pageTitle', current($nav));
 } else {
-	$tpl->assign('title', 'Untitled page');
+	if (isset($title)) {
+		$tpl->assign('navTitle', $title);
+		$tpl->assign('pageTitle', $title);
+	} else {
+		$tpl->assign('navTitle', 'Untitled page');
+		$tpl->assign('pageTitle', 'Untitled page');
+	}
 }
 
 $tpl->assign('loggedIn', Session::isLoggedIn());
@@ -126,6 +151,8 @@ if (Session::isLoggedIn()) {
 	$generalLinks->add('#', 'System &blacktriangledown;');
 	$generalLinks->addChildCollection('System &blacktriangledown;', $systemLinks);
 }
+
+
 
 $tpl->assign('generalLinks', $generalLinks);
 

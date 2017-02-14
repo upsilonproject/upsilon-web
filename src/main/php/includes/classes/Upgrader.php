@@ -88,6 +88,15 @@ abstract class DatabaseUpgradeTask extends UpgradeTask {
 		}
 	}
 
+	public function tableHasRow($table, $pkey, $value) {
+		$sql = "SELECT $pkey FROM $table WHERE $pkey = :value ";
+		$stmt = stmt($sql);
+		$stmt->bindValue(':value', $value);
+		$stmt->execute();
+
+		return $stmt->numRows() != 0;
+	}
+
 	public function isPossible() {
 		return true;
 	}
@@ -271,5 +280,38 @@ class ServiceAssociationIncludeNode extends DatabaseUpgradeTask {
 }
 
 upgrader::registerTask(new ServiceAssociationIncludeNode());
+
+class InstallWidgetViewClassInstances extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->tableHasRow('widgets', 'class', 'ViewClassInstances');
+	}
+
+	public function perform() {
+		$sql = 'INSERT INTO widgets (class) VALUES (:name)';
+		$stmt = stmt($sql);
+		$stmt->bindValue(':name', 'ViewClassInstances');
+		$stmt->execute();
+	}
+}
+
+upgrader::registerTask(new InstallWidgetViewClassInstances());
+
+class ClassInstanceGroupMembershipTableExists extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->doesTableExist('class_instance_group_memberships');
+	}
+
+	public function isPossible() {
+		return true;
+	}
+
+	public function perform() {
+		$sql = 'CREATE TABLE class_instance_group_memberships (id int not null primary key auto_increment, gid int not null, class_instance int not null)';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+Upgrader::registerTask(new ClassInstanceGroupMembershipTableExists());
 
 ?>

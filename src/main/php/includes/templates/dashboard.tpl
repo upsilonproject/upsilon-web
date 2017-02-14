@@ -19,7 +19,7 @@
 						{include file = "links.tpl" links = $widget.instance->getLinks() skipTitle = true sub = true}
 				</div>
 				{/if}
-				<h3>{$widget.instance->getTitle()}</h3>
+				<h3><a href = "{$widget.instance->getHeaderLink()}">{$widget.instance->getTitle()}</a></h3>
 
 				{$widget.instance->render()}
 			</div>

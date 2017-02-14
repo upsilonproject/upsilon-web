@@ -44,8 +44,16 @@
 			<br />
 		</p>
 
-		<p><strong>Node:</strong> <a href = "viewNode.php?identifier={$itemService.node}">{$itemService.node}</a></p>
-
+		<p>
+			{if $configSource == "local"} 
+				<strong>Configuration:</strong> <em>Configured locally</em><br /> 
+				<strong>Service:</strong> {$itemService.identifier} (local config only) </br >
+			{else}
+				<strong>Configuration:</strong> <em>Centrally, in</em> <a href = "viewRemoteConfig.php?id={$configSource.remote_config_id}">{$configSource.remote_config_name}</a> <br />
+				<strong>Service: </strong> {$itemService.identifier} (<a href = "updateRemoteConfigurationService.php?id={$configSource.remote_configuration_service_id}">update</a>)<br />
+			{/if}
+			<strong>Node: </strong> <a href = "viewNode.php?identifier={$itemService.node}">{$itemService.node}</a>
+		</p>
 	</div>
 
 	<div style = "margin-right: 2em; float: right; vertica-align: top">
@@ -68,7 +76,7 @@
 	{if !empty($metadata.metrics)}
 		<strong>Metric:</strong>
 		{foreach from = $metadata.metrics item = metric}
-			<a href = "#graphContainer" onclick = "javascript:fetchServiceMetricResultGraph('{$metric|trim}', [{$itemService.id}], 0)">{$metric|trim}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+			<a href = "#graphContainer" onclick = "javascript:fetchServiceMetricResultGraph('{$metric|trim}', {literal}{{/literal}node: '{$itemService.node}', services: ['{$itemService.identifier}']{literal}}{/literal}, 0)">{$metric|trim}</a>&nbsp;&nbsp;&nbsp;&nbsp;
 		{/foreach}
 	{/if}
 	</p>

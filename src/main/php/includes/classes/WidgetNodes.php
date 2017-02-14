@@ -7,6 +7,10 @@ class WidgetNodes extends Widget {
 		return 'Nodes';
 	}
 
+	public function getHeaderLink() {
+		return 'listNodes.php';
+	}
+
 	public function render() {
 		global $tpl;
 

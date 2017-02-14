@@ -8,6 +8,7 @@ use \libAllure\Form;
 use \libAllure\FormHandler;
 use \libAllure\ElementInput;
 use \libAllure\ElementSelect;
+use \libAllure\HtmlLinksCollection;
 
 class UpdateRemoteConfigCommand extends Form {
 	public function __construct() {
@@ -58,6 +59,9 @@ class UpdateRemoteConfigCommand extends Form {
 		$stmt->execute();
 	}
 }
+
+$links = new HtmlLinksCollection('Dashboard &nabla;');
+$links->add('deleteRemoteConfigurationCommand.php?id=' . san()->filterUint('id'), 'Delete');
 
 $fh = new FormHandler('UpdateRemoteConfigCommand');
 $fh->setRedirect('listRemoteConfigurations.php');

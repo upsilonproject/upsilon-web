@@ -6,9 +6,10 @@
 
 		action: "release",
 
+		async: true,
 
-		layerOptimize: "shrinksafe", // shrinksafe
-		optimize: "shrinksafe", // shrinksafe
+		layerOptimize: "closure", // shrinksafe
+		optimize: "closure", // shrinksafe
 		cssOptimize: "comments",
 		mini: true,
 		stripConsole: "warn",

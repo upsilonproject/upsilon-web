@@ -2,7 +2,7 @@
 
 require_once 'includes/widgets/header.php';
 
-$sql = 'SELECT l.*, u.username FROM logs l LEFT JOIN users u ON l.userId = u.id ORDER BY l.timestamp LIMIT 250';
+$sql = 'SELECT l.*, u.username FROM logs l LEFT JOIN users u ON l.userId = u.id ORDER BY l.timestamp DESC LIMIT 250';
 $stmt = stmt($sql);
 $stmt->execute();
 $logs = $stmt->fetchAll();

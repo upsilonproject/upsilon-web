@@ -48,29 +48,6 @@ metric('Services', dbQuery('SELECT count(id) AS count FROM services')[0]['count'
 metric('Group memberships', dbQuery('SELECT count(id) AS count FROM group_memberships')[0]['count']);
 metric('Groups', dbQuery('SELECT count(id) AS count FROM groups')[0]['count']);
 
-function getServiceResults() {
-	$sql = 'SELECT s.identifier, r.service, r.checked, r.karma FROM service_check_results r JOIN services s ON r.service = s.id WHERE (r.checked + 60) < now() ORDER BY r.service, r.checked';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->execute();
-
-	$lastService = null;
-
-	$hourAgo = strtotime('-1 hour');
-
-	$listServiceResults = array();
-
-	foreach ($stmt->fetchAll() as $serviceResult) {
-		$relative = strtotime($serviceResult['checked']) - $hourAgo;
-		$relative /= 2;
-
-		if ($relative < 50) {
-			continue;
-		}
-
-		$listServiceResults[] = $serviceResult;
-	}
-}
-
 echo '<a href = "?purge" class = "badButton">Purge everything</a><br />';
 echo '<a href = "?purgeDeadGroups" class = "badButton">Purge dead groups</a>';
 
