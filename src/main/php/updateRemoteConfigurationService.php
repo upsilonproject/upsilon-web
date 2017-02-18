@@ -71,7 +71,6 @@ class UpdateRemoteConfigService extends Form {
 			$this->addElementReadOnly('', 'This check command does not have any arguments.');
 		} else { 
 			foreach ($stmt->fetchAll() as $argument) {
-				var_dump($argument);
 				$this->arguments[$argument['name']] = $argument['id'];
 
 				$el = new ElementInput($argument['name'], $argument['name']);
@@ -79,7 +78,6 @@ class UpdateRemoteConfigService extends Form {
 				$this->addElement($el);
 			}
 
-var_dump(getServiceArgumentValues($this->serviceId));
 			foreach (getServiceArgumentValues($this->serviceId) as $argumentName => $argumentValue) {
 				try {
 					$this->getElement($argumentName)->setValue($argumentValue);

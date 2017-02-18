@@ -25,13 +25,31 @@
 	</div>
 
 	<div style = "float: right; vertical-align: top;">
-		<h3>Debug info</h3>
+		<h3>Service</h3>
 		<p><strong>ID:</strong> {$itemService.id}</p>
-		<p><strong><abbr title = "Command identifier: {$itemService.commandIdentifier}">Command line</abbr>:</strong> {$itemService.commandLine} 
+		<p><strong>Node: </strong> <a href = "viewNode.php?identifier={$itemService.node}">{$itemService.node}</a></p>
+		<p><strong><abbr title = "Command identifier: {$itemService.commandIdentifier}">Reported command line</abbr>:</strong> {$itemService.commandLine} 
 		{if $metadata.commandMetadataId}(<a href = "updateCommand.php?id={$metadata.commandMetadataId}">{$itemService.commandIdentifier}</a>){/if}
 		</p>
 
-		<p><strong>Group memberships:</strong>
+		<h3>Configuration</h3>
+		<p>
+			{if $configSource == "local"} 
+				<strong>Configuration:</strong> <em>Configured locally</em><br /> 
+				<strong>Service: </strong> {$itemService.identifier} (local config only) </br >
+				<strong>Command: </strong> - <br />
+			{else}
+				<strong>Configuration:</strong> <em>Centrally, in</em> <a href = "viewRemoteConfig.php?id={$configSource.remote_config_id}">{$configSource.remote_config_name}</a> <br />
+				<strong>Service: </strong> {$itemService.identifier} (<a href = "updateRemoteConfigurationService.php?id={$configSource.remote_configuration_service_id}">update</a>)<br />
+				<strong>Command: </strong> <a href = "updateRemoteConfigurationCommand.php?id={$configSource.remote_config_command_id}">{$configSource.remote_config_command_name}</a>  <br />
+				<strong>Command line: </strong> <br /><br /> <pre>{$commandLineClickable}</pre>
+			{/if}
+		</p>
+	</div>
+
+	<div style = "float: right; vertical-align: top; margin-right: 2em;">
+		<h3>Group Memberships</h3>
+		<p>
 		{if $listGroupMemberships|@count eq 0}
 			<em>No memberships.</em>
 		{else}
@@ -44,17 +62,8 @@
 			<br />
 		</p>
 
-		<p>
-			{if $configSource == "local"} 
-				<strong>Configuration:</strong> <em>Configured locally</em><br /> 
-				<strong>Service:</strong> {$itemService.identifier} (local config only) </br >
-			{else}
-				<strong>Configuration:</strong> <em>Centrally, in</em> <a href = "viewRemoteConfig.php?id={$configSource.remote_config_id}">{$configSource.remote_config_name}</a> <br />
-				<strong>Service: </strong> {$itemService.identifier} (<a href = "updateRemoteConfigurationService.php?id={$configSource.remote_configuration_service_id}">update</a>)<br />
-			{/if}
-			<strong>Node: </strong> <a href = "viewNode.php?identifier={$itemService.node}">{$itemService.node}</a>
-		</p>
 	</div>
+
 
 	<div style = "margin-right: 2em; float: right; vertica-align: top">
 		{if not empty($metadata.room)}

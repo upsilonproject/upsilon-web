@@ -519,7 +519,6 @@ function enrichServices($listServices, $parseOutput = true, $parseMetadata = tru
 		$listServices[$k]['output'] = htmlspecialchars($listServices[$k]['output']);
 	}
 
-
 	return $listServices;
 }
 
@@ -699,7 +698,7 @@ function getServiceById($id, $parseOutput = false) {
 
 		$parseOutput && parseOutputJson($service);
 
-		$service['commandLine'] = "foo";
+		$service['commandLine'] = $service['executable'];
 
 		return $service;
 }

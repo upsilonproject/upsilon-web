@@ -555,3 +555,7 @@ button#fullscreen {
 	margin: 1em;
 	float: right;
 }
+
+abbr.commandArg {
+	font-weight: bold;
+}

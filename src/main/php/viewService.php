@@ -41,8 +41,14 @@ function getServiceMetadata($identifier) {
 	return $metadata;
 }
 
+$configSource = getConfigSourceFromServiceResultIdentifier($service['identifier'], $service['node']);
+
 $tpl->assign('metadata', getServiceMetadata($service['identifier']));
-$tpl->assign('configSource', getConfigSourceFromServiceResultIdentifier($service['identifier'], $service['node']));
+$tpl->assign('configSource', $configSource);
+
+if (isset($configSource['remote_config_command_id'])) {
+	$tpl->assign('commandLineClickable', getClickableCommandLine($configSource));
+}
 
 $listResults = getServiceResults($service['identifier'], $service['node']);
 
