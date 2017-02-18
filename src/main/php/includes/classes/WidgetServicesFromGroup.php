@@ -16,11 +16,17 @@ class WidgetServicesFromGroup extends Widget {
 
 		if (!empty($group)) {
 			$this->group = getGroup($this->getArgumentValue('group'));
+		} else {
+			$this->group = null;
 		}
 	}
 
 	public function getHeaderLink() {
-		return 'viewGroup.php?id=' . $this->group['id'];
+		if ($this->group == null) {
+			return '#';
+		} else {
+			return 'viewGroup.php?id=' . $this->group['id'];
+		}
 	}
 
 	public function getTitle() {
