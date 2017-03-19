@@ -559,3 +559,12 @@ button#fullscreen {
 abbr.commandArg {
 	font-weight: bold;
 }
+
+span.smartFilterKeyword {
+	font-weight: bold;
+}
+
+div.smartFilterDescription {
+	background-color: lightgray;
+	padding: 1em;
+}

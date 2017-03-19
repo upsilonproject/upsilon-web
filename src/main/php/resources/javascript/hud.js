@@ -529,9 +529,9 @@ function renderServiceList(data, owner) {
 			owner.append(generate('<p class = "services" />'))
 		}
 
-		container = owner.children('.services');
-		container.addClass('metricListContainer');
-		container.empty();
+		owner.children('.metricListContainer').remove();
+
+		container = owner.append(generate('<div class = "metricListContainer" />'));
 
 		container.append(generate('<p class = "metricListDescription"></p>'));
 
