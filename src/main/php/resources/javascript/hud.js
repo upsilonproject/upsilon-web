@@ -196,26 +196,6 @@ function fetchServiceMetricResultGraph(metric, dataset, graphIndex) {
 	request(window.serviceResultGraphUrl, data, updateGraph);
 }
 
-
-function layoutBoxes() {
-	require([
-		"dojo/query"
-	], function(query) {
-		blocks = query("div.blockContainer");
-
-		if (blocks.length > 0) {
-			if (typeof(window.boxLayoutManager) == "undefined") {
-				window.boxLayoutManager = new Masonry('div.blockContainer', {itemSelector: 'div.block', gutter: 10, isFitWidth: true });
-			}
-
-			//console.log("blocks", blocks);
-
-			window.boxLayoutManager.layout();
-		}
-	});
-
-}
-
 function cookieOrDefault(cookieName, defaultValue) {
 	require(["dojo/cookie"], function(cookie) {
 		cookieValue = cookie(cookieName)
@@ -291,13 +271,13 @@ function toggleGroups() {
 					servicesWarning.style('display', 'none');
 					var indicator = dojo.toDom('<div style = "display:inline-block"><span class = "metricIndicator good grouped">~</span></div> <div class = "metricText">All <strong>' + servicesGood.length + '</strong> services are good.</div>');
 
-					query(desc)[0].appendChild(indicator);
+					if (query(desc).length > 0) {
+						query(desc)[0].appendChild(indicator);
+					}
 
 					if (servicesWarning.length > 0) {
 						desc.appendChild(dojo.toDom(' <br /><span class = "warning"><strong>' + servicesWarning.length + '</strong> have a warning</span>.'));
 					}
-
-					query(desc).click = console.log; // FIXME
 				}
 
 				if (servicesSkipped.length > 0) {
@@ -336,7 +316,6 @@ function(domConstruct, on, query, keys) {
                         window.showGoodGroups = !window.showGoodGroups;
 
                         toggleGroups();
-                        layoutBoxes(false);
 
                         break;
                 case window.shortcutToggleEmptyGroups:
@@ -535,34 +514,31 @@ function renderServiceList(data, owner) {
 
 		container.append(generate('<p class = "metricListDescription"></p>'));
 
-			list = query(generate('<ul class = "metricList"></ul>'));
+		list = container.append(generate('<ul class = "metricList"></ul>'));
 
-			data.forEach(function(service, index) {
-				indicator = query(generate('<span class = "metricIndicator" />'));
-				indicator.addClass(service.karma.toLowerCase());
+		data.forEach(function(service, index) {
+			indicator = query(generate('<span class = "metricIndicator" />'));
+			indicator.addClass(service.karma.toLowerCase());
 
-				if (service.icon != null) {
-					indicator.append(dojo.toDom('<img src = "resources/images/serviceIcons/' + service.icon + '" /><br />'));
-				}
-				
-				indicator.append(dojo.toDom('<span>' + service.lastChangedRelative + '</span>'));
-				indicator = query(generate('<div class = "metricIndicatorContainer" />')).append(indicator);
+			if (service.icon != null) {
+				indicator.append(dojo.toDom('<img src = "resources/images/serviceIcons/' + service.icon + '" /><br />'));
+			}
+			
+			indicator.append(dojo.toDom('<span>' + service.lastChangedRelative + '</span>'));
+			indicator = query(generate('<div class = "metricIndicatorContainer" />')).append(indicator);
 
-				metric = query(generate('<li />'));
-				metric.append(indicator);
+			metric = query(generate('<li />'));
+			metric.append(indicator);
 
-				text = query(generate('<div class = "metricText" />'));
-				text.append('<span class = "metricDetail">' + service.estimatedNextCheckRelative + '</span>');
-				text.append('<a href = "viewService.php?id=' + service.id + '"><span class = "metricTitle">' + service.alias + '</span></a>');
-				metric.append(text);
+			text = query(generate('<div class = "metricText" />'));
+			text.append('<span class = "metricDetail">' + service.estimatedNextCheckRelative + '</span>');
+			text.append('<a href = "viewService.php?id=' + service.id + '"><span class = "metricTitle">' + service.alias + '</span></a>');
+			metric.append(text);
 
-				list.append(metric);
-			});
-	
-		container.append(list);
-		owner.append(container)
+			list.append(metric);
+		});
+
 		toggleGroups();
-		layoutBoxes();
 	});
 }
 
@@ -581,8 +557,6 @@ function renderNewsList(data, ref) {
 			storyHtml.append("<strong>" + formatUnixTimestamp(news['time']) + '</strong> <span class = "subtle">' + news['source'] +  '</span> <a href = "' + news['url'] + '">' + news['title'] + '</a>');
 			container.append(storyHtml);
 		});
-
-		layoutBoxes();
 	});
 }
 

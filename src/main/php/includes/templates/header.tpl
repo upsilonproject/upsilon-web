@@ -10,6 +10,7 @@
 	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/phone-thin.css" title = "mobile" media = "(max-width: 300px)" />
 	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/phone-wide.css" title = "mobile" media = "(max-width: 400px)" />
 	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/tablet.css" title = "mobile" media = "(max-width: 400px)" />
+	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/driveway.min.css" />
 
 	<link rel = "{if $isNighttime}stylesheet{/if}" type = "text/css" href = "resources/stylesheets/main-nighttime.css" title = "nighttime" />
 
@@ -17,7 +18,6 @@
 
 	<meta name="viewport" content="width=device-width" />
 
-	<script src="resources/javascript/masonry.js"></script>
 	<script src="resources/dojo/dojo/dojo.js"></script>
 	<script src="resources/javascript/hud.js"></script>
 
