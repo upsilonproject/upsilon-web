@@ -62,13 +62,33 @@ abstract class UpgradeTask {
 }
 
 abstract class DatabaseUpgradeTask extends UpgradeTask {
-	protected function doesFieldExistInTable($field, $table) {
+	protected function getFieldLength($field, $table) {
+		$def = $this->getFieldDefinition($field, $table);
+		$def = $def['Type'];
+
+		$matches = array();
+		if (preg_match('#\((.+)\)#i', $def, $matches)) {
+			return $matches[1];
+		} else {
+			throw new Exception('Could not find field length for ' . $table . ' ' . $field . ' ' . print_r($matches, true));
+		}
+	}
+
+	protected function getFieldDefinition($field, $table) {
 		$sql = 'DESC ' . $table .  ' :field';
 		$stmt = stmt($sql);
 		$stmt->bindValue(':field', $field);
 		$stmt->execute();
 
 		if ($stmt->numRows() == 0) {
+			return null;
+		} else {
+			return $stmt->fetch();
+		}
+	}
+
+	protected function doesFieldExistInTable($field, $table) {
+		if ($this->getFieldDefinition($field, $table) == null) {
 			return false;
 		} else {
 			return true;
@@ -313,5 +333,34 @@ class ClassInstanceGroupMembershipTableExists extends DatabaseUpgradeTask {
 }
 
 Upgrader::registerTask(new ClassInstanceGroupMembershipTableExists());
+
+class FieldLengthUpgradeTask extends DatabaseUpgradeTask {
+	public function __construct($table, $field, $length, $desc) {
+		$this->table = $table;
+		$this->field = $field;
+		$this->length = $length;
+		$this->desc = $desc;
+	}
+
+	public function getDescription() {
+		return $this->desc;
+	}
+
+	public function isNecessary() {
+		if ($this->getFieldLength($this->field, $this->table) != $this->length) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function perform() {
+		$sql = 'ALTER TABLE ' . $this->table . ' CHANGE ' . $this->field . ' ' . $this->field . ' varchar(' . $this->length . ')';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+Upgrader::registerTask(new FieldLengthUpgradeTask('remote_config_commands', 'command_line', 1024, 'remote_config_commands.command_line -> 1024'));
 
 ?>
