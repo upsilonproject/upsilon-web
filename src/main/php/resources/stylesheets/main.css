@@ -438,6 +438,11 @@ table.dataTable th:hover, p.collapseable:hover {
 	float: right;	
 }
 
+input[type="text"], input:not([type]) {
+	min-width: 50%;
+	padding: .2em;
+}
+
 input[type="button"], button, a[role="button"] {
 	border: 1px solid #666;
 	padding: .2em;
