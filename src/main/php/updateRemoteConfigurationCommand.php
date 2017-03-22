@@ -27,7 +27,7 @@ class UpdateRemoteConfigCommand extends Form {
 		$this->addElementReadOnly('ID', $id, 'id');
 		$this->addElement(new ElementInput('identifier', 'Identifier', $this->remoteCommand['identifier']));
 		$this->addElement(new ElementInput('command_line', 'Command Line', $this->remoteCommand['command_line']));
-		$this->getElement('command_line')->setMinMaxLengths(0, 512);
+		$this->getElement('command_line')->setMinMaxLengths(0, 1024);
 		$this->addElement($this->getElementMetadataSelection($this->remoteCommand['metadata']));
 
 		$this->addDefaultButtons();
