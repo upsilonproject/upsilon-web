@@ -28,7 +28,8 @@
 <div id = "header">
 	{if $sessionOptions->drawHeader}
 	<div class = "title">
-		<h1>
+		<img src = "resources/images/icons/logo96pxdarkbg.png" width = "16" style = "margin-right: 1em; margin-bottom: 4px; display: inline-block; vertical-align: middle;" />
+		<h1 style = "display: inline-block">
 			<a href = "index.php">{$siteTitle}</a>
 			&raquo;
 			<span class = "navTitle">{$navTitle}</span>
