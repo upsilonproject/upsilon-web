@@ -7,6 +7,7 @@ require_once 'includes/functions.remoteConfig.php';
 use \libAllure\Form;
 use \libAllure\FormHandler;
 use \libAllure\ElementInput;
+use \libAllure\ElementInputRegex;
 use \libAllure\ElementSelect;
 
 class UpdateRemoteConfigService extends Form {
@@ -28,7 +29,8 @@ class UpdateRemoteConfigService extends Form {
 		$this->remoteService = $service;
 		$this->serviceId = $id;
 
-		$this->addElement(new ElementInput('name', 'Name', $service['name']));
+		$elName = $this->addElement(new ElementInputRegex('name', 'Name', $service['name']));
+		$elName->setPatternToIdentifier();
 		$this->addElement(new ElementInput('parent', 'Parent', $service['parent']));
 		$this->addElementCommand($service['command']);
 
