@@ -1,14 +1,13 @@
 #!groovy                                                                           
-                                                                                   
-properties(                                                                        
-    [                                                                              
-        [                                                                          
-            $class: 'jenkins.model.BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '10', artifactNumToKeepStr: '10'],
-            $class: 'CopyArtifactPermissionProperty', projectNames: '*'            
-        ]                                                                          
-    ]                                                                              
-)                                                                                  
-                                                                                   
+
+properties(
+	[
+		buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10')), 
+		[$class: 'CopyArtifactPermissionProperty', projectNames: '*'], 
+		pipelineTriggers([[$class: 'PeriodicFolderTrigger', interval: '1d']])
+	]
+)
+                                                                                  
 def buildRpm(dist) {                                                               
     deleteDir()                                                                    
                                                                                    
