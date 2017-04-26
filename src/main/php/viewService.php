@@ -1,6 +1,7 @@
 <?php
 
 require_once 'includes/common.php';
+require_once 'includes/functions.remoteConfig.php';
 
 use \libAllure\DatabaseFactory;
 use \libAllure\Sanitizer;
@@ -40,14 +41,21 @@ function getServiceMetadata($identifier) {
 	return $metadata;
 }
 
-$tpl->assign('metadata', getServiceMetadata($service['identifier']));
+$configSource = getConfigSourceFromServiceResultIdentifier($service['identifier'], $service['node']);
 
-$listResults = getServiceResults($service['identifier']);
+$tpl->assign('metadata', getServiceMetadata($service['identifier']));
+$tpl->assign('configSource', $configSource);
+
+if (isset($configSource['remote_config_command_id'])) {
+	$tpl->assign('commandLineClickable', getClickableCommandLine($configSource));
+}
+
+$listResults = getServiceResults($service['identifier'], $service['node']);
 
 $tpl->assign('listResults', $listResults);
 
 $tpl->assign('instanceGraphIndex', 0);
-$tpl->assign('listServiceId', array($service['id']));
+$tpl->assign('listServiceId', array($service['identifier']));
 $tpl->assign('metric', 'karma');
 $tpl->assign('yAxisMarkings', array());
 $tpl->display('viewService.tpl');

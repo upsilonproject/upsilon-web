@@ -14,14 +14,39 @@ class FormAddMembership extends Form {
 	public function __construct() {
 		parent::__construct('formAddMembership', 'Form Add Membership');
 
-		$this->addElement($this->getElementService());
+		$classInstance = san()->filterInt('classInstance');
+		if (!empty($classInstance)) {
+			$this->addElement($this->getElementClassInstance($classInstance));
+			$this->addType = 'classInstance';
+		} else {
+			$this->addElement($this->getElementService());
+			$this->addType = 'service';
+		}
+
 		$this->addElementGroupSelect();
 		
 		$this->addDefaultButtons();
 	}
 
+	public function getElementClassInstance($classInstanceId) {
+		$sql = 'SELECT ci.id, ci.title, group_concat(c.title) AS classList FROM class_instances ci LEFT JOIN class_instance_parents cp ON cp.instance = ci.id LEFT JOIN classes c ON cp.parent = c.id GROUP BY ci.id ORDER BY ci.title ASC';
+		$stmt = db()->prepare($sql);
+		$stmt->execute();
+
+		$el = new ElementSelect('classInstance', 'Class Instance');
+		$el->setSize(10);
+		
+		foreach ($stmt->fetchAll() as $classInstance) {
+			$el->addOption($classInstance['title'] . ' - ' . $classInstance['classList'], $classInstance['id']);
+		}
+
+		$el->setValue($classInstanceId);
+
+		return $el;
+	}
+
 	private function getElementService() {
-		$sql = 'SELECT s.id, s.identifier, count(m.id) AS groups, s.node FROM services s LEFT JOIN service_group_memberships m ON m.`service` = s.identifier GROUP BY s.id ORDER BY node ASC, groups DESC, s.identifier ASC';
+		$sql = 'SELECT s.id, s.identifier, count(m.id) AS groups, s.node FROM services s LEFT JOIN service_group_memberships m ON m.`service` = s.identifier GROUP BY s.id ORDER BY s.node ASC, s.identifier, groups DESC, s.identifier ASC';
 		$stmt = db()->prepare($sql);
 		$stmt->execute();
 
@@ -48,13 +73,16 @@ class FormAddMembership extends Form {
 		$stmt = DatabaseFactory::getInstance()->prepare($sql);
 		$stmt->execute();
 
+		$this->groups = array();
+
 		foreach ($stmt->fetchAll() as $group) {
-			$el->addOption($group['title'], $group['title']);
+			$el->addOption($group['title'], $group['id']);
+			$this->groups[$group['id']] = $group['title'];
 		}
 
-		$group = san()->filterString('group');
-		if (!empty($group)) {
-			$el->setValue($group);
+		$groupFromRequest = san()->filterString('group');
+		if (!empty($groupFromRequest)) {
+			$el->setValue(array_search($groupFromRequest, $this->groups));
 		}
 
 		$el->description = ('If the group you want is not listed, <a href = "createGroup.php">create a new group</a>.');
@@ -72,25 +100,33 @@ class FormAddMembership extends Form {
 	}
 
 	public function process() {
-		$sql = 'INSERT INTO service_group_memberships (`group`, service) VALUES (:group, :service)';
-		$stmt = DatabaseFactory::getInstance()->prepare($sql);
-		$stmt->bindValue(':group', $this->getElementValue('group'));
+		switch ($this->addType) {
+			case 'service':
+				$sql = 'INSERT INTO service_group_memberships (`group`, service) VALUES (:group, :service)';
+				$stmt = DatabaseFactory::getInstance()->prepare($sql);
+				$stmt->bindValue(':group', $this->groups[$this->getElementValue('group')]);
 
-		$services = $this->getElementValue('serviceId');
+				$services = $this->getElementValue('serviceId');
 
-		foreach ($services as $service) {
-			$stmt->bindValue(':service', $service);
-			$stmt->execute();
+				foreach ($services as $service) {
+					$stmt->bindValue(':service', $service);
+					$stmt->execute();
+				}
+
+				break;
+
+			case 'classInstance':
+				$sql = 'INSERT INTO class_instance_group_memberships (gid, class_instance) VALUES (:gid, :classInstance) ';
+				$stmt = stmt($sql);
+				$stmt->bindValue(':gid', $this->getElementValue('group'));
+				$stmt->bindValue(':classInstance', $this->getElementValue('classInstance'));
+				$stmt->execute();
+
+				break;
 		}
 
-		$sql = 'SELECT g.id FROM service_groups g WHERE g.title = :title';
-		$stmt = stmt($sql);
-		$stmt->bindValue(':title', $this->getElementValue('group'));
-		$stmt->execute();
-		$group = $stmt->fetchRowNotNull();
-
 		// hack
-		redirect('viewGroup.php?id=' . $group['id'], 'Membership Added');
+		redirect('viewGroup.php?id=' . $this->getElementValue('group'), 'Membership Added');
 	}
 
 	public function getServiceId() {

@@ -29,7 +29,7 @@ class UpdateRemoteConfigServiceInstance extends Form {
 	}
 
 	public function addElementService($current) {
-		$el = new ElementSelect('service', 'services');
+		$el = new ElementSelect('service', 'Service');
 		$el->addOption('(null)', null);
 		$el->addOptions(array_column(getAllRemoteConfigServices(), 'name', 'id'));
 		$el->setValue($current);

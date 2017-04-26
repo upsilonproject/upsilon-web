@@ -18,6 +18,10 @@ class Widget {
 		return $this->getArgumentValue('title');
 	}
 
+	public function getHeaderLink() {
+		return '#';
+	}
+
 	public function loadArguments($id) {
 		$this->id = $id;
 

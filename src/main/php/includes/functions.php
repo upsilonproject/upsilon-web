@@ -7,6 +7,16 @@ use \libAllure\HtmlLinksCollection;
 
 require_once 'includes/classes/SessionOptions.php';
 
+$nav = array();
+
+function setNav() {
+	global $nav;
+
+	foreach (func_get_args() as $arg) {
+		$nav[] = $arg;
+	}
+}
+
 function loggerFields() {
 	return array('userId', 'usergroupId', 'serviceResultId', 'nodeId', 'nodeConfigId', 'serviceDefinitionId', 'commandDefinitionId', 'classId', 'dashboardId', 'serviceGroupId');
 }
@@ -321,6 +331,10 @@ function parseOutputJson(&$service) {
 			}
 		}
 
+		if (isset($json['metrics'])) {
+			$service['listMetrics'] = $json['metrics'];
+		}
+
 		if (isset($json['tasks'])) {
 			$service['tasks'] = $json['tasks'];
 		}
@@ -505,7 +519,6 @@ function enrichServices($listServices, $parseOutput = true, $parseMetadata = tru
 		$listServices[$k]['output'] = htmlspecialchars($listServices[$k]['output']);
 	}
 
-
 	return $listServices;
 }
 
@@ -543,6 +556,30 @@ function enrichGroupListingsWithServiceMemberships($listGroups, $subGroupDepth =
 	return $listGroups;
 }
 
+function getClassInstancesInGroup($gid) {
+	$sql = 'SELECT ci.id, ci.title FROM class_instance_group_memberships gm LEFT JOIN class_instances ci ON gm.class_instance = ci.id WHERE gm.gid = :gid';
+	$stmt = stmt($sql);
+	$stmt->bindValue(':gid', $gid);
+	$stmt->execute();
+
+	$ret = $stmt->fetchAll();
+
+	foreach ($ret as &$ci) {
+		$ci['requirements'] = getInstanceRequirements($ci['id']);
+	}
+
+	return $ret;
+}
+
+function enrichGroupListingsWithClassInstanceMemberships($listGroups, $subGroupDepth = 1) {
+	foreach ($listGroups as &$itemGroup) {
+		$itemGroup['listClassInstances'] = getClassInstancesInGroup($itemGroup['id']);
+	}
+
+	return $listGroups;
+}
+
+
 function enrichGroupListingsWithNodeMemberships($listGroups) {
 	foreach ($listGroups as &$itemGroup) {
 		$itemGroup['listNodes'] = array();
@@ -551,7 +588,7 @@ function enrichGroupListingsWithNodeMemberships($listGroups) {
 	return $listGroups;
 }
 
-function getGroups($includeServices = true, $includeNodes = true) {
+function getGroups($includeServices = true, $includeNodes = true, $includeClassInstances = true) {
 	$sql = 'SELECT g.id, g.title AS name, g.description, p.id AS parentId, p.title AS parentName, count(m.id) AS serviceCount, count(n.id) AS nodeCount FROM service_groups g LEFT JOIN service_group_memberships m ON g.title = m.group LEFT JOIN service_groups p ON g.parent = p.title LEFT JOIN node_group_memberships mn ON g.id = mn.gid LEFT JOIN nodes n ON mn.node = n.id GROUP BY g.id ORDER BY g.title ASC';
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->execute();
@@ -566,6 +603,10 @@ function getGroups($includeServices = true, $includeNodes = true) {
 		$listGroups = enrichGroupListingsWithNodeMemberships($listGroups);
 	}
 
+	if ($includeClassInstances) {
+		$listGroups = enrichGroupListingsWithClassInstanceMemberships($listGroups);
+	}
+
 	return $listGroups;
 }
 
@@ -577,6 +618,7 @@ function getGroup($id) {
 
 	$itemGroup = enrichGroupListingsWithServiceMemberships(array($stmt->fetchRowNotNull()));
 	$itemGroup = enrichGroupListingsWithNodeMemberships(array($itemGroup[0]));
+	$itemGroup = enrichGroupListingsWithClassInstanceMemberships(array($itemGroup[0]));
 
 	return $itemGroup[0];
 }
@@ -655,6 +697,8 @@ function getServiceById($id, $parseOutput = false) {
 		$service = enrichService($service);
 
 		$parseOutput && parseOutputJson($service);
+
+		$service['commandLine'] = $service['executable'];
 
 		return $service;
 }
@@ -1038,7 +1082,7 @@ function getSingleServiceMetric($service, $field) {
 
 	if ($field == 'karma') {
 		$metric = new stdClass;
-		$metric->date = $service['date'];
+		$metric->date = $service['checked'];
 		$metric->karma = $service['karma'];
 		$metric->value = karmaToInt($service['karma']);
 
@@ -1067,7 +1111,7 @@ function getSingleServiceMetric($service, $field) {
 						continue;
 					}
 		
-					$metric->date = $service['date'];
+					$metric->date = $service['checked'];
 					$metric->karma = $service['karma'];
 
 					return $metric;
@@ -1097,7 +1141,6 @@ function getServiceMetrics($results, $field) {
 			$metrics[] = $metric;
 		}
 	}
-	
 
 	foreach ($metrics as &$metric) {
 		$metric->date = strtotime($metric->date);
@@ -1110,9 +1153,12 @@ function getClassInstance($id) {
 	$sql = <<<SQL
 SELECT
 	i.id,
-	i.title
+	i.title,
+	p.icon
 FROM 
 	class_instances i 
+LEFT JOIN class_instance_parents ip ON ip.instance = i.id
+LEFT JOIN classes p ON ip.parent = p.id
 WHERE 
 	i.id = :instanceId
 LIMIT 1
@@ -1448,10 +1494,11 @@ function getServiceArgumentValues($serviceId) {
 	return $args;
 }
 
-function getServiceResults($serviceIdentifier) {
-	$sql = 'SELECT r.id, r.output, r.checked, r.karma, r.checked AS lastUpdated FROM service_check_results r WHERE r.service = :serviceIdentifier ORDER BY r.checked DESC LIMIT 10';
+function getServiceResults($serviceIdentifier, $nodeIdentifier) {
+	$sql = 'SELECT r.id, r.output, r.checked, r.karma, r.checked AS lastUpdated FROM service_check_results r WHERE r.service = :serviceIdentifier AND r.node = :nodeIdentifier ORDER BY r.checked DESC LIMIT 10';
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->bindValue(':serviceIdentifier', $serviceIdentifier);
+	$stmt->bindValue(':nodeIdentifier', $nodeIdentifier);
 	$stmt->execute();
 
 	$listResults = $stmt->fetchAll();
@@ -1499,9 +1546,9 @@ function associateRemoteAndReportedConfigs($configString, $remoteConfigs) {
 		foreach ($reportedConfigs as $reportedConfig) {
 			if ($remoteConfig['id'] == $reportedConfig['remoteId']) {
 				$remoteConfigs[$index]['reported'] = $reportedConfig;
+				break;
 			}
 
-			break;
 		}
 	}
 
