@@ -62,13 +62,33 @@ abstract class UpgradeTask {
 }
 
 abstract class DatabaseUpgradeTask extends UpgradeTask {
-	protected function doesFieldExistInTable($field, $table) {
+	protected function getFieldLength($field, $table) {
+		$def = $this->getFieldDefinition($field, $table);
+		$def = $def['Type'];
+
+		$matches = array();
+		if (preg_match('#\((.+)\)#i', $def, $matches)) {
+			return $matches[1];
+		} else {
+			throw new Exception('Could not find field length for ' . $table . ' ' . $field . ' ' . print_r($matches, true));
+		}
+	}
+
+	protected function getFieldDefinition($field, $table) {
 		$sql = 'DESC ' . $table .  ' :field';
 		$stmt = stmt($sql);
 		$stmt->bindValue(':field', $field);
 		$stmt->execute();
 
 		if ($stmt->numRows() == 0) {
+			return null;
+		} else {
+			return $stmt->fetch();
+		}
+	}
+
+	protected function doesFieldExistInTable($field, $table) {
+		if ($this->getFieldDefinition($field, $table) == null) {
 			return false;
 		} else {
 			return true;
@@ -86,6 +106,15 @@ abstract class DatabaseUpgradeTask extends UpgradeTask {
 		} else {
 			return true;
 		}
+	}
+
+	public function tableHasRow($table, $pkey, $value) {
+		$sql = "SELECT $pkey FROM $table WHERE $pkey = :value ";
+		$stmt = stmt($sql);
+		$stmt->bindValue(':value', $value);
+		$stmt->execute();
+
+		return $stmt->numRows() != 0;
 	}
 
 	public function isPossible() {
@@ -271,5 +300,67 @@ class ServiceAssociationIncludeNode extends DatabaseUpgradeTask {
 }
 
 upgrader::registerTask(new ServiceAssociationIncludeNode());
+
+class InstallWidgetViewClassInstances extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->tableHasRow('widgets', 'class', 'ViewClassInstances');
+	}
+
+	public function perform() {
+		$sql = 'INSERT INTO widgets (class) VALUES (:name)';
+		$stmt = stmt($sql);
+		$stmt->bindValue(':name', 'ViewClassInstances');
+		$stmt->execute();
+	}
+}
+
+upgrader::registerTask(new InstallWidgetViewClassInstances());
+
+class ClassInstanceGroupMembershipTableExists extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->doesTableExist('class_instance_group_memberships');
+	}
+
+	public function isPossible() {
+		return true;
+	}
+
+	public function perform() {
+		$sql = 'CREATE TABLE class_instance_group_memberships (id int not null primary key auto_increment, gid int not null, class_instance int not null)';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+Upgrader::registerTask(new ClassInstanceGroupMembershipTableExists());
+
+class FieldLengthUpgradeTask extends DatabaseUpgradeTask {
+	public function __construct($table, $field, $length, $desc) {
+		$this->table = $table;
+		$this->field = $field;
+		$this->length = $length;
+		$this->desc = $desc;
+	}
+
+	public function getDescription() {
+		return $this->desc;
+	}
+
+	public function isNecessary() {
+		if ($this->getFieldLength($this->field, $this->table) != $this->length) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function perform() {
+		$sql = 'ALTER TABLE ' . $this->table . ' CHANGE ' . $this->field . ' ' . $this->field . ' varchar(' . $this->length . ')';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+Upgrader::registerTask(new FieldLengthUpgradeTask('remote_config_commands', 'command_line', 1024, 'remote_config_commands.command_line -> 1024'));
 
 ?>

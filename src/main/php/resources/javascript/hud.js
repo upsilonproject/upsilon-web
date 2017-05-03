@@ -16,7 +16,7 @@ function pad(number) {
 
 function toLocalIsoLikeString(d) {
 	return d.getFullYear() + 
-	'-' + pad(d.getMonth()) +
+	'-' + pad(d.getMonth() + 1) +
 	'-' + pad(d.getDate()) +
 	' ' + pad(d.getHours()) +
 	':' + pad(d.getMinutes()) +
@@ -182,9 +182,11 @@ function getAxisColor(index) {
 window.plots = {};
 window.plotMarkings = {};
 
-function fetchServiceMetricResultGraph(metric, id, graphIndex) {
+function fetchServiceMetricResultGraph(metric, dataset, graphIndex) {
+	console.log("datasets", dataset);
 	data = {
-		"services[]": id,
+		"services[]": dataset.services,
+		"node": dataset.node,
 		"metric": metric,
 		"graphIndex": graphIndex
 	}
@@ -192,26 +194,6 @@ function fetchServiceMetricResultGraph(metric, id, graphIndex) {
 	window.serviceResultGraphUrl = 'viewServiceResultGraph.php';
 
 	request(window.serviceResultGraphUrl, data, updateGraph);
-}
-
-
-function layoutBoxes() {
-	require([
-		"dojo/query"
-	], function(query) {
-		blocks = query("div.blockContainer");
-
-		if (blocks.length > 0) {
-			if (typeof(window.boxLayoutManager) == "undefined") {
-				window.boxLayoutManager = new Masonry('div.blockContainer', {itemSelector: 'div.block', gutter: 10, isFitWidth: true });
-			}
-
-			console.log("blocks", blocks);
-
-			window.boxLayoutManager.layout();
-		}
-	});
-
 }
 
 function cookieOrDefault(cookieName, defaultValue) {
@@ -289,13 +271,13 @@ function toggleGroups() {
 					servicesWarning.style('display', 'none');
 					var indicator = dojo.toDom('<div style = "display:inline-block"><span class = "metricIndicator good grouped">~</span></div> <div class = "metricText">All <strong>' + servicesGood.length + '</strong> services are good.</div>');
 
-					query(desc)[0].appendChild(indicator);
+					if (query(desc).length > 0) {
+						query(desc)[0].appendChild(indicator);
+					}
 
 					if (servicesWarning.length > 0) {
 						desc.appendChild(dojo.toDom(' <br /><span class = "warning"><strong>' + servicesWarning.length + '</strong> have a warning</span>.'));
 					}
-
-					query(desc).click = console.log; // FIXME
 				}
 
 				if (servicesSkipped.length > 0) {
@@ -334,7 +316,6 @@ function(domConstruct, on, query, keys) {
                         window.showGoodGroups = !window.showGoodGroups;
 
                         toggleGroups();
-                        layoutBoxes(false);
 
                         break;
                 case window.shortcutToggleEmptyGroups:
@@ -447,47 +428,117 @@ function renderSubresults(data, ref) {
 
 }
 
-function renderServiceList(data, ref) {
+function renderGroup(data, ref) {
 	require([
 		"dojo/query",
 		"dojo/dom-construct",
-		"dojo/NodeList-manipulate"
+		"dojo/NodeList-manipulate",
+		'dojo/NodeList-traverse'
 	], function(query, construct) {
-		generate = construct.toDom;
+		generate = construct.toDom
 
 		container = query('.widgetRef' + ref);
-		container.addClass('metricListContainer');
-		container.empty();
+		container.empty()
+
+		container.append(generate('<h2>Services</h2>'))
+		renderServiceList(data['listServices'], container)
+
+		if (data['listClassInstances'].length > 0) {
+			container.append(generate('<h2>Class Instances'));
+			renderClassInstances(data['listClassInstances'], container);
+		}
+	});
+}
+
+function renderClassInstances(data, owner) {
+	require([
+		"dojo/dom-construct",
+		"dojo/dom-class",
+		"dojo/query",
+		"dojo/NodeList-manipulate",
+		"dojo/NodeList-traverse"
+	], function(construct, domClass, query) {
+		if (!domClass.contains(owner, ".classInstances")) {
+			container = generate('<p class = "classInstances" />');
+			owner.append(container);
+		} else {
+			container = owner.children('.classInstances');
+		}
+
+		data.forEach(function(classInstance, index) {
+			dom = construct.toDom('<p><a href = "viewClassInstance.php?id=' + classInstance['id'] + '">' + classInstance['title'] + "</a></p>")
+
+			classInstance['requirements'].forEach(function(requirement, index) {
+				domRequirement = construct.toDom('<p>&nbsp;</p>');
+				indicator = construct.place('<span class = "metricIndicator">&nbsp;</span>', domRequirement);
+
+				construct.place(' <span>' + requirement['requirementTitle'] + '</span> - ', domRequirement);
+
+				if (requirement['serviceIdentifier'] != null) {
+					query(indicator).addClass(requirement['karma'].toLowerCase());
+					construct.place('<span>' + requirement['serviceIdentifier'] + '</span>', domRequirement);
+				} else {
+					construct.place('<span class = "subtle">Not covered</span>', domRequirement);
+				}
+
+				dom.append(domRequirement)
+			});
+
+			container.append(dom);
+		});
+	});
+}
+
+function renderServiceList(data, owner) {
+	require([
+		"dojo/query",
+		"dojo/dom-construct",
+		"dojo/dom-class",
+		"dojo/NodeList-manipulate",
+		"dojo/NodeList-traverse"
+	], function(query, construct, domClass) {
+		generate = construct.toDom;
+
+		if (typeof(owner) == "string") {
+			owner = query('.widgetRef' + owner)
+		}
+
+		if (!domClass.contains(owner, '.services')) {
+			owner.children('.loading').remove();
+			owner.append(generate('<p class = "services" />'))
+		}
+
+		owner.children('.metricListContainer').remove();
+
+		container = owner.append(generate('<div class = "metricListContainer" />'));
 
 		container.append(generate('<p class = "metricListDescription"></p>'));
 
-			list = query(generate('<ul class = "metricList"></ul>'));
+		list = container.append(generate('<ul class = "metricList"></ul>'));
 
-			data.forEach(function(service, index) {
-				indicator = query(generate('<span class = "metricIndicator" />'));
-				indicator.addClass(service.karma.toLowerCase());
+		data.forEach(function(service, index) {
+			indicator = query(generate('<span class = "metricIndicator" />'));
+			indicator.addClass(service.karma.toLowerCase());
 
-				if (service.icon != null) {
-					indicator.append(dojo.toDom('<img src = "resources/images/serviceIcons/' + service.icon + '" /><br />'));
-				}
-				
-				indicator.append(dojo.toDom('<span>' + service.lastChangedRelative + '</span>'));
-				indicator = query(generate('<div class = "metricIndicatorContainer" />')).append(indicator);
+			if (service.icon != null) {
+				indicator.append(dojo.toDom('<img src = "resources/images/serviceIcons/' + service.icon + '" /><br />'));
+			}
+			
+			indicator.append(dojo.toDom('<span>' + service.lastChangedRelative + '</span>'));
+			indicator = query(generate('<div class = "metricIndicatorContainer" />')).append(indicator);
 
-				metric = query(generate('<li />'));
-				metric.append(indicator);
+			metric = query(generate('<li />'));
+			metric.append(indicator);
 
-				text = query(generate('<div class = "metricText" />'));
-				text.append('<span class = "metricDetail">' + service.estimatedNextCheckRelative + '</span>');
-				text.append('<a href = "viewService.php?id=' + service.id + '"><span class = "metricTitle">' + service.alias + '</span></a>');
-				metric.append(text);
+			text = query(generate('<div class = "metricText" />'));
+			text.append('<span class = "metricDetail">' + service.estimatedNextCheckRelative + '</span>');
+			text.append('<a href = "viewService.php?id=' + service.id + '"><span class = "metricTitle">' + service.alias + '</span></a>');
+			metric.append(text);
 
-				list.append(metric);
-			});
-	
-		container.append(list);
+			list.append(metric);
+		});
+
 		toggleGroups();
-		layoutBoxes();
 	});
 }
 
@@ -506,8 +557,6 @@ function renderNewsList(data, ref) {
 			storyHtml.append("<strong>" + formatUnixTimestamp(news['time']) + '</strong> <span class = "subtle">' + news['source'] +  '</span> <a href = "' + news['url'] + '">' + news['title'] + '</a>');
 			container.append(storyHtml);
 		});
-
-		layoutBoxes();
 	});
 }
 

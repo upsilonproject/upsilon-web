@@ -5,13 +5,13 @@
 </div>
 {/if}
 
-<div class = "blockContainer">
+<div class = "blockContainer dw">
 {if empty($listInstances)}
 	<p>This dashboard is empty. Select <strong>Actions</strong> &raquo; <strong>Add Widget</strong> from the Dashboard menu.</p>
 {else}
 		{foreach from = $listInstances item = widget}
 			{if $widget.instance->isShown()}
-			<div class = "block">
+			<div class = "block dw-panel">
 				{if $sessionOptions->drawNavigation}
 				<div style = "float: right" data-dojo-type = "dijit/form/DropDownButton">
 					<span>Widget</span>
@@ -19,7 +19,7 @@
 						{include file = "links.tpl" links = $widget.instance->getLinks() skipTitle = true sub = true}
 				</div>
 				{/if}
-				<h3>{$widget.instance->getTitle()}</h3>
+				<h3><a href = "{$widget.instance->getHeaderLink()}">{$widget.instance->getTitle()}</a></h3>
 
 				{$widget.instance->render()}
 			</div>
@@ -38,7 +38,6 @@
 <script type = "text/javascript">
 {literal}
 dojo.addOnLoad(function() {
-	layoutBoxes();
 	{/literal}
 	{if $itemDashboard->isServicesGrouped()}
 	toggleGroups();

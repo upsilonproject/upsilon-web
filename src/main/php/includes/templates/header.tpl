@@ -2,7 +2,7 @@
 
 <html>
 <head>
-	<title>{$siteTitle} &raquo; {$title|default:'Untitled page'}</title>
+	<title>{$pageTitle} &laquo; {$siteTitle}</title>
 
 	<link rel="stylesheet" href="resources/dojo/dijit/themes/claro/claro.css" />
 
@@ -10,6 +10,7 @@
 	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/phone-thin.css" title = "mobile" media = "(max-width: 300px)" />
 	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/phone-wide.css" title = "mobile" media = "(max-width: 400px)" />
 	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/tablet.css" title = "mobile" media = "(max-width: 400px)" />
+	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/driveway.min.css" />
 
 	<link rel = "{if $isNighttime}stylesheet{/if}" type = "text/css" href = "resources/stylesheets/main-nighttime.css" title = "nighttime" />
 
@@ -17,7 +18,6 @@
 
 	<meta name="viewport" content="width=device-width" />
 
-	<script src="resources/javascript/masonry.js"></script>
 	<script src="resources/dojo/dojo/dojo.js"></script>
 	<script src="resources/javascript/hud.js"></script>
 
@@ -28,10 +28,11 @@
 <div id = "header">
 	{if $sessionOptions->drawHeader}
 	<div class = "title">
-		<h1>
+		<img src = "resources/images/icons/logo96pxdarkbg.png" width = "16" style = "margin-right: 1em; margin-bottom: 4px; display: inline-block; vertical-align: middle;" />
+		<h1 style = "display: inline-block">
 			<a href = "index.php">{$siteTitle}</a>
 			&raquo;
-			<span class = "pageTitle">{$title|default:'Untitled page'}</span>
+			<span class = "navTitle">{$navTitle}</span>
 		</h1>
 	</div>
 	{/if}

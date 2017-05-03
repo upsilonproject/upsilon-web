@@ -5,7 +5,7 @@
 		<a href = "createRemoteConfigCommand.php">Create</a>
 	</p>
 	
-	<table>
+	<table class = "hover">
 		<thead>
 			<tr>
 				<th class = "small media-width-prio-low">ID</th>
@@ -32,7 +32,7 @@
 				</td>
 				<td class = "media-width-prio-low"><a href = "updateCommand.php?id={$command.metadataId}">{$command.metadataIdentifier}</a></td>
 				<td class = "media-width-prio-low">{$command.command_line}</td>
-				<td>{if $command.instanceCount == 0}<em>0 services using this command</em>{else}{$command.instanceCount}{/if}</td>
+				<td>{if $command.instanceCount == 0}<em>0 services using this command</em>{else}<a href = "listServiceDefinitions.php?command={$command.identifier}">{$command.instanceCount}</a>{/if}</td>
 				<td><a href = "createRemoteConfigService.php?commandId={$command.id}">Create service...</a></td>
 			</tr>
 		{/foreach}

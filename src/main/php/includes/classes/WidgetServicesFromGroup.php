@@ -16,6 +16,16 @@ class WidgetServicesFromGroup extends Widget {
 
 		if (!empty($group)) {
 			$this->group = getGroup($this->getArgumentValue('group'));
+		} else {
+			$this->group = null;
+		}
+	}
+
+	public function getHeaderLink() {
+		if ($this->group == null) {
+			return '#';
+		} else {
+			return 'viewGroup.php?id=' . $this->group['id'];
 		}
 	}
 
@@ -36,9 +46,9 @@ class WidgetServicesFromGroup extends Widget {
 	public function render() {
 		global $tpl;
 		$tpl->assign('ref', rand());
-		$tpl->assign('url', 'json/getServicesInGroup.php');
-		$tpl->assign('queryParams', json_encode(array('group' => $this->getArgumentValue('group'))));
-		$tpl->assign('callback', 'renderServiceList');
+		$tpl->assign('url', 'json/getGroup.php');
+		$tpl->assign('queryParams', json_encode(array('id' => $this->getArgumentValue('group'))));
+		$tpl->assign('callback', 'renderGroup');
 		$tpl->assign('repeat', 60000);
 		$tpl->display('widgetAjax.tpl');
 	}

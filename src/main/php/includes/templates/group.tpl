@@ -13,4 +13,20 @@
 {else}
 	<p>This group is has 0 services and 0 subgroups.</p>
 {/if}
+	{if !empty($itemGroup.listClassInstances)}
+		<h2>Class instances</h2>
+		{foreach from = $itemGroup.listClassInstances item = classInstance}
+			{$classInstance.title}<br />
+
+			<table>
+			{foreach $classInstance.requirements item = itemRequirement}
+			<tr>
+				<td>
+					<span class = "metricIndicator {$itemRequirement.karma|strtolower}">&nbsp;</span> {$itemRequirement.identifier}<br />
+				</td>
+			</tr>
+			{/foreach}
+			</table>
+		{/foreach}
+	{/if}
 </div>

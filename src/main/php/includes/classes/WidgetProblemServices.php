@@ -10,6 +10,10 @@ class WidgetProblemServices extends Widget {
 		$this->problemServices = getServicesBad();
 	}
 
+	public function getHeaderLink() {
+		return 'viewList.php?problems';
+	}
+
 	public function render() {
 		global $tpl;
 		$tpl->assign('ref', rand());

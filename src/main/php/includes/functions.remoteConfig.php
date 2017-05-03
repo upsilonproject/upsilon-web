@@ -1,5 +1,49 @@
 <?php
 
+function getClickableCommandLine($configSource) {
+	$line = $configSource['remote_config_command_line'];
+	$args = getServiceArgumentValues($configSource['remote_configuration_service_id']);
+
+	foreach ($args as $name => $value) {
+		$line = str_replace('$' . $name, '<a href = "updateRemoteConfigurationService.php?id=' . $configSource['remote_configuration_service_id'] . '"><abbr class = "commandArg" title = "' . $name . '">' . $value . '</abbr></a>', $line);
+	}
+
+	return $line;
+
+}
+
+function deleteRemoteConfigurationCommand($id) {
+	$sql = 'DELETE FROM remote_config_commands WHERE id = :id';
+	$stmt = stmt($sql);
+	$stmt->bindValue(':id', $id);
+	$stmt->execute();
+}
+
+function getConfigSourceFromServiceResultIdentifier($serviceIdentifier, $nodeIdentifier) {
+	$sql = 'SELECT rc.id AS remote_config_id, rc.name AS remote_config_name, rcs.id AS remote_configuration_service_id, ras.id AS remote_config_allocated_service_id, rcc.id AS remote_config_command_id, rcc.identifier AS remote_config_command_name, rcc.command_line AS remote_config_command_line FROM services s LEFT JOIN remote_config_services rcs ON rcs.name = s.identifier LEFT JOIN remote_config_commands rcc ON rcs.command = rcc.id LEFT JOIN remote_config_allocated_services ras ON ras.service = rcs.id LEFT JOIN remote_configs rc ON rc.id = ras.config WHERE s.identifier = :serviceIdentifier AND s.node = :nodeIdentifier';
+	$stmt = stmt($sql);
+	$stmt->bindValue(':serviceIdentifier', $serviceIdentifier);
+	$stmt->bindValue(':nodeIdentifier', $nodeIdentifier);
+	$stmt->execute();
+
+	$configs = $stmt->fetchAll();
+
+	if ($configs[0]['remote_config_id'] == null) {
+		return 'local';
+	} else {
+		return $configs[0];
+	}
+}
+
+function updateConfig($configId, $description = null) {
+	$sql = 'UPDATE remote_configs r SET r.mtime = now() WHERE r.id = :id';
+	$stmt = stmt($sql);
+	$stmt->bindValue(':id', $configId);
+	$stmt->execute();
+
+	logger('Config updated', array('nodeConfigId' => $configId));
+}
+
 function getConfigById($configId) {
 	$sql = 'SELECT r.id, r.name, r.mtime, unix_timestamp(r.mtime) AS modifiedTimestamp FROM remote_configs r WHERE r.id = :id';
 	$stmt = stmt($sql);
@@ -49,7 +93,7 @@ function getConfigNodes($configId) {
 }
 
 function getConfigServices($config) {
-	$sql = 'SELECT a.id, s.id AS serviceId, sr.id AS serviceResultsId, s.name, c.id AS commandId, c.identifier AS commandIdentifier, s.parent, cm.icon FROM remote_config_allocated_services a LEFT JOIN remote_config_services s ON a.service = s.id LEFT JOIN remote_config_commands c ON s.command = c.id LEFT JOIN command_metadata cm ON c.metadata = cm.id LEFT JOIN remote_configs rc ON a.config = rc.id LEFT JOIN services sr ON sr.identifier = s.name WHERE rc.id = :config';
+	$sql = 'SELECT a.id, s.id AS serviceId, s.name, c.id AS commandId, c.identifier AS commandIdentifier, s.parent, cm.icon FROM remote_config_allocated_services a LEFT JOIN remote_config_services s ON a.service = s.id LEFT JOIN remote_config_commands c ON s.command = c.id LEFT JOIN command_metadata cm ON c.metadata = cm.id LEFT JOIN remote_configs rc ON a.config = rc.id WHERE rc.id = :config';
 	$stmt = stmt($sql);
 	$stmt->bindValue(':config', $config);
 	$stmt->execute();

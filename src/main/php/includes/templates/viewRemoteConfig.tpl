@@ -52,7 +52,6 @@
 				<th class = "small">ID</th>
 				<th>Identifier</th>
 				<th>Command</th>
-				<th>Results</th>
 				<th>Actions</th>
 			</tr>
 		</thead>
@@ -70,13 +69,6 @@
 				</td>
 				<td>
                     <a href = "updateRemoteConfigurationCommand.php?id={$service.commandId}">{$service.commandIdentifier}</a>
-				</td>
-				<td>
-					{if empty($service.serviceResultsId)}
-						<em>None found</em>
-					{else}
-						<a href = "viewService.php?id={$service.serviceResultsId}">View</a>
-					{/if}
 				</td>
 				<td>
 					Service: 
