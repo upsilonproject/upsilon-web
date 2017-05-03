@@ -29,10 +29,11 @@ $loginBanner = getSiteSetting('loginBanner');
 
 if (!empty($loginBanner)) {
 	$tpl->assign('message', $loginBanner);
+	$tpl->assign('messageClass', 'loginFormContainer box');
 	$tpl->display('message.tpl');
 }
 
-if (!isUsingSsl() && getSiteSetting('warn_not_using_https', true)) {
+if (!isUsingSsl() && getSiteSetting('warnNotUsingHttps', true)) {
 	$httpsUrl = 'https://' . $_SERVER['HTTP_HOST'] . '/' . $_SERVER['PHP_SELF'];
 	$tpl->assign('message', 'You are not using SSL! Would you like to switch to the <a href = "' . $httpsUrl . '">HTTPS</a> version?');
 	$tpl->assign('messageClass', 'loginFormContainer box tutorialMessage');

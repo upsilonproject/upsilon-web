@@ -31,7 +31,7 @@ class UserSettings extends Form {
 
                 $this->addElement(new ElementCheckbox('warnNotUsingHttps', 'Warn when not using HTTPS', $warn));
                 $this->addElement(new ElementInput('siteTitle', 'Site title', getSiteSetting('siteTitle', 'Upsilon')));
-                $this->addElement(new ElementInput('loginBanner', 'Login Page Banner', getSiteSetting('loginPageBanner', '')));
+                $this->addElement(new ElementInput('loginBanner', 'Login Page Banner', getSiteSetting('loginPageBanner', getSiteSetting('loginBanner'))));
 
 				$this->addSection('AMQP');
                 $this->addElement(new ElementInput('amqpHost', 'AMQP Host', getSiteSetting('amqpHost', 'localhost')));
