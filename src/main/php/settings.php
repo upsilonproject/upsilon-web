@@ -31,6 +31,8 @@ class UserSettings extends Form {
 
                 $this->addElement(new ElementCheckbox('warnNotUsingHttps', 'Warn when not using HTTPS', $warn));
                 $this->addElement(new ElementInput('siteTitle', 'Site title', getSiteSetting('siteTitle', 'Upsilon')));
+                $this->addElement(new ElementInput('loginBanner', 'Login Page Banner', getSiteSetting('loginPageBanner', getSiteSetting('loginBanner'))));
+				$this->getElement('loginBanner')->setMinMaxLengths(0, 512);
 
 				$this->addSection('AMQP');
                 $this->addElement(new ElementInput('amqpHost', 'AMQP Host', getSiteSetting('amqpHost', 'localhost')));
@@ -57,6 +59,7 @@ class UserSettings extends Form {
         public function process() {
                 setSiteSetting('warnNotUsingHttps', $this->getElementValue('warnNotUsingHttps'));
                 setSiteSetting('siteTitle', $this->getElementValue('siteTitle'));
+                setSiteSetting('loginBanner', $this->getElementValue('loginBanner'));
                 setSiteSetting('amqpHost', $this->getElementValue('amqpHost'));
                 setSiteSetting('amqpPort', $this->getElementValue('amqpPort'));
                 setSiteSetting('amqpUser', $this->getElementValue('amqpUser'));

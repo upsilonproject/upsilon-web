@@ -58,7 +58,7 @@ foreach ($catalog->catalog as $command) {
 
 	foreach ($matches[0] as $arg) {
 		$stmtArgs->bindValue(':command', $commandId);
-		$stmtArgs->bindValue(':arg', $arg);
+		$stmtArgs->bindValue(':arg', str_replace('$', '', $arg));
 		$stmtArgs->execute();
 	}
 }
