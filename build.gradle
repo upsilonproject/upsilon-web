@@ -48,4 +48,9 @@ distZip {
 		include "README.md" 
 		into "upsilon-web-${version}/"
 	}
+
+	from ("var/pkg") {
+		include "Dockerfile"
+		into "upsilon-web-${version}/var/pkg/"
+	}
 }
