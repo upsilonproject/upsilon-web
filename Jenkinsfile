@@ -48,6 +48,7 @@ def buildRpm(dist) {
     sh "rpmbuild -ba SPECS/upsilon-web.spec --define '_topdir ${env.WORKSPACE}' --define 'dist ${dist}'"
                                                                                    
     archive 'RPMS/noarch/*.rpm'                                                    
+	stash includes: "RPMS/noarch/*.rpm", name: dist
 }                                                                                  
                                                                                    
 node {                                                                             
