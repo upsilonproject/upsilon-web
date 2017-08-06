@@ -18,7 +18,7 @@ class UpsilonMessage extends AMQPMessage {
 		$this->headers[$key] = $value;
 	}
 
-	function publish($routingKey = 'upsilon.cmds') {
+	public function publish($routingKey = 'upsilon.cmds') {
 		global $amqpChan;
 
 		$headerTable = new Wire\AMQPTable($this->headers);

@@ -1,7 +1,6 @@
 <?php
 
-$title = 'View service result graph';
-require_once 'includes/common.php';
+require_once 'jsonCommon.php';
 
 use \libAllure\DatabaseFactory;
 use \libAllure\Sanitizer;
@@ -12,9 +11,9 @@ function extractNagiosMetric($service, $field) {
 	$match = preg_match_all('#([\|\w]+)=([\d\.]+)#i', $service['output'], $matches, PREG_SET_ORDER);
 
 	$metric = new stdClass;
-	$metric->date = $service['date'];
+	$metric->date = $service['checked'];
 	$metric->karma = $service['karma'];
-	$metric->value = '[NO OUTPUT]';
+	$metric->value = &$service['value'];
 
 	foreach ($matches as $match) {
 			if ($match[1] == $field) {
@@ -25,47 +24,38 @@ function extractNagiosMetric($service, $field) {
 	return $metric;
 }
 
-function karmaToInt($karma) {
-	switch ($karma) {
-		case 'BAD': return -1;
-		case 'STALLED': return 0;
-		case 'GOOD': return 1;
-		case 'WARNING': return -.5;
-		case 'UNKNOWN': return 0;
+if (empty($_REQUEST['metrics'])) {
+	$fields = array('karma');
+} else {
+	$fields = array();
+
+	foreach ($_REQUEST['metrics'] as $metric) {
+		$fields[] = $metric;
 	}
-}
-
-$field = Sanitizer::getInstance()->filterString('metric');
-
-if (empty($field)) {
-	$field = 'karma';
 }
 
 $metrics = array();
 
-foreach ($_REQUEST['services'] as $service) {
-	$results = getServiceResults($service, $_REQUEST['node']);
-	$results = array_reverse($results);
+foreach ($fields as $field) {
+	foreach ($_REQUEST['serviceIds'] as $serviceId) {
+		$service = getServiceById($serviceId);
 
-	$metrics[] = array(
-		'serviceId' => $service,
-		'metrics' => getServiceMetrics($results, $field)
-	);
+		$results = getServiceResults($service['identifier'], $service['node'], 7);
+		$results = array_reverse($results);
+
+		$metrics[] = array(
+			'serviceId' => $serviceId,
+			'field' => $field,
+			'metrics' => getServiceMetrics($results, $field)
+		);
+	}
 }
 
 header('Content-Type: application/json');
 echo json_encode(array(
-	'graphIndex' => $_REQUEST['graphIndex'],
-	'metric' => $field,
+	'chartIndex' => $_REQUEST['chartIndex'],
+	'metric' => implode($fields, ' + '),
 	'services' => $metrics
 ));
-
-exit;
-
-$g = new Graph();
-$g->drawAxis(false, true);
-
-$g->plotMetrics($metrics, $field);
-$g->output();
 
 ?>

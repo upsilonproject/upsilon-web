@@ -4,6 +4,7 @@ use \libAllure\DatabaseFactory;
 use \libAllure\Session;
 use \libAllure\Sanitizer;
 use \libAllure\HtmlLinksCollection;
+use \libAllure\FilterTracker;
 
 require_once 'includes/classes/SessionOptions.php';
 
@@ -22,7 +23,7 @@ function loggerFields() {
 }
 
 function logger($message, $keys = array()) {
-	$sql = 'INSERT INTO logs (message, timestamp, userId, usergroupId, serviceResultId, nodeId, nodeConfigId, serviceDefinitionId, commandDefinitionId, classId, dashboardId, serviceGroupId) VALUES (:message, now(), :userId, :usergroupId, :serviceResultId, :nodeId, :nodeConfigId, :serviceDefinitionId, :commandDefinitionId, :classId, :dashboardId, :serviceGroupId)';
+	$sql = 'INSERT INTO logs (message, timestamp, userId, usergroupId, serviceResultId, nodeId, nodeConfigId, serviceDefinitionId, commandDefinitionId, classId, dashboardId, serviceGroupId) VALUES (:message, utc_timestamp(), :userId, :usergroupId, :serviceResultId, :nodeId, :nodeConfigId, :serviceDefinitionId, :commandDefinitionId, :classId, :dashboardId, :serviceGroupId)';
 	$stmt = stmt($sql);
 	$stmt->bindValue(':message', $message);
 	
@@ -252,21 +253,16 @@ function findLatestNodeVersion($nodes) {
 	return $latestValue;
 }
 
+function isOld($timestamp) {
+	$diff = usertime() - strtotime($timestamp);
+
+	return $diff > intval(Session::getUser()->getData('oldServiceThreshold'));
+}
+
 function addStatusToNodes($nodes) {
 	$latestVersion = findLatestNodeVersion($nodes);
 
 	foreach ($nodes as &$itemNode) {
-		$itemNode['lastUpdateRelative'] = getRelativeTime($itemNode['lastUpdated'], true);
-		$itemNode['karma'] = 'UNKNOWN';
-
-		$diff = time() - strtotime($itemNode['lastUpdated']);
-
-		if ($diff > 1200) {
-			$itemNode['karma'] = 'OLD';
-		} else {
-			$itemNode['karma'] = 'GOOD';
-		}
-
 		if (isset($itemNode['instanceApplicationVersion'])) {
 			if ($itemNode['instanceApplicationVersion'] == $latestVersion) {
 				$itemNode['versionKarma'] = 'GOOD';
@@ -450,13 +446,25 @@ function getFailedDowntimeRule(array $downtime) {
 	return false;
 }
 
-function getServicesBad() {
-	$sql = 'SELECT s.id, s.identifier, IF(m.icon IS NULL, cmd.icon, m.icon) AS icon, IF(m.criticalCast IS NULL OR s.karma != "GOOD", s.karma, m.criticalCast) AS karma, s.consecutiveCount, s.output, s.description, s.executable, s.estimatedNextCheck, s.lastUpdated, s.lastChanged, IF(m.alias IS null, s.identifier, m.alias) AS alias, IF(m.acceptableDowntimeSla IS NULL, m.acceptableDowntime, sla.content) AS acceptableDowntime FROM services s LEFT JOIN service_metadata m ON s.identifier = m.service LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN acceptable_downtime_sla sla ON m.acceptableDowntimeSla = sla.id WHERE s.karma != "GOOD" ORDER BY s.lastChanged DESC ';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->execute();
+function getFilterServices() {
+	$filters = new FilterTracker();
+	$filters->addBool('problems', 'Problems');
+	$filters->addBool('ungrouped');
+	$filters->addBool('ungrouped');
+	$filters->addBool('ungrouped');
+	$filters->addInt('maintPeriod', 'Maintenance Period');
+	$filters->addString('name');
+	$filters->addSelect('node', getNodes(), 'identifier');
 
-	$problemServices = $stmt->fetchAll();
-	$problemServices = enrichServices($problemServices);
+	return $filters;
+}
+
+function getServicesBad() {
+	$filters = getFilterServices();
+	
+	$_REQUEST['problems'] = true;
+
+	$problemServices = getServicesWithFilter(null, $filters);
 
 	foreach ($problemServices as $key => $service) {
 		if ($service['karma'] == 'OLD') {
@@ -467,6 +475,61 @@ function getServicesBad() {
 	$problemServices = array_values($problemServices);
 
 	return $problemServices;
+}
+
+function getServicesWithFilter($groupId = null, $filters = null) {
+	if ($filters == null) {
+		$filters = getFilterServices();
+	}
+
+	$qb = new \libAllure\QueryBuilder();
+	$qb->from('services')->fields('id', 'identifier', 'identifier alias', 'commandLine executable', 'estimatedNextCheck', 'lastChanged', 'output', 'description', 'lastUpdated', 'karma', 'secondsRemaining', 'node');
+
+	if ($filters->isUsed('problems')) {
+		$qb->whereNotEquals('karma', 'good');
+	}
+
+	if ($filters->isUsed('ungrouped'))  {
+		$qbGroupMemberships = new \libAllure\QueryBuilder();
+		$qbGroupMemberships->from('service_group_memberships', 'g')->fields('service');
+
+		$qb->whereSubquery('s.identifier', 'NOT IN', $qbGroupMemberships);
+	} 
+
+	if ($filters->isUsed('maintPeriod')) {
+		$id = san()->filterUint('maintPeriod');
+
+		$qb->leftJoin('service_metadata', 'm')->on('s.identifier', 'm.service');
+		$qb->whereEquals('m.acceptableDowntimeSla', $id);
+
+		$activeFilters[] = 'Maint Period';
+	}
+
+	if ($filters->isUsed('name')) {
+		$qb->where('identifier', 'LIKE', '"%' . $filters->getValue('name') . '%"');
+	}
+
+	if ($filters->isUsed('node')) {
+		$qb->whereEquals('node', $filters->getValue('node'));
+	}
+
+	$qb->leftJoin('remote_config_allocated_nodes', 'rn')->on('s.node', 'rn.node');
+	$qb->leftJoin('remote_config_allocated_services', 'ras')->on('ras.config', 'rn.config');
+	$qb->leftJoin('remote_config_services', 'rs')->on('ras.service', 'rs.id')->on('rs.name', 'identifier');
+	$qb->leftJoin('remote_configs', 'rc')->on('rn.config', 'rc.id')->onImpl(null, null, 'not(isnull(rs.id))');
+	$qb->fields(array('rc.id', 'remote_config_id'));
+	$qb->fields(array('rs.id', 'remote_config_service_id'));
+	$qb->fields(array('rs.name', 'remote_config_service_identifier'));
+	$qb->fields(array('rc.name', 'remote_config_name'));
+	$qb->groupBy('s.id');
+
+	$stmt = DatabaseFactory::getInstance()->prepare($qb->build());
+	$stmt->execute();
+	$listServices = $stmt->fetchAll();
+
+	$listServices = enrichServices($listServices);
+
+	return $listServices;
 }
 
 function getServices($groupId = null) {
@@ -490,7 +553,7 @@ function getServices($groupId = null) {
 }
 
 function castService(&$service) {
-	echo 'yo';
+	echo 'Warning: Service Cast';
 	var_dump($service['castServiceCritical']);
 }
 
@@ -1077,6 +1140,16 @@ function setGroupPermissions($id, array $perms) {
 	}
 }
 
+function karmaToInt($karma) {
+	switch ($karma) {
+		case 'BAD': return -1;
+		case 'STALLED': return 0;
+		case 'GOOD': return 1;
+		case 'WARNING': return -.5;
+		case 'UNKNOWN': return 0;
+	}
+}
+
 function getSingleServiceMetric($service, $field) {
 	$pat = '#<json>(.+)</json>#ims';
 
@@ -1176,9 +1249,11 @@ function getInstanceRequirements($id) {
 // if DISTINCT is removed and the query is slightly adjusted. 
 $sql = <<<SQL
 SELECT DISTINCT
+	i.id AS instanceId,
 	p.title AS owningClassTitle, 
 	p.id AS owningClassId,
 	r.title AS requirementTitle,
+	r.command AS requirementRecommendedCommand,
 	r.id AS requirementId,
 	a.service,
 	s.identifier,
@@ -1494,11 +1569,20 @@ function getServiceArgumentValues($serviceId) {
 	return $args;
 }
 
-function getServiceResults($serviceIdentifier, $nodeIdentifier) {
-	$sql = 'SELECT r.id, r.output, r.checked, r.karma, r.checked AS lastUpdated FROM service_check_results r WHERE r.service = :serviceIdentifier AND r.node = :nodeIdentifier ORDER BY r.checked DESC LIMIT 10';
+function getServiceResults($serviceIdentifier, $nodeIdentifier, $interval = 7, $resolution = null) {
+	$interval = intval($interval);
+
+	$interval = 2;
+	if ($resolution == null) {
+		$resolution = $interval * 50;
+	}
+
+	stmt('SET @row := -1')->execute();
+	$sql = 'SELECT r.id, r.output, r.checked, r.karma, r.checked AS lastUpdated FROM service_check_results r INNER JOIN (SELECT ID from (SELECT @row := @row + 1 AS rowNum, id FROM (SELECT id FROM service_check_results WHERE checked > date_sub(now(), INTERVAL ' . $interval . ' DAY) AND service = :serviceIdentifier AND node = :nodeIdentifier) AS sorted) AS ranked where rowNum % :resolution = 0) AS subset on subset.id = r.id ORDER BY r.checked DESC ';
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->bindValue(':serviceIdentifier', $serviceIdentifier);
 	$stmt->bindValue(':nodeIdentifier', $nodeIdentifier);
+	$stmt->bindValue(':resolution', $resolution);
 	$stmt->execute();
 
 	$listResults = $stmt->fetchAll();
@@ -1517,6 +1601,12 @@ function getServiceResults($serviceIdentifier, $nodeIdentifier) {
 	foreach ($listResults as $result) {
 		invalidateOldServices($result);
 	}
+
+	$listResultsDebug = array(
+		array('checked' => '2016-05-26T14:35:02+00:00', 'value' => 1, 'output' => '', 'karma' => 'GOOD'),
+		array('checked' => '2017-05-26T14:35:02+00:00', 'value' => 2, 'output' => '', 'karma' => 'GOOD'),
+		array('checked' => '2018-05-26T14:35:02+00:00', 'value' => 3, 'output' => '', 'karma' => 'GOOD'),
+	);
 
 	return $listResults;
 }
@@ -1600,6 +1690,27 @@ function sessionOptions() {
 	return $_SESSION['options'];
 }
 
+function defineFromEnv($name) {
+	if (defined($name)) {
+		return;
+	}
+
+	if (isset($_ENV[$name])) {
+		define($name, $_ENV[$name]);
+	}
+}
+
+function configAutodiscover() {
+	if (!isset($_SESSION['configAutodiscover'])) {
+		$_SESSION['configAutodiscover'] = true;
+	}
+
+	defineFromEnv('CFG_DB_DSN');
+	defineFromEnv('CFG_DB_USER');
+	defineFromEnv('CFG_DB_PASS');
+	defineFromEnv('CFG_PASSWORD_SALT');
+}
+
 function definedOrException($key) {
 	if (!defined($key)) {
 		throw new Exception("Constant not defined: $key");
@@ -1607,6 +1718,8 @@ function definedOrException($key) {
 }
 
 function isEssentialConfigurationProvided() {
+	configAutodiscover();
+
 	try {
 		definedOrException('CFG_DB_DSN');
 		definedOrException('CFG_DB_USER');
@@ -1618,5 +1731,65 @@ function isEssentialConfigurationProvided() {
 
 	return true;
 }
+
+function getRelatedLogs($criteria, $limit = 5) {
+	$qb = new \libAllure\QueryBuilder();
+	$qb->from('logs')->fields('*');
+
+	foreach ($criteria as $field => $value) {
+		$qb->whereEquals($field, $value);
+	}
+
+	$qb->orderBy('timestamp DESC', 'id DESC');
+
+	$stmt = stmt($qb->build() . ' LIMIT ' . $limit);
+	$stmt->execute();
+
+	return $stmt->fetchAll();
+}
+
+function processLogs($logs) {
+	foreach ($logs as $key => $log) {
+		$message = $logs[$key]['message'];
+
+		$message = str_replace('_userId_', '<a href = "viewUser.php?id=' . $log['userId'] . '">' . $log['userId'] . '</a>', $message);
+		$message = str_replace('_nodeConfigId_', '<a href = "viewRemoteConfig.php?id=' . $log['nodeConfigId'] . '">' . $log['nodeConfigId'] . '</a>', $message);
+		$message = str_replace('_serviceDefinitionId_', '<a href = "updateRemoteConfigurationService.php?id=' . $log['serviceDefinitionId'] . '">' . $log['serviceDefinitionId'] . '</a>', $message);
+
+		$logs[$key]['message'] = $message;
+	}
+
+	return $logs;
+}
+
+function instanceCoverageFilter() {
+	$filters = new \libAllure\FilterTracker();
+	$filters->addString('identifier', 'Identifier');
+	$filters->addSelect('node', getNodes(), 'identifier');
+
+	return $filters;
+}
+
+function getServiceMetadata($identifier) {
+	$sql = 'SELECT sm.actions, sm.metrics, sm.defaultMetric, sm.room, cm.id AS commandMetadataId, IF(sm.icon IS NULL, cm.icon, sm.icon) AS icon, sm.criticalCast, sm.goodCast FROM services s LEFT JOIN service_metadata sm ON s.identifier = sm.service LEFT JOIN command_metadata cm ON s.commandIdentifier = cm.commandIdentifier WHERE s.identifier = :serviceIdentifier LIMIT 1';
+	$stmt = DatabaseFactory::getInstance()->prepare($sql);
+	$stmt->bindValue(':serviceIdentifier', $identifier);
+	$stmt->execute();
+
+	if ($stmt->numRows() == 0) {
+		$metadata = array();
+		$metadata['actions'] = null;
+		$metadata['metrics'] = '';
+		$metadata['defaultMetric'] = null;
+	} else {
+		$metadata = $stmt->fetchRow();
+	}
+
+	$metadata['metrics'] = explodeOrEmpty("\n", trim($metadata['metrics']));
+
+	return $metadata;
+}
+
+
 
 ?>

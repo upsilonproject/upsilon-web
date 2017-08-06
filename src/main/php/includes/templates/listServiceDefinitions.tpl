@@ -29,7 +29,7 @@
 				</td>
 				<td><a href = "updateRemoteConfigurationCommand.php?id={$service.commandId}">{$service.commandIdentifier}</a></td>
 				<td class = "media-width-prio-low">{$service.parent}</a>
-				<td class = "media-width-prio-low">{if $service.instanceCount == 0}<em>Not allowed to a node config</em>{else}{$service.instanceCount}{/if}</td>
+				<td class = "media-width-prio-low">{if $service.instanceCount == 0}<em>Not allocated to a node config</em>{else}{$service.instanceCount}{/if}</td>
 				<td class = "media-width-prio-low">-</td>
 			</tr>
 		{/foreach}

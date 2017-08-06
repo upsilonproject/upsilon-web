@@ -4,14 +4,15 @@ require_once 'includes/common.php';
 
 use \libAllure\Form;
 use \libAllure\FormHandler;
-use \libAllure\ElementInput;
+use \libAllure\ElementInputRegex;
 
 class CreateCommandArgument extends Form {
 	public function __construct() {
 		parent::__construct('createCommandArgument', 'Create Command Argument');
 
 		$this->addElementReadOnly('Command', san()->filterUint('command'), 'command');
-		$this->addElement(new ElementInput('name', 'Name'));
+		$this->addElement(new ElementInputRegex('name', 'Name'));
+		$this->getElement('name')->setPatternToIdentifier();
 
 		$this->addDefaultButtons();
 	}

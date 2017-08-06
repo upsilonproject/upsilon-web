@@ -6,7 +6,7 @@
 	<h3>Used by Nodes</h3>
 	<ul>
 	{foreach from = $listNodes item = node}
-		<li><a href = "viewNode.php?id={$node.id}">{$node.identifier}</a></li>
+		<li>Config <a href = "viewRemoteConfig.php?id={$node.configId}">{$node.configName}</a> on node <a href = "viewNode.php?id={$node.id}">{$node.identifier}</a></li>
 	{/foreach}
 	</ul>
 </div>

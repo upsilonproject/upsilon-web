@@ -20,7 +20,6 @@
 			<th>Type</th>
 			<th class = "media-width-prio-low">Service count</th>
 			<th class = "media-width-prio-low">Last updated</th>
-			<th>Status</th>
 		</tr>
 	</thead>
 
@@ -32,7 +31,6 @@
 			<td class = "{$itemNode.versionKarma|strtolower}">{$itemNode.nodeType} (version {$itemNode.instanceApplicationVersion})</td>
 			<td class = "media-width-prio-low">{$itemNode.serviceCount}</td>
 			<td class = "media-width-prio-low"><span class = "date">{$itemNode.lastUpdated}</span></td>
-			<td class = "{$itemNode.karma|strtolower}">{$itemNode.karma}</td>
 		</tr>
 		{/foreach}
 	</tbody>

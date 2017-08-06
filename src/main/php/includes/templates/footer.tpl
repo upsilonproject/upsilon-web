@@ -1,14 +1,14 @@
 </div>
 <div id = "footer">
 	<p>
-		<strong>Crypto:</strong> <span class = "{if $crypto}good{else}bad{/if}">{if $crypto}on{else}off{/if}</span>
-		&nbsp;&nbsp;&nbsp;&nbsp;
 		<strong>Version:</strong> <a href = "viewVersion.php">{$version}</a>
 		&nbsp;&nbsp;&nbsp;&nbsp;
 	{if !empty($apiClient)}
 		<strong>API Client:</strong> {$apiClient}
 	{else}
-		<strong>Time now:</strong> {$date}
+		<strong>Server time:</strong> <span class ="date">{$date}</span> 
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		<strong>Client time:</strong> <span><span class = "date">now</span></span>
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<strong>DB Queries:</strong> {$queryCount}
 	{/if}

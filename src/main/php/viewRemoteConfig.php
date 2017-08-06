@@ -24,6 +24,7 @@ $tpl->assign('nodes', getConfigNodes($remoteConfig['id']));
 $tpl->assign('services', getConfigServices($remoteConfig['id']));
 $tpl->assign('commands', getConfigCommands($remoteConfig['id']));
 
+$tpl->assign('logs', processLogs(getRelatedLogs(array('nodeConfigId' => $remoteConfig['id']))));
 $tpl->assign('remoteConfig', $remoteConfig);
 $tpl->display('viewRemoteConfig.tpl');
 

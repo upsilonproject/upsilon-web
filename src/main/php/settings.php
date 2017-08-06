@@ -23,7 +23,6 @@ class UserSettings extends Form {
 
                 $this->addSection('General');
 
-
                 $warn = getSiteSetting('warnNotUsingHttps');
                 if ($warn == null) {
                         $warn = false;
@@ -39,6 +38,14 @@ class UserSettings extends Form {
                 $this->addElement(new ElementInput('amqpPort', 'AMQP Port', getSiteSetting('amqpPort', 5672)));
                 $this->addElement(new ElementInput('amqpUser', 'AMQP User', getSiteSetting('amqpUser', 'guest')));
                 $this->addElement(new ElementInput('amqpPass', 'AMQP Pass', getSiteSetting('amqpPass', 'guest')));
+
+				$this->addSection('PHP Settings');
+				if (ini_get('zlib.output_compression') != "1") {
+					$this->addElementReadOnly('zlib Compression', 'Zlib compression is <span class = "bad">off</span>.');
+				} else {
+					$this->addElementReadOnly('zlib Compression', 'Zlib compression is <span class = "good">on</span>.');
+				}
+
                 
 		$this->addSection('Other');
 

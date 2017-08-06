@@ -13,16 +13,16 @@ class WidgetGraphMetrics extends Widget {
 	
 		$this->instanceGraphIndex = self::$graphIndex++;
 
-		$this->arguments['service[]'] = null;
+		$this->arguments['serviceList'] = null;
 		$this->arguments['metric'] = null;
 		$this->arguments['yAxisMarkings'] = null;
 	}
 
 	public function render() {
-		$id = $this->getArgumentValue('service[]');
+		$ids = $this->getArgumentValueArray('serviceList');
 
 		global $tpl;
-		$tpl->assign('listServiceId', $id);
+		$tpl->assign('listServiceId', $ids);
 		$tpl->assign('metric', $this->getArgumentValue('metric'));
 
 		$v = trim($this->getArgumentValue('yAxisMarkings'));
@@ -33,8 +33,8 @@ class WidgetGraphMetrics extends Widget {
 		}
 
 		$tpl->assign('yAxisMarkings', $v);
-		$tpl->assign('instanceGraphIndex', $this->instanceGraphIndex);
-		$tpl->display('widgetGraphMetric.tpl');
+		$tpl->assign('instanceChartIndex', $this->instanceGraphIndex);
+		$tpl->display('widgetChartMetric.tpl');
 
 	}
 
@@ -52,15 +52,14 @@ class WidgetGraphMetrics extends Widget {
 	public function addLinks() {
 		$servicesMenu = linksCollection();
 
-		if (is_array($this->getArgumentValue('service[]'))) {
-			foreach ($this->getArgumentValue('service[]') as $service) {
-				$servicesMenu->add('viewService.php?id=' . $service, 'Service ' . $service);
-			}
+		foreach ($this->getArgumentValueArray('serviceList') as $service) {
+			$servicesMenu->add('viewService.php?id=' . $service, 'Service ' . $service);
 		}
 
 		$this->links->add(null, 'Services');
 		$this->links->addChildCollection('Services', $servicesMenu);
 	}
 }
+
 
 ?>

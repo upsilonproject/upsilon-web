@@ -9,9 +9,21 @@
 </div>
 
 <div class = "box">
+	<h2>Logs</h2>
+	<table class = "hover">
+	{foreach from = $logs item = log}
+		<tr>
+			<td class = "smedium"><span class = "date">{$log.timestamp}</span></td>
+			<td>{$log.message}</td>
+		</tr>
+	{/foreach}
+	</table>
+</div>
+
+<div class = "box">
 	<h2>Allocated Nodes</h2>
 	<p><a href = "createRemoteConfigNodeAllocation.php?id={$remoteConfig.id}">Allocate Node</a></p>
-	<table>
+	<table class = "hover">
 		<thead>
 			<tr>
 				<th class = "small">ID</th>
@@ -19,7 +31,6 @@
 				<th>Last Updated</th>
 				<th>Actions</th>
 				<th>Config status</th>
-				<th>Node Status</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -33,7 +44,6 @@
 					<a href = "amqpSendRemoteConfig.php?configId={$remoteConfig.id}&amp;node={$node.identifier}">Send</a>
 				</td>
 				<td class = "{$node.reportKarma|strtolower}">{$node.reportStatus} {if not empty($node.reportVersion)}Version: <span class = "date">{$node.reportVersion}</span>{/if}</td>
-				<td class = "{$node.karma|strtolower} small">{$node.karma}</td>
 			</tr>
 		{/foreach}
 		</tbody>
@@ -46,7 +56,7 @@
 		<a href = "createRemoteConfigServiceInstance.php?id={$remoteConfig.id}">Allocate existing service</a> | 
 		<a href = "createRemoteConfigService.php?id={$remoteConfig.id}&config={$remoteConfig.id}">Create &amp; allocate service</a>
 	</p>
-	<table>
+	<table class = "hover">
 		<thead>
 			<tr>
 				<th class = "small">ID</th>
