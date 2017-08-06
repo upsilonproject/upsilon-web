@@ -391,4 +391,18 @@ class RemoteConfigAllocatedCommands extends DatabaseUpgradeTask {
 
 Upgrader::registerTask(new RemoteConfigAllocatedCommands());
 
+class RemoteConfigServiceArgValues extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->doesTableExist('remote_config_service_arg_values');
+	}
+
+	public function perform() {
+		$sql = 'CREATE TABLE `remote_config_service_arg_values` (`id` int(11) NOT NULL AUTO_INCREMENT,`service` int(11) DEFAULT NULL, `argument` int(11) NOT NULL, `value` varchar(512) DEFAULT NULL, PRIMARY KEY (`id`), UNIQUE KEY `service` (`service`,`argument`))';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+Upgrader::registerTask(new RemoteConfigServiceArgValues());
+
 ?>

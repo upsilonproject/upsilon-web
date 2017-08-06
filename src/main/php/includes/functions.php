@@ -1738,7 +1738,7 @@ function getRelatedLogs($criteria, $limit = 5) {
 	$qb->from('logs')->fields('*');
 
 	foreach ($criteria as $field => $value) {
-		$qb->whereEquals($field, $value);
+		$qb->whereEqualsValue($field, $value);
 	}
 
 	$qb->orderBy('timestamp DESC', 'id DESC');
