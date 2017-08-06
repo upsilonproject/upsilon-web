@@ -383,7 +383,7 @@ class RemoteConfigAllocatedCommands extends DatabaseUpgradeTask {
 	}
 
 	public function perform() {
-		$sql = 'CREATE TABLE `remote_config_allocated_commands` (`id` int(11) NOT NULL AUTO_INCREMENT, `command` int(11) NOT NULL, `config` int(11) NOT NULL, PRIMARY KEY (`id`)';
+		$sql = 'CREATE TABLE `remote_config_allocated_commands` (`id` int(11) NOT NULL AUTO_INCREMENT, `command` int(11) NOT NULL, `config` int(11) NOT NULL, PRIMARY KEY (`id`))';
 		$stmt = stmt($sql);
 		$stmt->execute();
 	}
