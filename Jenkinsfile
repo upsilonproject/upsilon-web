@@ -72,19 +72,24 @@ node {
 }                                                                                  
                                                                                    
 stage ("Package") {                                                          
-	node {                                                                             
-		buildRpm("el7")                                                                
-	}                                                                                  
-																					   
-	node {                                                                             
-		buildRpm("el6")                                                                
-	}                                                                                  
-																					   
-	node {                                                                             
-		buildRpm("fc24")                                 
-	} 
-
-	node {
-		buildDockerContainer()
-	}
+	paralell (
+		"rpm-el6": {
+			node {                                                                             
+				buildRpm("el6")                                                                
+			}                                                                                  
+		},
+		"rpm-el7": {
+			node {                                                                             
+				buildRpm("el7")                                                                
+			}                                                                                  
+			node {
+				buildDockerContainer()
+			}
+		},
+		"rpm-fc24": {
+			node {                                                                             
+				buildRpm("fc24")
+			}                                                                                  
+		}
+	)
 }
