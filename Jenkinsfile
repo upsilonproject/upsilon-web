@@ -72,7 +72,7 @@ node {
 }                                                                                  
                                                                                    
 stage ("Package") {                                                          
-	paralell (
+	parallel (
 		"rpm-el6": {
 			node {                                                                             
 				buildRpm("el6")                                                                
