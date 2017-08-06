@@ -46,8 +46,8 @@ rm -rf /var/lib/php/session/*
 %doc /usr/share/doc/upsilon-web/schema.sql
 /usr/share/upsilon-web/*
 /usr/share/upsilon-web/.buildid
-/etc/httpd/conf.d/upsilon-web.conf
-/etc/httpd/conf.d/upsilon-web-alias.conf
+%config(noreplace) /etc/httpd/conf.d/upsilon-web.conf
+%config(noreplace) /etc/httpd/conf.d/upsilon-web-alias.conf
 /etc/upsilon-web/
 
 %changelog
