@@ -36,6 +36,7 @@ distZip {
 
 	from ("var") {
 		include "upsilon-apache.conf"
+		include "upsilon-alias-apache.conf"
 		include "schema.sql"
 		include "initialData.sql"
 		include "upsilon-web.spec"

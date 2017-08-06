@@ -1717,6 +1717,28 @@ function definedOrException($key) {
 	}
 }
 
+function defineFromEnv($name) {
+    if (defined($name)) {
+        return;
+    }
+
+    if (isset($_ENV[$name])) {
+        define($name, $_ENV[$name]);
+    }
+}
+
+function configAutodiscover() {
+    if (!isset($_SESSION['configAutodiscover'])) {
+        $_SESSION['configAutodiscover'] = true;
+    }
+
+    defineFromEnv('CFG_DB_DSN');
+    defineFromEnv('CFG_DB_USER');
+    defineFromEnv('CFG_DB_PASS');
+    defineFromEnv('CFG_PASSWORD_SALT');
+}
+
+
 function isEssentialConfigurationProvided() {
 	configAutodiscover();
 

@@ -32,6 +32,7 @@ cp setup/schema.sql %{buildroot}/usr/share/doc/upsilon-web/
 
 mkdir -p %{buildroot}/etc/httpd/conf.d
 cp setup/upsilon-apache.conf %{buildroot}/etc/httpd/conf.d/upsilon-web.conf
+cp setup/upsilon-alias-apache.conf %{buildroot}/etc/httpd/conf.d/upsilon-web-alias.conf
 
 mkdir -p %{buildroot}/etc/upsilon-web/
 
@@ -46,6 +47,7 @@ rm -rf /var/lib/php/session/*
 /usr/share/upsilon-web/*
 /usr/share/upsilon-web/.buildid
 /etc/httpd/conf.d/upsilon-web.conf
+/etc/httpd/conf.d/upsilon-web-alias.conf
 /etc/upsilon-web/
 
 %changelog
