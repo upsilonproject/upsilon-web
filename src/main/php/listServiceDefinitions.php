@@ -5,7 +5,7 @@ require_once 'includes/common.php';
 $links = linksCollection();
 $links->add('createRemoteConfigService.php?', 'Create Service');
 
-$title = 'Remote configurations';
+$title = 'Service definitions';
 require_once 'includes/widgets/header.php';
 
 $filters = new \libAllure\FilterTracker();

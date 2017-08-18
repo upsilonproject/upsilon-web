@@ -1,6 +1,5 @@
 <?php
 
-$title = 'View remote config';
 require_once 'includes/common.php';
 require_once 'includes/functions.remoteConfig.php';
 
@@ -18,6 +17,7 @@ $links->addSeparator();
 $links->add('deleteRemoteConfig.php?id=' . $remoteConfig['id'], 'Delete config ');
 $links->add('updateRemoteConfig.php?id=' . $remoteConfig['id'], 'Update config ');
 
+setNav(array('listRemoteConfigurations.php' => 'Remote configurations'), $remoteConfig['name']);
 require_once 'includes/widgets/header.php';
 
 $tpl->assign('nodes', getConfigNodes($remoteConfig['id']));

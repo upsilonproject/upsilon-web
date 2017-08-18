@@ -1,8 +1,9 @@
 <?php
 
-$title = 'Update remote configuration service';
 require_once 'includes/common.php';
 require_once 'includes/functions.remoteConfig.php';
+
+setNav(array('listServiceDefinitions.php' => 'Service definitions'), 'Update remote configuration service');
 
 use \libAllure\Form;
 use \libAllure\FormHandler;

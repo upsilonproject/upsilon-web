@@ -15,7 +15,7 @@ $links->add('deleteDashboard.php?id=' . $id, 'Delete this dashboard');
 
 $itemDashboard = new Dashboard($id); 
 
-$title = 'Dashboard: ' . $itemDashboard->getTitle();
+setNav(array('listDashboards.php' => 'Dashboards'), $itemDashboard->getTitle());
 require_once 'includes/widgets/header.php';
 
 $tpl->assign('itemDashboard', $itemDashboard);

@@ -23,7 +23,7 @@ $node = $stmt->fetchRow();
 $links = new HtmlLinksCollection();
 $links->add('deleteNode.php?id=' . $node['id'], 'Delete');
 
-setNav(array('listNodes.php' => 'Nodes'), 'View Node');
+setNav(array('listNodes.php' => 'Nodes'), $node['identifier']);
 
 require_once 'includes/widgets/header.php';
 require_once 'libAllure/Sanitizer.php';

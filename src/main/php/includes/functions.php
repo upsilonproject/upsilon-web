@@ -18,6 +18,16 @@ function setNav() {
 	}
 }
 
+function addNavBreadcrumb($link, $title = null) {
+	global $nav;
+	
+	if ($title == null) {
+		$nav[] = $link;
+	} else {
+		$nav[] = array($link => $title);
+	}
+}
+
 function loggerFields() {
 	return array('userId', 'usergroupId', 'serviceResultId', 'nodeId', 'nodeConfigId', 'serviceDefinitionId', 'commandDefinitionId', 'classId', 'dashboardId', 'serviceGroupId');
 }

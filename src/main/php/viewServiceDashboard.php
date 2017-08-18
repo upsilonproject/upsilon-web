@@ -2,8 +2,9 @@
 
 require_once 'includes/common.php';
 
-$title = 'Service HUD';
+setNav(array('listDashboards.php' => 'Dashboards'), 'Service Dashboard');
 require_once 'includes/widgets/header.php';
+
 
 use \libAllure\DatabaseFactory;
 

@@ -1,9 +1,10 @@
 <?php
 
-$title = 'View Group';
 require_once 'includes/common.php';
 
 $itemGroup = getGroup(san()->filterUint('id'));
+
+setNav(array('listGroups.php' => 'Groups'), $itemGroup['title']);
 
 use \libAllure\HtmlLinksCollection;
 

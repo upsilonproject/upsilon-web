@@ -1,6 +1,6 @@
 <?php
 
-$title = _('Commands');
+$title = _('Command Metadata');
 require_once 'includes/common.php';
 
 $links = linksCollection();
