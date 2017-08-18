@@ -134,10 +134,6 @@ function formatUnixTimestamp(timestamp, range) {
 	return dojo.date.locale.format(d, {selector:"date", datePattern: dp });
 }
 
-function chartZoomRelative(zoom, chartIndex) {
-	window.charts[chartIndex].zoomIn("x", zoom);
-}
-
 function updateChart(results) {
 	require([
 		"dojox/charting/Chart",
@@ -146,12 +142,13 @@ function updateChart(results) {
 		"dojo/query",
 		"dojo/dom-construct",
 		"dojox/charting/plot2d/Indicator",
-		"dojox/charting/widget/Legend",
+		"dojox/charting/widget/SelectableLegend",
 		"dojox/charting/action2d/Tooltip",
+		"dojox/charting/action2d/MouseZoomAndPan",
 		"dojo/NodeList-manipulate",
 		"dojox/charting/plot2d/Lines",
 		"dojox/charting/axis2d/Default"
-	], function(Chart, theme, stamp, qquery, construct, ind, Legend, Tooltip) {
+	], function(Chart, theme, stamp, qquery, construct, ind, Legend, Tooltip, ZaP) {
 		var d = qquery('#chartService' + results.chartIndex);
 
 		/*
@@ -188,6 +185,7 @@ function updateChart(results) {
 			});
 
 			seriesName = "service " + service.serviceId + "_" + service.field;
+			seriesName = service.field;
 			c.addSeries(seriesName, axisData);
 
 		});
@@ -213,8 +211,10 @@ function updateChart(results) {
 		});
 		*/
 
+		new ZaP(c, "default", {axis: "x" });
+
 		if (window.charts[results.chartIndex].legend == null) {
-			window.charts[results.chartIndex].legend = new Legend({chart: c}, "legend" + results.chartIndex);
+			window.charts[results.chartIndex].legend = new Legend({chart: c, autoScale: true}, "legend" + results.chartIndex);
 		}
 
 		tooltip = new Tooltip(c, "default");
@@ -712,6 +712,12 @@ function filterGetFieldValues() {
 
 	window.filters.forEach(function(v) {
 		fields[v] = document.getElementById('filterInput-' + v).value
+
+		if (fields[v] != "" && fields[v] != null) {
+			document.getElementById('filterLabel-' + v).classList.add("good");
+		} else {
+			document.getElementById('filterLabel-' + v).classList.remove("good");
+		}
 	});
 
 	return fields;
@@ -730,10 +736,21 @@ function filteringSelectClear() {
 
 		el = document.getElementById('filterLabel-' + name)
 		el.classList.remove("good")
+		el.classList.remove("warning")
 		el.classList.add("unknown")
 	});
+
+	filteringSelectBlur();
 }
 
 function filteringSelectBlur() {
 	filterInstanceCoverageOptions()
+}
+
+function filteringSelectChanged() {
+	lblClasses = document.activeElement.previousElementSibling.classList;
+	
+	lblClasses.remove("good")
+	lblClasses.remove("unknown")
+	lblClasses.add("warning")
 }

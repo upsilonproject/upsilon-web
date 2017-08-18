@@ -27,7 +27,7 @@ class FormUpdateInstanceCoverage extends Form {
 		$this->addElementHidden('requirement', Sanitizer::getInstance()->filterUint('requirement'));
 		$this->addElementReadOnly('Requirement', $req['title']);
 		$this->addElementSelectServiceCheck($req, $inst);
-		$this->addDefaultButtons();
+		$this->addDefaultButtons('Associate');
 	}
 
 	private function getClassInstance($id) { 

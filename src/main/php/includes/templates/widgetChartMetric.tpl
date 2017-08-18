@@ -9,9 +9,6 @@
 
 	<a class = "fakeButton" href = "viewServiceResultChart.php?serviceIds[]={$listServiceId|implode:','}">larger</a>
 
-	<button onclick = "chartZoomRelative(-1, '{$instanceChartIndex}')">-</button>
-	<button onclick = "chartZoomRelative(+1, '{$instanceChartIndex}')">+</button>
-
 	<br />
 	
 	<script type = "text/javascript">

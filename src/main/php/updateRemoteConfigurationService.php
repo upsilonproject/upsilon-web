@@ -155,4 +155,6 @@ $tpl->display('updateServiceOverview.tpl');
 $tpl->assignForm($f);
 $tpl->display('form.tpl');
 
+require_once 'includes/widgets/footer.php';
+
 ?>

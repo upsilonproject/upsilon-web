@@ -11,23 +11,25 @@ $qb = new QueryBuilder();
 $qb->from('services')->fields('s.id', 's.identifier', 's.node');
 
 if ($filters->isUsed('node')) {
-	$qb->whereEquals('s.node', $filters->getValue('node'));
+	$qb->whereEqualsValue('s.node', $filters->getValue('node'));
 }
 
 if ($filters->isUsed('identifier')) {
-	$qb->where('s.identifier', 'LIKE', '"%' . $filters->getValue('identifier') . '%"');
+	$qb->whereLikeValue('s.identifier', $filters->getValue('identifier'));
 }
 
 $qb->orderBy('s.identifier ASC');
 
 $stmt = DatabaseFactory::getInstance()->prepare($qb->build());
+
 $stmt->execute();
 
 $ret = [];
 foreach ($stmt->fetchAll() as $itemService) {
 	$ret[] = [ 
-		'identifier' => $itemService['identifier'],
 		'id' => $itemService['id'],
+		'identifier' => $itemService['identifier'] . ' - ' . $itemService['node'],
+		'serviceIdentifier' => $itemService['identifier'],
 		'node' => $itemService['node']
 	];
 }

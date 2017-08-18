@@ -52,7 +52,13 @@ function explodeOrEmpty($delimiter = null, $serialString = "") {
 	if (strlen($serialString) == 0) {
 		return array();
 	} else {
-		return explode($delimiter, $serialString);
+		$ret = array();
+
+		foreach (explode($delimiter, $serialString) as $line) {
+			$ret[] = trim($line);	
+		}
+
+		return $ret;
 	}
 }
 

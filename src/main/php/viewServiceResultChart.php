@@ -15,7 +15,7 @@ foreach ($_REQUEST['serviceIds'] as $serviceId) {
 $tpl->assign('legend', true);
 $tpl->assign('instanceChartIndex', 0);
 $tpl->assign('listServiceId', $_REQUEST['serviceIds']);
-$tpl->assign('metric', 'karma');
+$tpl->assign('metric', implode(',', $metadata['metrics']));
 $tpl->assign('yAxisMarkings', array());
 $tpl->assign('metadata', array('metrics' => $metadata['metrics']));
 $tpl->assign('itemService', $service);

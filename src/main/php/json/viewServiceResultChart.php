@@ -36,10 +36,10 @@ if (empty($_REQUEST['metrics'])) {
 
 $metrics = array();
 
-foreach ($fields as $field) {
-	foreach ($_REQUEST['serviceIds'] as $serviceId) {
-		$service = getServiceById($serviceId);
+foreach ($_REQUEST['serviceIds'] as $serviceId) {
+	$service = getServiceById($serviceId);
 
+	foreach ($fields as $field) {
 		$results = getServiceResults($service['identifier'], $service['node'], 7);
 		$results = array_reverse($results);
 
@@ -51,11 +51,13 @@ foreach ($fields as $field) {
 	}
 }
 
-header('Content-Type: application/json');
-echo json_encode(array(
+$ret = array(
 	'chartIndex' => $_REQUEST['chartIndex'],
 	'metric' => implode($fields, ' + '),
 	'services' => $metrics
-));
+);
+
+header('Content-Type: application/json');
+echo json_encode($ret);
 
 ?>

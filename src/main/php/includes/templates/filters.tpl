@@ -17,12 +17,12 @@
 			{/if}
 
 			{if $filter.type == "string" || $filter.type == "int"}
-				<input onblur = "filteringSelectBlur()" id = "filterInput-{$filter.name}" name = "{$filter.name}" value = "{$filter.value}"></input>
+				<input onkeydown = "filteringSelectChanged()" onblur = "filteringSelectBlur()" id = "filterInput-{$filter.name}" name = "{$filter.name}" value = "{$filter.value}"></input>
 			{/if}
 
 			{if $filter.type == "select"}
 				<select onblur = "filteringSelectBlur()" id = "filterInput-{$filter.name}" name = "{$filter.name}" data-dojo-type="dijit/form/FilteringSelect">
-					<option value = "">-- Any node</option>
+					<option value = ""></option>
 				{foreach from = $filter.options item = option}
 					<option {if $filter.value == $option.name}selected{/if} value = "{$option.name}">{$option.name}</option>
 				{/foreach}
