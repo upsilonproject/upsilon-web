@@ -43,7 +43,7 @@ class Widget {
 		if (!$multi) {
 			$el = new ElementSelect('service', 'Service');
 		} else if ($multi) {
-			$el = new ElementSelect('service[]', 'Services');
+			$el = new ElementSelect('serviceList', 'Services');
 			$el->setSize(5);
 			$el->multiple = true;
 		} else {
@@ -76,10 +76,12 @@ class Widget {
 
 		$val = $this->arguments[$key];
 
-		if (strpos($key, '[]') !== FALSE) {
-			$val = explode(';', $val);
-		}
+		return $val;
+	}
 
+	public function getArgumentValueArray($key) {
+		$val = $this->getArgumentValue($key);
+		$val = explode(';', $val);
 
 		return $val;
 	}
@@ -97,7 +99,7 @@ class Widget {
 
 	public function getArgumentFormElement($optionName) {
 		switch ($optionName) {
-		case 'service[]':
+		case 'serviceList':
 			return $this->getFormElementService(true);
 		case 'service':
 			return $this->getFormElementService(false);

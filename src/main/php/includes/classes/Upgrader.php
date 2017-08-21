@@ -363,4 +363,46 @@ class FieldLengthUpgradeTask extends DatabaseUpgradeTask {
 
 Upgrader::registerTask(new FieldLengthUpgradeTask('remote_config_commands', 'command_line', 1024, 'remote_config_commands.command_line -> 1024'));
 
+class RemoteConfigAutoSend extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->doesFieldExistInTable('autoSendOnUpdate', 'remote_configs');
+	}
+
+	public function perform() {
+		$sql = 'ALTER TABLE remote_configs ADD autoSendOnUpdate tinyint(1) default 0 ';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+Upgrader::registerTask(new RemoteConfigAutoSend());
+
+class RemoteConfigAllocatedCommands extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->doesTableExist('remote_config_allocated_commands');
+	}
+
+	public function perform() {
+		$sql = 'CREATE TABLE `remote_config_allocated_commands` (`id` int(11) NOT NULL AUTO_INCREMENT, `command` int(11) NOT NULL, `config` int(11) NOT NULL, PRIMARY KEY (`id`))';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+Upgrader::registerTask(new RemoteConfigAllocatedCommands());
+
+class RemoteConfigServiceArgValues extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->doesTableExist('remote_config_service_arg_values');
+	}
+
+	public function perform() {
+		$sql = 'CREATE TABLE `remote_config_service_arg_values` (`id` int(11) NOT NULL AUTO_INCREMENT,`service` int(11) DEFAULT NULL, `argument` int(11) NOT NULL, `value` varchar(512) DEFAULT NULL, PRIMARY KEY (`id`), UNIQUE KEY `service` (`service`,`argument`))';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+Upgrader::registerTask(new RemoteConfigServiceArgValues());
+
 ?>

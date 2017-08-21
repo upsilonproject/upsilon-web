@@ -1,12 +1,20 @@
 <?php
 
+require_once 'includes/classes/Amqp.php';
+
 function getClickableCommandLine($configSource) {
 	$line = $configSource['remote_config_command_line'];
 	$args = getServiceArgumentValues($configSource['remote_configuration_service_id']);
 
 	foreach ($args as $name => $value) {
+		if ($value == '') {
+			$value = '<span class = "bad">(empty)</span>';
+		}
+
 		$line = str_replace('$' . $name, '<a href = "updateRemoteConfigurationService.php?id=' . $configSource['remote_configuration_service_id'] . '"><abbr class = "commandArg" title = "' . $name . '">' . $value . '</abbr></a>', $line);
 	}
+
+	$line = preg_replace('#\$(\w+)#i', '<a href = "updateRemoteConfigurationCommand.php?id=' . $configSource['remote_configuration_service_id'] . '">$<strong class = "bad">\1</strong></a>', $line);
 
 	return $line;
 
@@ -36,16 +44,20 @@ function getConfigSourceFromServiceResultIdentifier($serviceIdentifier, $nodeIde
 }
 
 function updateConfig($configId, $description = null) {
-	$sql = 'UPDATE remote_configs r SET r.mtime = now() WHERE r.id = :id';
+	$sql = 'UPDATE remote_configs r SET r.mtime = utc_timestamp() WHERE r.id = :id';
 	$stmt = stmt($sql);
 	$stmt->bindValue(':id', $configId);
 	$stmt->execute();
 
-	logger('Config updated', array('nodeConfigId' => $configId));
+	if (empty($description)) {
+		$description = 'Config updated.';
+	}
+
+	logger($description, array('nodeConfigId' => $configId));
 }
 
 function getConfigById($configId) {
-	$sql = 'SELECT r.id, r.name, r.mtime, unix_timestamp(r.mtime) AS modifiedTimestamp FROM remote_configs r WHERE r.id = :id';
+	$sql = 'SELECT r.id, r.autoSendOnUpdate, r.name, r.mtime, unix_timestamp(r.mtime) AS modifiedTimestamp FROM remote_configs r WHERE r.id = :id';
 	$stmt = stmt($sql);
 	$stmt->bindValue(':id', $configId);
 	$stmt->execute();
@@ -203,9 +215,18 @@ function deleteConfigAllocatedNode($id) {
 }
 
 function getNodesUsingRemoteService($serviceId) {
-	$sql = 'SELECT n.id, n.identifier FROM remote_config_allocated_services ass LEFT JOIN remote_configs c ON ass.config = c.id LEFT JOIN remote_config_allocated_nodes an ON an.config = c.id LEFT JOIN nodes n ON an.node = n.identifier WHERE ass.service = :serviceId';
+	$sql = 'SELECT n.id, n.identifier, c.id AS configId, c.name AS configName FROM remote_config_allocated_services ass RIGHT JOIN remote_configs c ON ass.config = c.id RIGHT JOIN remote_config_allocated_nodes an ON an.config = c.id RIGHT JOIN nodes n ON an.node = n.identifier WHERE ass.service = :serviceId';
 	$stmt = stmt($sql);
 	$stmt->bindValue(':serviceId', $serviceId);
+	$stmt->execute();
+
+	return $stmt->fetchAll();
+}
+
+function getNodesUsingConfig($configId) {
+	$sql = 'SELECT n.id, n.identifier FROM remote_config_allocated_nodes aln LEFT JOIN nodes n ON aln.node = n.identifier WHERE aln.config = :configId ';
+	$stmt = stmt($sql);
+	$stmt->bindValue(':configId', $configId);
 	$stmt->execute();
 
 	return $stmt->fetchAll();
@@ -227,5 +248,18 @@ function deleteRemoteConfigurationCommandInstance($commandInstanceId) {
 
 	return $config;
 }
+
+function sendUpdatedConfig($configId, $nodeIdentifier) {
+	$config = generateConfigFromId($configId);
+
+	$msg = new UpsilonMessage('UPDATED_NODE_CONFIG', $config);
+	$msg->addHeader('node-identifier', $nodeIdentifier);
+	$msg->addHeader('remote-config-id', $configId);
+	$msg->addHeader('remote-config-source-identifier', getSiteSetting('configSourceIdentifier') . '-' . $configId);
+	$msg->publish();
+
+	logger('Sending _nodeConfigId_ to ' . $nodeIdentifier, array('nodeConfigId' => $configId));
+}
+
 
 ?>

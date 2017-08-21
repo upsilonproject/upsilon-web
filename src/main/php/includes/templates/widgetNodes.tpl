@@ -11,8 +11,6 @@
 {foreach from = $listNodes item = node} 
 	<tr>
 		<td>
-	<span class = "metricIndicator {$node.karma|strtolower}">&nbsp;</span> 
-	
 		{if $sessionOptions->drawNavigation}<a href = "viewNode.php?id={$node.id}">{/if}
 		{$node.identifier}
 		{if $sessionOptions->drawNavigation}</a>{/if}

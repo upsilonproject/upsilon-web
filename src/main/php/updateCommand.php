@@ -15,7 +15,7 @@ class FormUpdateCommand extends \libAllure\Form {
 		$this->addElementReadOnly('ID', $command['id'], 'id');
 		$this->addElement(new ElementAlphaNumeric('identifier', 'Identifier', $command['commandIdentifier']));
 		$this->addElement(getElementServiceIcon($command['icon']));
-		$this->addDefaultButtons();
+		$this->addDefaultButtons('Save');
 	}
 
 	public function getCommand($id) {
@@ -36,6 +36,9 @@ class FormUpdateCommand extends \libAllure\Form {
 		$stmt->execute();
 	}
 }
+
+setNav(array('listCommands.php' => 'Command Metadata'), 'Update');
+require_once 'includes/widgets/header.php';
 
 $fh = new FormHandler('FormUpdateCommand');
 $fh->setConstructorArgument(0, san()->filterUint('id'));

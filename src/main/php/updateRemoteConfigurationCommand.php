@@ -1,8 +1,9 @@
 <?php
 
-$title = 'Update remote configuration command';
 require_once 'includes/common.php';
 require_once 'includes/functions.remoteConfig.php';
+
+setNav(array('listCommandDefinitions.php' => 'Command Definitions'), 'Update remote configuration command');
 
 use \libAllure\Form;
 use \libAllure\FormHandler;
@@ -30,7 +31,7 @@ class UpdateRemoteConfigCommand extends Form {
 		$this->getElement('command_line')->setMinMaxLengths(0, 1024);
 		$this->addElement($this->getElementMetadataSelection($this->remoteCommand['metadata']));
 
-		$this->addDefaultButtons();
+		$this->addDefaultButtons('Save');
 	}
 
 	private function getElementMetadataSelection($currentVal) {
@@ -63,9 +64,12 @@ class UpdateRemoteConfigCommand extends Form {
 $links = new HtmlLinksCollection('Dashboard &nabla;');
 $links->add('deleteRemoteConfigurationCommand.php?id=' . san()->filterUint('id'), 'Delete');
 
+require_once 'includes/widgets/header.php';
+
 $fh = new FormHandler('UpdateRemoteConfigCommand');
-$fh->setRedirect('listRemoteConfigurations.php');
+$fh->setRedirect('updateRemoteConfigurationCommand.php?id=' . san()->filterUint('id'));
 $fh->showFooter = false;
+
 $fh->handle();
 
 $tpl->assign('commandId', san()->filterUint('id'));

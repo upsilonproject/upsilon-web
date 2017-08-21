@@ -75,24 +75,24 @@
 	<div style = "clear: both;"></div>
 </div>
 
-<div class = "box" id = "graphContainer">
-	<h2 id = "graphTitle">Graph</h2>
+<div class = "box" id = "chartContainer">
+	<h2 id = "chartTitle">Chart</h2>
 
-	{include file = "widgetGraphMetric.tpl"}
+	{include file = "widgetChartMetric.tpl"}
 
 	<p>
 
 	{if !empty($metadata.metrics)}
 		<strong>Metric:</strong>
 		{foreach from = $metadata.metrics item = metric}
-			<a href = "#graphContainer" onclick = "javascript:fetchServiceMetricResultGraph('{$metric|trim}', {literal}{{/literal}node: '{$itemService.node}', services: ['{$itemService.identifier}']{literal}}{/literal}, 0)">{$metric|trim}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+			<a href = "#chartContainer" onclick = "javascript:fetchServiceMetricResultChart('{$metric|trim}', {literal}{{/literal}node: '{$itemService.node}', serviceIds: ['{$itemService.id}']{literal}}{/literal}, 0)">{$metric|trim}</a>&nbsp;&nbsp;&nbsp;&nbsp;
 		{/foreach}
 	{/if}
 	</p>
 </div>
 
 <div class = "recentResults box">
-	<h2>Results</h2>
+	<h2>Results ({$listResults|@count})</h2>
 
 {if $listResults|@count == 0}
 	<p>No results stored in the results table.</p>

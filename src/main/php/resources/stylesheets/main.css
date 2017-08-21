@@ -127,11 +127,11 @@ ul.metricList > li:last-child {
 }
 
 .old {
-	background-color: yellow;
+	background-color: yellow !important;
 }
 
 .good {
-	background-color: lightgreen;
+	background-color: lightgreen !important;
 }
 
 .neut, .unknown  {
@@ -152,6 +152,17 @@ ul.metricList > li:last-child {
 
 .skipped {
 	background-color: lightskyblue;
+}
+
+table.hover tr:hover td.good,
+table.hover tr:hover td.neut,
+table.hover tr:hover td.bad 
+table.hover tr:hover td.old 
+table.hover tr:hover td.warning 
+table.hover tr:hover td.stale 
+table.hover tr:hover td.skipped
+{
+	opacity: .7;
 }
 
 p.metricGroupDescription {
@@ -189,6 +200,10 @@ th {
 
 td.small, th.small {
 	width: 5%;
+}
+
+td.smedium, th.smedium {
+	width: 15%;
 }
 
 td.centered {
@@ -261,6 +276,8 @@ label {
 	width: 120px;
 	text-align: right;
 	margin-right: 1em;
+	vertical-align: top;
+	margin-top: .3em;
 }
 
 fieldset {
@@ -572,4 +589,8 @@ span.smartFilterKeyword {
 div.smartFilterDescription {
 	background-color: lightgray;
 	padding: 1em;
+}
+
+.filterTracker input {
+	min-width: auto;
 }

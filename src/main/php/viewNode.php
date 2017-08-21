@@ -4,6 +4,7 @@ require_once 'includes/common.php';
 
 use \libAllure\HtmlLinksCollection;
 use \libAllure\Sanitizer;
+use \libAllure\QueryBuilder;
 
 if (isset($_REQUEST['identifier'])) {
 	$sql = 'SELECT n.* FROM nodes n WHERE n.identifier = :nodeId LIMIT 1';
@@ -22,7 +23,7 @@ $node = $stmt->fetchRow();
 $links = new HtmlLinksCollection();
 $links->add('deleteNode.php?id=' . $node['id'], 'Delete');
 
-setNav(array('listNodes.php' => 'Nodes'), 'View Node');
+setNav(array('listNodes.php' => 'Nodes'), $node['identifier']);
 
 require_once 'includes/widgets/header.php';
 require_once 'libAllure/Sanitizer.php';
@@ -53,6 +54,11 @@ function getServicesConfiguredForNode($node) {
 }
 
 function getServicesReportedForNode($node) {
+	$qb = new QueryBuilder();
+	$qb->from('services')->fields('id', 'identifier', 'lastUpdated', 'output', 'karma', 'node');
+	$qb->where('node', '=', ':node');
+	$qb->whereLikeValue('identifier', 'waffles');
+
 	$sql = 'SELECT s.id, s.identifier, s.lastUpdated, s.output, s.karma, s.node FROM services s WHERE s.node = :node';
 
 	$stmt = stmt($sql);
@@ -113,7 +119,12 @@ function getServicesForNode($node) {
 	return $ret;
 }
 
-$tpl->assign('listServices', getServicesForNode($node['identifier']));
+$filters = new \libAllure\FilterTracker();
+$filters->addString("name");
+$filters->setHiddenValue('identifier', $node['identifier']);
+
+$tpl->assign('filters', $filters->getAll());
+$tpl->assign('listServices', getServicesForNode($node['identifier']), $filters);
 $tpl->display('listServices.tpl');
 
 require_once 'includes/widgets/footer.php';

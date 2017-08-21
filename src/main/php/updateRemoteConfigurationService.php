@@ -1,8 +1,9 @@
 <?php
 
-$title = 'Update remote configuration service';
 require_once 'includes/common.php';
 require_once 'includes/functions.remoteConfig.php';
+
+setNav(array('listServiceDefinitions.php' => 'Service definitions'), 'Update remote configuration service');
 
 use \libAllure\Form;
 use \libAllure\FormHandler;
@@ -99,9 +100,32 @@ class UpdateRemoteConfigService extends Form {
 		$stmt->execute();
 
 		$this->processArguments();
+
+
+		$sql = 'SELECT alc.config AS id, c.autoSendOnUpdate FROM remote_config_allocated_services alc RIGHT JOIN remote_configs c ON alc.config = c.id WHERE alc.service = :serviceId ';
+		$stmt = stmt($sql);
+		$stmt->bindValue('serviceId', $this->getElementValue('id'));
+		$stmt->execute();
+
+		foreach ($stmt->fetchAll() as $touchedConfigs) {
+			updateConfig($touchedConfigs['id'], 'Updated service: ' . $this->getElementValue('name') . ' in config ' . $touchedConfigs['id']);
+
+			if ($touchedConfigs['autoSendOnUpdate']) {
+				$nodesUsingConfigs = getNodesUsingConfig($touchedConfigs['id']);
+
+				foreach ($nodesUsingConfigs as $node) {
+					sendUpdatedConfig($touchedConfigs['id'], $node['identifier']);
+				}
+			}
+		}
 	}
 
 	private function processArguments() {
+		$sql = 'DELETE FROM remote_config_service_arg_values WHERE service = :service';
+		$stmt = db()->prepare($sql);
+		$stmt->bindValue(':service', $this->serviceId);
+		$stmt->execute();
+
 		$sql = 'INSERT INTO remote_config_service_arg_values (service, argument, `value`) VALUES (:service, :argument, :valueInsert) ON DUPLICATE KEY UPDATE `value` = :valueUpdate ';
 		$stmt = db()->prepare($sql);
 
@@ -131,5 +155,7 @@ $tpl->display('updateServiceOverview.tpl');
 
 $tpl->assignForm($f);
 $tpl->display('form.tpl');
+
+require_once 'includes/widgets/footer.php';
 
 ?>

@@ -24,25 +24,30 @@ function toLocalIsoLikeString(d) {
 }
 
 function makeDateHumanReadable(element) {
-	utcDate = new Date(element.textContent + " UTC")
+	if (element.textContent == "now") {
+		utcDate = new Date((new Date()).toUTCString());
+	} else {
+		utcDate = new Date(element.textContent + " UTC")
+	}
+
 	elementUnixTimestamp = utcDate / 1000
 	nowUnixTimestamp = Date.now() / 1000
 
 	if (isNaN(elementUnixTimestamp)) {
+		console.log("Could not parse date in element", element);
 		return;
 	}
 
-
 	if ((nowUnixTimestamp - elementUnixTimestamp) > 3600) {
 		dojo.addClass(element.parentElement, "old");
+	} else if ((nowUnixTimestamp - elementUnixTimestamp) < 0) {
+		dojo.addClass(element.parentElement, "bad");
 	} else {
 		dojo.addClass(element.parentElement, "good");
 	}
 
-
-
 	if (dojo.hasClass(element, "relative")) {
-	description = "<strong>" + toLocalIsoLikeString(utcDate) + "</strong>";
+		description = "<strong>" + toLocalIsoLikeString(utcDate) + "</strong>";
 		element.textContent = secondsToString(nowUnixTimestamp - elementUnixTimestamp);
 	} else {
 		description = "<strong>" + secondsToString(nowUnixTimestamp - elementUnixTimestamp) + "</strong>";
@@ -114,62 +119,109 @@ function rawPlot(plot, ctx) {
 }
 
 function labelDateAxis(date) {
-	return formatUnixTimestamp(date);
+	return formatUnixTimestamp(date, "week");
 }
 
-function formatUnixTimestamp(timestamp) {
+function formatUnixTimestamp(timestamp, range) {
 	var d = new Date(timestamp * 1000);
 
-	return dojo.date.locale.format(d, {selector:"date", datePattern: "HH:mm" });
+	if (range == "week") {
+		dp = "EEE d MMM"
+	} else {
+		dp = "HH:mm"
+	}
+
+	return dojo.date.locale.format(d, {selector:"date", datePattern: dp });
 }
 
-function updateGraph(results) {
+function updateChart(results) {
 	require([
 		"dojox/charting/Chart",
 		"dojox/charting/themes/Claro",
 		"dojo/date/locale",
-		"dojox/charting/plot2d/StackedAreas",
-		"dojox/charting/axis2d/Default",
 		"dojo/query",
 		"dojo/dom-construct",
-		"dojo/NodeList-manipulate"
-	], function(Chart, theme, stamp, qquery, construct) {
-		var d = qquery('#graphService' + results.graphIndex);
-		d.clear();
+		"dojox/charting/plot2d/Indicator",
+		"dojox/charting/widget/SelectableLegend",
+		"dojox/charting/action2d/Tooltip",
+		"dojox/charting/action2d/MouseZoomAndPan",
+		"dojo/NodeList-manipulate",
+		"dojox/charting/plot2d/Lines",
+		"dojox/charting/axis2d/Default"
+	], function(Chart, theme, stamp, qquery, construct, ind, Legend, Tooltip, ZaP) {
+		var d = qquery('#chartService' + results.chartIndex);
 
 		/*
 		xaxis: {mode: "time", timeformat: "%a\n %H:%M"},
 		{colors: ["#cecece", '#cecece'] }
 		*/
 
-		var c = new Chart("graphService" + results.graphIndex, {
-			title: "Metric: " + results.metric,
-			titleFont: "sans-serif",
-			axisFont: "sans-serif",
-		});
+		if (window.charts[results.chartIndex] == undefined) {
+			window.charts[results.chartIndex] = new Chart("chartService" + results.chartIndex, {
+				title: "Metric: " + results.metric,
+				titleFont: "sans-serif",
+				axisFont: "sans-serif",
+			});
+
+//			window.charts[results.chartIndex].destroy()
+		}
+
+		c = window.charts[results.chartIndex];
+
 		c.setTheme(theme);
-		c.addPlot("default", {
-			type: "StackedAreas",
-			markers: true,
-		});
 
 		c.addAxis("x", {vertical: false, titleOrientation: "away", font: "sans-serif", labelFunc: labelDateAxis });
 		c.addAxis("y", {vertical: true, titleOrientation: "axis", font: "sans-serif" });
 
+		window.chartResults = results;
+
 		results.services.forEach(function(service, index) {
 			axisData = []
 
+			console.log("plotting service", service);
+
 			service.metrics.forEach(function(result, index) {
-				axisData.push({y: result.value, x: result.date})
+				axisData.push({y: result.value, x: result.date, karma: result.karma })
 			});
 
-			c.addSeries("service " + service.serviceId, axisData);
+			seriesName = "service " + service.serviceId + "_" + service.field;
+			seriesName = service.field;
+			c.addSeries(seriesName, axisData);
+
 		});
+
+		c.addPlot("default", {
+			type: "Lines",
+			markers: true,
+			styleFunc: function(i) {
+				if (i.karma in window.karmaColors) {
+					r = { fill: "" + window.karmaColors[i.karma] }
+					return r;
+				} else {
+					return { fill: "gray" }
+				}
+			}
+		});
+
+		/**
+		c.addPlot("threshhold", { type: ind, 
+			vertical: false,
+			lineStroke: { color: "red", style: "ShortDash" },
+			values: 100,
+		});
+		*/
+
+		new ZaP(c, "default", {axis: "x" });
+
+		if (window.charts[results.chartIndex].legend == null) {
+			window.charts[results.chartIndex].legend = new Legend({chart: c, autoScale: true}, "legend" + results.chartIndex);
+		}
+
+		tooltip = new Tooltip(c, "default");
 
 		c.render();
 
-
-		window.plots[results.graphIndex] = c;
+		window.charts[results.chartIndex].legend.refresh();
 	});
 }
 
@@ -179,21 +231,21 @@ function getAxisColor(index) {
 	}
 }
 
-window.plots = {};
-window.plotMarkings = {};
+window.charts = {};
+window.chartMarkings = {};
 
-function fetchServiceMetricResultGraph(metric, dataset, graphIndex) {
-	console.log("datasets", dataset);
+function fetchServiceMetricResultChart(metric, dataset, chartIndex) {
+	console.log("chart " + chartIndex + " datasets", dataset);
 	data = {
-		"services[]": dataset.services,
+		"serviceIds[]": dataset.serviceIds,
 		"node": dataset.node,
-		"metric": metric,
-		"graphIndex": graphIndex
+		"metrics[]": metric.split(","),
+		"chartIndex": chartIndex
 	}
 
-	window.serviceResultGraphUrl = 'viewServiceResultGraph.php';
+	window.serviceResultChartUrl = 'json/viewServiceResultChart.php';
 
-	request(window.serviceResultGraphUrl, data, updateGraph);
+	request(window.serviceResultChartUrl, data, updateChart);
 }
 
 function cookieOrDefault(cookieName, defaultValue) {
@@ -440,8 +492,10 @@ function renderGroup(data, ref) {
 		container = query('.widgetRef' + ref);
 		container.empty()
 
-		container.append(generate('<h2>Services</h2>'))
-		renderServiceList(data['listServices'], container)
+		if (data['listServices'].length > 0) {
+			container.append(generate('<h2>Services</h2>'))
+			renderServiceList(data['listServices'], container)
+		}
 
 		if (data['listClassInstances'].length > 0) {
 			container.append(generate('<h2>Class Instances'));
@@ -472,13 +526,13 @@ function renderClassInstances(data, owner) {
 				domRequirement = construct.toDom('<p>&nbsp;</p>');
 				indicator = construct.place('<span class = "metricIndicator">&nbsp;</span>', domRequirement);
 
-				construct.place(' <span>' + requirement['requirementTitle'] + '</span> - ', domRequirement);
+				construct.place(' <span><a href = "addInstanceCoverage.php?requirementId=' + requirement['requirementId'] + '&instanceId=' + requirement['instanceId'] + '">' + requirement['requirementTitle'] + '</a></span> - ', domRequirement);
 
 				if (requirement['serviceIdentifier'] != null) {
 					query(indicator).addClass(requirement['karma'].toLowerCase());
-					construct.place('<span>' + requirement['serviceIdentifier'] + '</span>', domRequirement);
+					construct.place('<span><a href = "viewService.php?id=' + requirement['service'] + '">' + requirement['serviceIdentifier'] + '</a></span>', domRequirement);
 				} else {
-					construct.place('<span class = "subtle">Not covered</span>', domRequirement);
+					construct.place('<span class = "bad">Not covered</span>', domRequirement)
 				}
 
 				dom.append(domRequirement)
@@ -510,11 +564,13 @@ function renderServiceList(data, owner) {
 
 		owner.children('.metricListContainer').remove();
 
-		container = owner.append(generate('<div class = "metricListContainer" />'));
+		container = generate('<div class = "metricListContainer" />');
+		owner.append(container);
 
 		container.append(generate('<p class = "metricListDescription"></p>'));
 
-		list = container.append(generate('<ul class = "metricList"></ul>'));
+		list = generate('<ul class = "metricList"></ul>');
+		container.append(list);
 
 		data.forEach(function(service, index) {
 			indicator = query(generate('<span class = "metricIndicator" />'));
@@ -535,7 +591,7 @@ function renderServiceList(data, owner) {
 			text.append('<a href = "viewService.php?id=' + service.id + '"><span class = "metricTitle">' + service.alias + '</span></a>');
 			metric.append(text);
 
-			list.append(metric);
+			query(list).append(metric);
 		});
 
 		toggleGroups();
@@ -633,4 +689,68 @@ function showFullscreenButton() {
 	});
 }
 
+function filteringTestLoad(dat) {
+	console.log("loaded", dat);
 
+	select = document.getElementById('update-service');
+
+	for (i = select.options.length -1; i >= 0; i--) {
+		select.remove(i);
+	}
+
+	dat.forEach(function(v) {
+		opt = document.createElement("option");
+		opt.value = v.id;
+		opt.text = v.identifier;
+
+		select.add(opt);
+	});
+}
+
+function filterGetFieldValues() {
+	fields = {};
+
+	window.filters.forEach(function(v) {
+		fields[v] = document.getElementById('filterInput-' + v).value
+
+		if (fields[v] != "" && fields[v] != null) {
+			document.getElementById('filterLabel-' + v).classList.add("good");
+		} else {
+			document.getElementById('filterLabel-' + v).classList.remove("good");
+		}
+	});
+
+	return fields;
+}
+
+function filterInstanceCoverageOptions() {
+	fields = filterGetFieldValues();
+
+	request('json/addInstanceCoverage.php', fields, filteringTestLoad)
+}
+
+function filteringSelectClear() {
+	window.filters.forEach(function(name) {
+		el = document.getElementById('filterInput-' + name)
+		el.value = "";
+
+		el = document.getElementById('filterLabel-' + name)
+		el.classList.remove("good")
+		el.classList.remove("warning")
+		el.classList.add("unknown")
+	});
+
+	filteringSelectBlur();
+}
+
+function filteringSelectBlur() {
+	filterInstanceCoverageOptions()
+}
+
+function filteringSelectChanged() {
+	lblClasses = document.activeElement.previousElementSibling.classList;
+	
+	lblClasses.remove("good")
+	lblClasses.remove("unknown")
+	lblClasses.add("warning")
+}

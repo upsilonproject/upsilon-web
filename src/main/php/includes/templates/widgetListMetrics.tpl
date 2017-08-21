@@ -20,7 +20,11 @@
 				{if not empty($itemMetric.caption)}
 					{$itemMetric.caption}
 				{else}
+					{if not empty($itemMetric.url)}
+					<a target = "_blank" href = "{$itemMetric.url}">{$itemMetric.name}</a>
+					{else}
 					{$itemMetric.name}
+					{/if}
 				{/if}
 				: {$itemMetric.value} 
 			{if not empty($itemMetric.comment)}<span class = "subtle">({$itemMetric.comment})</span>{/if}

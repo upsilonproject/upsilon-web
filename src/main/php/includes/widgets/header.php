@@ -44,6 +44,11 @@ if (!empty($nav)) {
 	$tpl->assign('navTitle', $navTitle);
 
 	end($nav);
+
+	if (is_array(current($nav))) {
+		throw new Exception('Last element of nav breadcrumb must not be an array');
+	}
+
 	$tpl->assign('pageTitle', current($nav));
 } else {
 	if (isset($title)) {

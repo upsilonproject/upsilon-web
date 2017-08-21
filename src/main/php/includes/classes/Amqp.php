@@ -18,7 +18,7 @@ class UpsilonMessage extends AMQPMessage {
 		$this->headers[$key] = $value;
 	}
 
-	function publish($routingKey = 'upsilon.cmds') {
+	public function publish($routingKey = 'upsilon.cmds') {
 		global $amqpChan;
 
 		$headerTable = new Wire\AMQPTable($this->headers);
@@ -29,11 +29,9 @@ class UpsilonMessage extends AMQPMessage {
 	}
 }
 
-//$amqpConn = new AMQPStreamConnection('www2.teratan.net', 5672, 'guest', 'guest');
 $host = getSiteSetting('amqpHost');
 $port = intval(getSiteSetting('amqpPort'));
 $user = getSiteSetting('amqpUser');
 $pass = getSiteSetting('amqpPass');
 $amqpConn = new AMQPStreamConnection($host, $port, $user, $pass);
 $amqpChan = $amqpConn->channel();
-

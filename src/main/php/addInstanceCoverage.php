@@ -2,6 +2,7 @@
 
 $title = 'Add instance coverage';
 require_once 'includes/common.php';
+require_once 'includes/classes/ElementFilteringSelect.php';
 
 use \libAllure\Form;
 use \libAllure\Sanitizer;
@@ -25,8 +26,8 @@ class FormUpdateInstanceCoverage extends Form {
 
 		$this->addElementHidden('requirement', Sanitizer::getInstance()->filterUint('requirement'));
 		$this->addElementReadOnly('Requirement', $req['title']);
-		$this->addElementSelectServiceCheck();
-		$this->addDefaultButtons();
+		$this->addElementSelectServiceCheck($req, $inst);
+		$this->addDefaultButtons('Associate');
 	}
 
 	private function getClassInstance($id) { 
@@ -47,27 +48,11 @@ class FormUpdateInstanceCoverage extends Form {
 		return $stmt->fetchRow();
 	}
 
-	private function addElementSelectServiceCheck() {
-		$el = new ElementSelect('service', 'Service');
-		$el->addOption('(none)', '');
+	private function addElementSelectServiceCheck($requirement, $inst) {
+		$filters = instanceCoverageFilter();
 
-		$sql = 'SELECT s.id, s.identifier, s.node FROM services s ORDER BY s.node ASC, s.identifier ASC';
-		$stmt = DatabaseFactory::getInstance()->prepare($sql);
-		$stmt->execute();
-
-		foreach ($stmt->fetchAll() as $itemService) {
-			$el->addOption($itemService['identifier'], $itemService['id'], $itemService['node']);
-		}
-
-		$sql = 'SELECT a.service FROM class_service_assignments a WHERE instance = :instance AND requirement = :requirement';
-		$stmt = DatabaseFactory::getInstance()->prepare($sql);
-		$stmt->bindValue(':instance', Sanitizer::getInstance()->filterUint('instance'));
-		$stmt->bindValue(':requirement', Sanitizer::getInstance()->filterUint('requirement'));
-		$stmt->execute();
-
-		if ($stmt->numRows() > 0) {
-			$el->setValue($stmt->fetchRowNotNull()['service']);
-		}
+		$el = new ElementFilteringSelect('service', 'Service', $filters, 'filterInstanceCoverageOptions');
+		$el->description = 'Cannot find an existing service? <a href = "createRemoteConfigService.php?commandId=' . $requirement['command'] . '&requirementId=' . $requirement['id'] . '&classInstanceId=' . $inst['id'] . '">Create</a>';
 
 		$this->addElement($el);
 	}

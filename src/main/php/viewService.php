@@ -21,26 +21,6 @@ require_once 'includes/widgets/header.php';
 
 $tpl->assign('listGroupMemberships', getMembershipsFromServiceIdentifier($service['identifier']));
 
-function getServiceMetadata($identifier) {
-	$sql = 'SELECT sm.actions, sm.metrics, sm.defaultMetric, sm.room, cm.id AS commandMetadataId, IF(sm.icon IS NULL, cm.icon, sm.icon) AS icon, sm.criticalCast, sm.goodCast FROM services s LEFT JOIN service_metadata sm ON s.identifier = sm.service LEFT JOIN command_metadata cm ON s.commandIdentifier = cm.commandIdentifier WHERE s.identifier = :serviceIdentifier LIMIT 1';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':serviceIdentifier', $identifier);
-	$stmt->execute();
-
-	if ($stmt->numRows() == 0) {
-		$metadata = array();
-		$metadata['actions'] = null;
-		$metadata['metrics'] = '';
-		$metadata['defaultMetric'] = null;
-	} else {
-		$metadata = $stmt->fetchRow();
-	}
-
-	$metadata['metrics'] = explodeOrEmpty("\n", trim($metadata['metrics']));
-
-	return $metadata;
-}
-
 $configSource = getConfigSourceFromServiceResultIdentifier($service['identifier'], $service['node']);
 
 $tpl->assign('metadata', getServiceMetadata($service['identifier']));
@@ -50,14 +30,15 @@ if (isset($configSource['remote_config_command_id'])) {
 	$tpl->assign('commandLineClickable', getClickableCommandLine($configSource));
 }
 
-$listResults = getServiceResults($service['identifier'], $service['node']);
+$listResults = getServiceResults($service['identifier'], $service['node'], 1);
 
 $tpl->assign('listResults', $listResults);
 
-$tpl->assign('instanceGraphIndex', 0);
-$tpl->assign('listServiceId', array($service['identifier']));
+$tpl->assign('instanceChartIndex', 0);
+$tpl->assign('listServiceId', array($service['id']));
 $tpl->assign('metric', 'karma');
 $tpl->assign('yAxisMarkings', array());
+$tpl->assign('linkToLarger', true);
 $tpl->display('viewService.tpl');
 
 require_once 'includes/widgets/footer.php';
