@@ -405,4 +405,76 @@ class RemoteConfigServiceArgValues extends DatabaseUpgradeTask {
 
 Upgrader::registerTask(new RemoteConfigServiceArgValues());
 
+class LotsOfForeignKeys extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return $this->doesKeyExist(); 
+	}
+
+	public function doesKeyExist() {
+		$sql = 'show create table service_metadata';
+		$stmt = stmt($sql)->execute();
+
+		$row = $stmt->fetchRow();
+		$def = $row['Create Table'];
+
+		if (stripos($def, 'CONSTRAINT') === false) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function perform() {
+		$sql = 'alter table widget_instances add foreign key (widget) references widgets (id);';
+		$stmt = stmt($sql)->execute();
+
+		$sql = 'alter table widget_instances add foreign key (dashboard) references dashboard (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table privileges_u add foreign key (permission) references permissions (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table privileges_g add foreign key (permission) references permissions (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table privileges_u add foreign key (user) references users (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table privileges_g add foreign key (`group`) references groups (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table users add foreign key (`group`) references groups (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table node_group_memberships add foreign key (gid) references service_groups (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table class_instance_group_memberships add foreign key (gid) references service_groups (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table remote_config_allocated_nodes add foreign key (config) references remote_configs (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table remote_config_allocated_commands add foreign key (config) references remote_configs (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table apiClients add foreign key (user) references users (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table widget_instance_arguments add foreign key (instance) references widget_instances (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table widget_instances add foreign key (dashboard) references dashboard (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table widget_instances add foreign key (widget) references widgets (id);';
+		$stmt = stmt($sql)->execute();
+		
+		$sql = 'alter table service_metadata add foreign key (room) references rooms (id);';
+		$stmt = stmt($sql)->execute();
+	}
+}
+
+Upgrader::registerTask(new LotsOfForeignKeys());
+
 ?>
