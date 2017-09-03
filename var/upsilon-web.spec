@@ -12,9 +12,9 @@ URL:		http://upsilon-project.co.uk
 Source0:	upsilon-web.zip
 
 %if "%{?dist}" == "el7scl"
-Requires: httpd24-httpd php php-pdo php-mysql php-mbstring php-bcmath mariadb-server php-Smarty
+Requires: httpd24-httpd rh-php56-php rh-php56-php-pdo rh-php56-php-mysqlnd rh-php56-php-mbstring.x86_64 rh-php56-php-bcmath.x86_64
 %else
-Requires: httpd php php-pdo php-mysql php-mbstring php-bcmath mariadb-server php-Smarty
+Requires: httpd php php-pdo php-mysql php-mbstring php-bcmath
 %endif
 
 %description
