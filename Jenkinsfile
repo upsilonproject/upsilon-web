@@ -23,7 +23,7 @@ def prepareEnv() {
 
 def buildDockerContainer() {
 	prepareEnv()
-	unstash 'el7-scl'
+	unstash 'el7scl'
 
 	sh 'mv RPMS/noarch/*.rpm RPMS/noarch/upsilon-web.rpm'
 
