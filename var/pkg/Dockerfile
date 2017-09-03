@@ -1,4 +1,4 @@
-FROM centos/httpd:latest
+FROM centos/httpd-24-centos7:latest
 
 RUN yum install -y https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-10.noarch.rpm
 ADD http://repos.upsilon-project.co.uk/upsilon-rpm-el7/upsilon-rpm-el7.repo /etc/yum.repos.d/
