@@ -79,7 +79,7 @@ stage ("Package") {
 		buildRpm("el7")                                                                
 	}                                                                                  
 	node {
-		buildRpm("el7-scl")
+		buildRpm("el7scl")
 		buildDockerContainer()
 	}
 	node {                                                                             
