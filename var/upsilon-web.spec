@@ -11,7 +11,7 @@ License:	GPLv2
 URL:		http://upsilon-project.co.uk
 Source0:	upsilon-web.zip
 
-%if "%{dist}" == "el7scl"
+%if "%{?dist}" == "el7scl"
 Requires: httpd24-httpd php php-pdo php-mysql php-mbstring php-bcmath mariadb-server php-Smarty
 %else
 Requires: httpd php php-pdo php-mysql php-mbstring php-bcmath mariadb-server php-Smarty
