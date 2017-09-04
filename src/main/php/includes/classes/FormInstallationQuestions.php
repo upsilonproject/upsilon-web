@@ -40,7 +40,7 @@ class FormInstallationQuestions extends Form {
         public function getDsn() {
 				try {
 					$dsn = $this->getElementValue('dsn');
-				} catch {
+				} catch (Exception $e) {
 					$hostOrSocket = $this->getElementValue('dbHost');
 
 					if (stripos($hostOrSocket, '/') !== FALSE) {
