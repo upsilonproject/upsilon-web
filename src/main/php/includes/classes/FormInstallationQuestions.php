@@ -15,7 +15,7 @@ class FormInstallationQuestions extends Form {
                 $this->addSection('Database');
 
 		        if ($this->isDatabaseEnvVarsSpecified()) {
-    	                $this->addElement(new ElementHtml('dialog', 'OpenShift', '<p class = "formSection">You are running on OpenShift. The installer has completed the database section of the installer with defaults. You still need to enter the database password.</p>'));
+    	                $this->addElement(new ElementHtml('dialog', 'Database credentials provided', '<p class = "formSection">Your database credentials have been provided by environment variables, so the installer has completed the database section of the installer. You still need to setup your initial administrator.</p>'));
 				}
 
                 $this->addElement(new ElementInput('dbHost', 'Database host or unix socket', 'localhost'));
@@ -62,9 +62,10 @@ class FormInstallationQuestions extends Form {
         public function autofillEnvVarValues() {
                 if ($this->isDatabaseEnvVarsSpecified()) {
 						$this->addElementReadOnly('DSN', getenv('CFG_DB_DSN'), 'dsn');
-                        $this->getElement('dbHost')->setValue('ignored');
+                        $this->getElement('dbHost')->setValue('ignored, using DSN');
+                        $this->getElement('dbName')->setValue('ignored, using DSN');
                         $this->getElement('dbUser')->setValue(getenv('CFG_DB_USER'));
-                        $this->getElement('dbName')->setValue(getenv('CFG_DB_PASS'));
+                        $this->getElement('dbPass')->setValue(getenv('CFG_DB_PASS'));
                 }
         }
 
