@@ -411,7 +411,7 @@ class LotsOfForeignKeys extends DatabaseUpgradeTask {
 	}
 
 	public function doesKeyExist() {
-		$sql = 'show create table service_metadata';
+		$sql = 'show create table widget_instance_arguments';
 		$stmt = stmt($sql)->execute();
 
 		$row = $stmt->fetchRow();
@@ -460,18 +460,16 @@ class LotsOfForeignKeys extends DatabaseUpgradeTask {
 		
 		$sql = 'alter table apiClients add foreign key (user) references users (id);';
 		$stmt = stmt($sql)->execute();
-		
-		$sql = 'alter table widget_instance_arguments add foreign key (instance) references widget_instances (id);';
-		$stmt = stmt($sql)->execute();
-		
+				
 		$sql = 'alter table widget_instances add foreign key (dashboard) references dashboard (id);';
 		$stmt = stmt($sql)->execute();
 		
 		$sql = 'alter table widget_instances add foreign key (widget) references widgets (id);';
 		$stmt = stmt($sql)->execute();
-		
-		$sql = 'alter table service_metadata add foreign key (room) references rooms (id);';
+
+		$sql = 'alter table widget_instance_arguments add foreign key (instance) references widget_instances (id);';
 		$stmt = stmt($sql)->execute();
+
 	}
 }
 
