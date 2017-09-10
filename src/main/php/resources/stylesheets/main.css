@@ -594,3 +594,7 @@ div.smartFilterDescription {
 .filterTracker input {
 	min-width: auto;
 }
+
+.formElementHtmlContainer {
+	margin-top: .3em;
+}

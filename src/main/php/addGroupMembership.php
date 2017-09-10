@@ -2,6 +2,7 @@
 
 $title = 'Add group membership';
 require_once 'includes/common.php';
+require_once 'includes/classes/ElementFilteringSelect.php';
 
 use \libAllure\Form;
 use \libAllure\FormHandler;
@@ -25,21 +26,13 @@ class FormAddMembership extends Form {
 
 		$this->addElementGroupSelect();
 		
-		$this->addDefaultButtons();
+		$this->addDefaultButtons('Add to group');
 	}
 
 	public function getElementClassInstance($classInstanceId) {
-		$sql = 'SELECT ci.id, ci.title, group_concat(c.title) AS classList FROM class_instances ci LEFT JOIN class_instance_parents cp ON cp.instance = ci.id LEFT JOIN classes c ON cp.parent = c.id GROUP BY ci.id ORDER BY ci.title ASC';
-		$stmt = db()->prepare($sql);
-		$stmt->execute();
+		$filters = classInstanceFilter();
 
-		$el = new ElementSelect('classInstance', 'Class Instance');
-		$el->setSize(10);
-		
-		foreach ($stmt->fetchAll() as $classInstance) {
-			$el->addOption($classInstance['title'] . ' - ' . $classInstance['classList'], $classInstance['id']);
-		}
-
+		$el = new ElementFilteringSelect('classInstance', 'Class Instance', $filters, 'filterClassInstance');
 		$el->setValue($classInstanceId);
 
 		return $el;

@@ -6,17 +6,29 @@ require_once 'includes/common.php';
 
 use \libAllure\Session;
 
-if (Session::isLoggedIn()) {
-	outputJson('Already logged in.');
+function loginStatusMessage($newLogin = false) {
+	$prefix = 'Already';
+
+	if ($newLogin) {
+		$prefix = '';
+	}
+
+	$status = array( 
+		'message' => $prefix . ' logged in as ' . Session::getUser()->getUsername(),
+		'sid' => session_id()
+	);
+
+	return $status;
 }
 
-$username = san()->filterString('username');
-$password = san()->filterString('password');
+if (Session::isLoggedIn()) {
+	outputJson(loginStatusMessage());
+}
 
 try {
-	Session::checkCredentials($username, $password);
+	handleApiLogin(false);
 
-	outputJson("logged in");
+	outputJson(loginStatusMessage(true));
 } catch (Exception $e) {
 	denyApiAccess('Exception. ' . get_class($e) . ' = ' . $e->getMessage());
 }

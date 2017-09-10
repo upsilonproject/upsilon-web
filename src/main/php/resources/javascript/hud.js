@@ -186,6 +186,7 @@ function updateChart(results) {
 
 			seriesName = "service " + service.serviceId + "_" + service.field;
 			seriesName = service.field;
+			seriesName = service.metrics[0].caption;
 			c.addSeries(seriesName, axisData);
 
 		});
@@ -203,13 +204,14 @@ function updateChart(results) {
 			}
 		});
 
-		/**
-		c.addPlot("threshhold", { type: ind, 
-			vertical: false,
-			lineStroke: { color: "red", style: "ShortDash" },
-			values: 100,
-		});
-		*/
+		window.chartMarkings[results.chartIndex].forEach(function(v)  {
+			c.addPlot("threshhold", { type: ind, 
+				vertical: false,
+				lineStroke: { color: "red", style: "ShortDash" },
+				values: v,
+			});
+		}
+		);
 
 		new ZaP(c, "default", {axis: "x" });
 
@@ -689,22 +691,12 @@ function showFullscreenButton() {
 	});
 }
 
-function filteringTestLoad(dat) {
-	console.log("loaded", dat);
+function createOption(val, txt) {
+	opt = document.createElement("option");
+	opt.value = val;
+	opt.text = txt;
 
-	select = document.getElementById('update-service');
-
-	for (i = select.options.length -1; i >= 0; i--) {
-		select.remove(i);
-	}
-
-	dat.forEach(function(v) {
-		opt = document.createElement("option");
-		opt.value = v.id;
-		opt.text = v.identifier;
-
-		select.add(opt);
-	});
+	return opt;
 }
 
 function filterGetFieldValues() {
@@ -723,10 +715,43 @@ function filterGetFieldValues() {
 	return fields;
 }
 
-function filterInstanceCoverageOptions() {
-	fields = filterGetFieldValues();
+function loadFilterResultsIntoSelect(sel, dat) {
+	select = document.getElementById(sel);
+	
+	console.log(select);
 
-	request('json/addInstanceCoverage.php', fields, filteringTestLoad)
+	for (i = select.options.length -1; i >= 0; i--) {
+		select.remove(i);
+	}
+
+	dat.forEach(function(v) {
+		select.add(createOption(v.id, v.identifier));
+	});
+
+}
+
+function filterClassInstance() {
+	window.filterFunc = function() {
+		fields = filterGetFieldValues()
+
+		request('json/getClassInstances.php', fields, function(dat) {
+			loadFilterResultsIntoSelect('formAddMembership-classInstance', dat);
+		});
+	}
+
+	window.filterFunc();
+}
+
+function filterInstanceCoverageOptions() {
+	window.filterFunc = function() {
+		fields = filterGetFieldValues();
+
+		request('json/addInstanceCoverage.php', fields, function(dat) {
+			loadFilterResultsIntoSelect('update-service', dat);
+		});
+	}
+
+	window.filterFunc();
 }
 
 function filteringSelectClear() {
@@ -744,7 +769,7 @@ function filteringSelectClear() {
 }
 
 function filteringSelectBlur() {
-	filterInstanceCoverageOptions()
+	window.filterFunc();
 }
 
 function filteringSelectChanged() {

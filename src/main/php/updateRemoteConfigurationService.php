@@ -14,6 +14,8 @@ use \libAllure\ElementSelect;
 class UpdateRemoteConfigService extends Form {
 	private $arguments;
 
+	private $saveButtonTitle = 'Save service &amp; arguments';
+
 	public function __construct() {
 		parent::__construct('UpdateRemoteConfig', 'Update remote config service');
 
@@ -37,7 +39,7 @@ class UpdateRemoteConfigService extends Form {
 
 		$this->addArgumentElements($service['command']);
 
-		$this->addDefaultButtons('Save');
+		$this->addDefaultButtons($this->saveButtonTitle);
 	}
 
 	private function getUsefulInfo($id) {
@@ -61,6 +63,7 @@ class UpdateRemoteConfigService extends Form {
 
 		if (empty($commandId)) {
 			$this->addElementReadOnly('Note', 'Command is not yet set. Once it has been and saved, command arguments can be set here.');
+			$this->saveButtonTitle = 'Save and add arguments';
 			return;
 		}
 
@@ -139,6 +142,8 @@ class UpdateRemoteConfigService extends Form {
 	}
 }
 
+$links = linksCollection();
+$links->add('deleteRemoteConfigurationService.php?id=' . san()->filterId(), 'Delete remote configuration service');
 
 $f = new UpdateRemoteConfigService();
 

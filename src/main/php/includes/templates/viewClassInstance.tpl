@@ -30,7 +30,7 @@
 					</td>
 
 					<td class = "{if empty($itemInstanceRequirement.karma)}bad{else}{$itemInstanceRequirement.karma|strtolower}{/if}">
-						{if empty($itemInstanceRequirement.service)}Not Covered{else}{$itemInstanceRequirement.serviceLastUpdated}{/if}
+						{if empty($itemInstanceRequirement.service)}Not Covered{else}<span class = "date">{$itemInstanceRequirement.serviceLastUpdated}</span>{/if}
 					</td>
 
 					<td>

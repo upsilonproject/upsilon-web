@@ -30,7 +30,7 @@ if (isset($configSource['remote_config_command_id'])) {
 	$tpl->assign('commandLineClickable', getClickableCommandLine($configSource));
 }
 
-$listResults = getServiceResults($service['identifier'], $service['node'], 1);
+$listResults = getServiceResultsMostRecent($service['identifier'], $service['node']);
 
 $tpl->assign('listResults', $listResults);
 
