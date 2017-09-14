@@ -33,7 +33,7 @@ class UpdateRemoteConfigService extends Form {
 		$this->serviceId = $id;
 
 		$elName = $this->addElement(new ElementInputRegex('name', 'Name', $service['name']));
-		$elName->setPatternToIdentifier();
+		$elName->setPatternToIdentifier('.-');
 		$this->addElement(new ElementInput('parent', 'Parent', $service['parent']));
 		$this->addElementCommand($service['command']);
 
