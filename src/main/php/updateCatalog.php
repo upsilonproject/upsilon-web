@@ -7,7 +7,8 @@ $commandsCatalogDir = "https://raw.githubusercontent.com/upsilonproject/upsilon-
 $catalog = file_get_contents($commandsCatalogDir . 'commands.json');
 $catalog = json_decode($catalog);
 
-echo 'Updating commands catalog from: ' . $commandsCatalogDir . '<br />';
+$output = "";
+$output .= 'Updating commands catalog from: ' . $commandsCatalogDir . '<br />';
 
 $sql = 'INSERT INTO remote_config_commands (command_line, identifier, metadata) VALUES (:commandLine, :identifier, :metadata) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), metadata = metadata';
 $stmtCommand = stmt($sql);
@@ -18,7 +19,7 @@ $stmtArgs = stmt($sql);
 $sql = 'INSERT INTO command_metadata (commandIdentifier, icon) values (:command, :icon) ON DUPLICATE KEY UPDATE icon = :iconUpdate';
 $stmtMetadata = stmt($sql);
 
-echo 'Number of commands: ' . sizeof($catalog->catalog) . '<br />';
+$output .= 'Number of commands: ' . sizeof($catalog->catalog) . '<br />';
 
 $count = 0;
 
@@ -26,19 +27,16 @@ foreach ($catalog->catalog as $command) {
 	if (isset($command->icon)) {
 		$stmtMetadata->bindValue(':icon', $command->icon);
 		$stmtMetadata->bindValue(':iconUpdate', $command->icon);
-		echo 'Setting icon for ' . $command->identifier . ' to ' . $command->icon . '<br />';
 
 		if (!file_exists('resources/images/serviceIcons/' . $command->icon)) {
 			$icon = file_get_contents($commandsCatalogDir . 'icons/' . $command->icon);
 			file_put_contents('resources/images/serviceIcons/' . $command->icon, $icon);
 		}
 	} else {
-		echo 'Default icon for ' . $command->identifier . '<br />';
 		$stmtMetadata->bindValue(':icon', '00defaultIcon.png');
 		$stmtMetadata->bindValue(':iconUpdate', '00defaultIcon.png');
 	}
 
-	var_dump($stmtMetadata->debugDumpParams());
 	$stmtMetadata->bindValue(':command', 'uc_' . $command->identifier);
 	$stmtMetadata->execute();
 	
@@ -62,7 +60,16 @@ foreach ($catalog->catalog as $command) {
 		$stmtArgs->execute();
 	}
 }
+
+$tpl->assign('message', $output);
+$tpl->assign('messageTitle', 'Update complete');
+$tpl->assign('messageClass', 'box');;
+$tpl->display('message.tpl');
 ?>
 <a href = "listCommandDefinitions.php">Command Definitions</a><br /><br />
 <a href = "index.php">Return to index</a>
+<?php
 
+require_once 'includes/widgets/footer.php';
+
+?>

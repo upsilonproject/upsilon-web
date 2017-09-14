@@ -14,8 +14,8 @@ class FormInstallationQuestions extends Form {
 
                 $this->addSection('Database');
 
-		        if ($this->isOpenShift()) {
-    	                $this->addElement(new ElementHtml('dialog', 'OpenShift', '<p class = "formSection">You are running on OpenShift. The installer has completed the database section of the installer with defaults. You still need to enter the database password.</p>'));
+		        if ($this->isDatabaseEnvVarsSpecified()) {
+    	                $this->addElement(new ElementHtml('dialog', 'Database credentials provided', '<p class = "formSection">Your database credentials have been provided by environment variables, so the installer has completed the database section of the installer. You still need to setup your initial administrator.</p>'));
 				}
 
                 $this->addElement(new ElementInput('dbHost', 'Database host or unix socket', 'localhost'));
@@ -25,7 +25,7 @@ class FormInstallationQuestions extends Form {
                 $this->addElement(new ElementPassword('dbPass', 'Database user password'));
                 $this->getElement('dbPass')->setOptional(true);
         
-		$this->autofillOpenShiftValues();
+				$this->autofillEnvVarValues();
 
                 $this->addSection('Administrator');
                 $this->addElement(new ElementAlphaNumeric('adminUsername', 'First Admin Username', 'administrator'));
@@ -38,27 +38,37 @@ class FormInstallationQuestions extends Form {
         }
 
         public function getDsn() {
-                $hostOrSocket = $this->getElementValue('dbHost');
+				try {
+					$dsn = $this->getElementValue('dsn');
+				} catch (Exception $e) {
+					$hostOrSocket = $this->getElementValue('dbHost');
 
-                if (stripos($hostOrSocket, '/') !== FALSE) {
-                        $dsn = 'mysql:unix_socket=' . $hostOrSocket . ';dbname=' . $this->getElementValue('dbName');
-                } else {
-                        $dsn = 'mysql:host=' . $hostOrSocket . ';dbname=' . $this->getElementValue('dbName');
-                }
+					if (stripos($hostOrSocket, '/') !== FALSE) {
+							$dsn = 'mysql:unix_socket=' . $hostOrSocket . ';dbname=' . $this->getElementValue('dbName');
+					} else {
+							$dsn = 'mysql:host=' . $hostOrSocket . ';dbname=' . $this->getElementValue('dbName');
+					}
+				}
+
 
                 return $dsn;
         }
 
-        public function isOpenShift() {
-                $openshiftDbHost = getenv('OPENSHIFT_MYSQL_DB_HOST');
-                return !empty($openshiftDbHost);
+        public function isDatabaseEnvVarsSpecified() {
+                $dsn = getenv('CFG_DB_DSN');
+                return !empty($dsn);
         }
 
-        public function autofillOpenShiftValues() {
-                if ($this->isOpenShift()) {
-                        $this->getElement('dbHost')->setValue(getenv('OPENSHIFT_MYSQL_DB_SOCKET'));
-                        $this->getElement('dbUser')->setValue(getenv('OPENSHIFT_MYSQL_DB_USERNAME'));
-                        $this->getElement('dbName')->setValue(getenv('OPENSHIFT_APP_NAME'));
+        public function autofillEnvVarValues() {
+                if ($this->isDatabaseEnvVarsSpecified()) {
+						$this->addElementReadOnly('DSN', getenv('CFG_DB_DSN'), 'dsn');
+                        $this->getElement('dbHost')->setValue('ignored');
+						$this->getElement('dbHost')->setDescription('The DSN will be used.');
+                        $this->getElement('dbName')->setValue('ignored');
+						$this->getElement('dbName')->setDescription('The DSN will be used.');
+
+                        $this->getElement('dbUser')->setValue(getenv('CFG_DB_USER'));
+                        $this->getElement('dbPass')->setValue(getenv('CFG_DB_PASS'));
                 }
         }
 

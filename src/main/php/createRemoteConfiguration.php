@@ -21,7 +21,7 @@ class FormCreateRemoteConfig extends Form {
 			$this->getElement('name')->setValue('Config for ' . $node);
 		}
 
-		$this->addDefaultButtons();
+		$this->addDefaultButtons('Create configuration');
 	}
 
 	public function process() {

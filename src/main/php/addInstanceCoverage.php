@@ -11,6 +11,8 @@ use \libAllure\ElementSelect;
 use \libAllure\FormHandler;
 use \libAllure\ElementButton;
 
+savePageInHistory();
+
 class FormUpdateInstanceCoverage extends Form {
 	public function __construct() {
 		parent::__construct('update', 'Update instance coverage');

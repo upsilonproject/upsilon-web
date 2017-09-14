@@ -8,6 +8,7 @@ use \libAllure\HtmlLinksCollection;
 
 global $tpl, $title;
 
+
 if (Session::isLoggedIn()) {
 	$dtBegin = Session::getUser()->getData('daytimeBegin');
 	$dtEnd = Session::getUser()->getData('daytimeEnd');
@@ -21,6 +22,8 @@ if (Session::isLoggedIn()) {
 } else {
 	$tpl->assign('isNighttime', false);
 }
+
+savePageInHistory();
 
 $tpl->assign('siteTitle', getSiteSetting('siteTitle', 'Upsilon'));
 
@@ -160,6 +163,7 @@ if (Session::isLoggedIn()) {
 
 
 $tpl->assign('generalLinks', $generalLinks);
+$tpl->assign('lang', getUiLanguage());
 
 $tpl->display('header.tpl');
 

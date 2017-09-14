@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html>
+<html lang = "{$lang}">
 <head>
 	<title>{$pageTitle} &laquo; {$siteTitle}</title>
 
@@ -17,18 +17,17 @@
 	<link rel = "shortcut icon" href = "resources/images/icons/logo96pxdarkbg.png" title = "Shortcut icon" type = "image/png" />
 
 	<meta name="viewport" content="width=device-width" />
+	<meta name="theme-color" content="#000000" />
 
 	<script src="resources/dojo/dojo/dojo.js"></script>
 	<script src="resources/javascript/hud.js"></script>
-
-
-	</head>
+</head>
 
 <body class = "claro">
 <div id = "header">
 	{if $sessionOptions->drawHeader}
 	<div class = "title">
-		<img src = "resources/images/icons/logo96pxdarkbg.png" width = "16" style = "margin-right: 1em; margin-bottom: 4px; display: inline-block; vertical-align: middle;" />
+		<img alt = "upsilon logo" src = "resources/images/icons/logo96pxdarkbg.png" width = "16" style = "margin-right: 1em; margin-bottom: 4px; display: inline-block; vertical-align: middle;" />
 		<h1 style = "display: inline-block">
 			<a href = "index.php">{$siteTitle}</a>
 			&raquo;

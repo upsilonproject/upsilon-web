@@ -18,6 +18,10 @@ function setNav() {
 	}
 }
 
+function getUiLanguage() {
+	return 'en';
+}
+
 function addNavBreadcrumb($link, $title = null) {
 	global $nav;
 	
@@ -499,7 +503,7 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 	}
 
 	$qb = new \libAllure\QueryBuilder();
-	$qb->from('services')->fields('id', 'identifier', 'identifier alias', 'commandLine executable', 'estimatedNextCheck', 'lastChanged', 'output', 'description', 'lastUpdated', 'karma', 'secondsRemaining', 'node');
+	$qb->from('services')->fields('id', 'identifier', array('ifnull(s.alias, s.identifier)', 'alias'), 'commandLine executable', 'estimatedNextCheck', 'lastChanged', 'output', 'lastUpdated', 'karma', 'node');
 
 	if ($filters->isUsed('problems')) {
 		$qb->whereNotEquals('karma', 'good');
@@ -550,12 +554,12 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 
 function getServices($groupId = null) {
 	if ($groupId == null) {
-		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.description, s.commandLine, s.output, s.karma, s.secondsRemaining, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id ORDER BY s.identifier';
+		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.alias, s.commandLine, s.output, s.karma, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id ORDER BY s.identifier';
 		$stmt = DatabaseFactory::getInstance()->prepare($sqlSubservices);
 		$stmt->execute();
 
 	} else {
-		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.description, s.commandLine, s.output, s.karma, s.secondsRemaining, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id WHERE g.id = :groupId ORDER BY s.identifier';
+		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.alias, s.commandLine, s.output, s.karma, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id WHERE g.id = :groupId ORDER BY s.identifier';
 		$stmt = DatabaseFactory::getInstance()->prepare($sqlSubservices);
 		$stmt->bindValue(':groupId', $groupId);
 		$stmt->execute();
@@ -635,6 +639,27 @@ function enrichGroupListingsWithServiceMemberships($listGroups, $subGroupDepth =
 	return $listGroups;
 }
 
+function getClassInstances() {
+	$filters = classInstanceFilter();
+
+	$qb = new \libAllure\QueryBuilder();
+	$qb->from('class_instances')->fields('id', 'title identifier');
+
+	if ($filters->isUsed('identifier')) {
+		$qb->whereLikeValue('title', $filters->getValue('identifier'));
+	}
+
+	$qb->orderBy('title');
+
+	$stmt = stmt($qb->build());
+	$stmt->execute();
+
+
+	$ret = $stmt->fetchAll();
+
+	return $ret;
+}
+
 function getClassInstancesInGroup($gid) {
 	$sql = 'SELECT ci.id, ci.title FROM class_instance_group_memberships gm LEFT JOIN class_instances ci ON gm.class_instance = ci.id WHERE gm.gid = :gid';
 	$stmt = stmt($sql);
@@ -702,7 +727,7 @@ function getGroup($id) {
 	return $itemGroup[0];
 }
 
-function handleApiLogin() {
+function handleApiLogin($redirect = true) {
 	if (isset($_REQUEST['login'])) {
 		$sql = 'SELECT u.id, u.username, a.* FROM apiClients a LEFT JOIN users u ON a.user = u.id WHERE a.identifier = :identifier LIMIT 1';
 		$stmt = DatabaseFactory::getInstance()->prepare($sql);
@@ -725,8 +750,9 @@ function handleApiLogin() {
 			$_SESSION['apiClient'] = $apiClient['identifier'];
 			$_SESSION['apiClientRedirect'] = $apiClient['redirect'];
 
-
-			redirectApiClients();
+			if ($redirect) {
+				redirectApiClients();
+			}
 		}
 	}  
 }
@@ -763,7 +789,7 @@ function getServiceByIdentifier($identifier) {
 }
 
 function getServiceById($id, $parseOutput = false) {
-		$sql = 'SELECT s.id, s.description, s.identifier, s.executable, s.commandLine, s.karma, s.node, s.output, s.lastChanged, s.lastUpdated, s.estimatedNextCheck, s.consecutiveCount, s.commandIdentifier FROM services s WHERE s.id = :serviceId';
+		$sql = 'SELECT s.id, s.alias, s.identifier, s.executable, s.commandLine, s.karma, s.node, s.output, s.lastChanged, s.lastUpdated, s.estimatedNextCheck, s.consecutiveCount, s.commandIdentifier FROM services s WHERE s.id = :serviceId';
 		$stmt = DatabaseFactory::getInstance()->prepare($sql);
 		$stmt->bindValue(':serviceId', $id);
 		$stmt->execute();
@@ -1065,6 +1091,8 @@ function getRooms() {
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->bindValue(':id', Sanitizer::getInstance()->filterUint('id'));
 	$stmt->execute();
+
+	return $stmt->fetchAll();
 }
 
 function getMaintPeriodById($id) {
@@ -1099,7 +1127,7 @@ function setMaintPeriodContent($id, $content, $title) {
 }
 
 function getServicesUngrouped() {
-	$sql = 'SELECT s.estimatedNextCheck, s.secondsRemaining, s.description, s.id FROM services s WHERE s.description NOT IN (SELECT s2.description FROM service_group_memberships m INNER JOIN services s2 ON m.service = s2.identifier)';
+	$sql = 'SELECT s.estimatedNextCheck, s.alias, s.id FROM services s WHERE s.id NOT IN (SELECT s2.id FROM service_group_memberships m INNER JOIN services s2 ON m.service = s2.identifier)';
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->execute();
 
@@ -1585,6 +1613,10 @@ function getServiceArgumentValues($serviceId) {
 	return $args;
 }
 
+function getServiceResultsMostRecent($serviceIdentifier, $nodeIdentifier) {
+	return getServiceResults($serviceIdentifier, $nodeIdentifier, 1, 1);
+}
+
 function getServiceResults($serviceIdentifier, $nodeIdentifier, $interval = 7, $resolution = null) {
 	$interval = intval($interval);
 
@@ -1617,12 +1649,6 @@ function getServiceResults($serviceIdentifier, $nodeIdentifier, $interval = 7, $
 	foreach ($listResults as $result) {
 		invalidateOldServices($result);
 	}
-
-	$listResultsDebug = array(
-		array('checked' => '2016-05-26T14:35:02+00:00', 'value' => 1, 'output' => '', 'karma' => 'GOOD'),
-		array('checked' => '2017-05-26T14:35:02+00:00', 'value' => 2, 'output' => '', 'karma' => 'GOOD'),
-		array('checked' => '2018-05-26T14:35:02+00:00', 'value' => 3, 'output' => '', 'karma' => 'GOOD'),
-	);
 
 	return $listResults;
 }
@@ -1807,6 +1833,67 @@ function getServiceMetadata($identifier) {
 	return $metadata;
 }
 
+function classInstanceFilter() {
+	$filters = new \libAllure\FilterTracker();
+	$filters->addString('identifier', 'Identifier');
+	$filters->addSelect('class', array(), 'Class');
 
+	return $filters;
+}
+
+function savePageInHistory() {
+	if (!isset($_SESSION['history'])) {
+		$_SESSION['history'] = array();
+	}
+
+	$_SESSION['history'] = array_slice($_SESSION['history'], -10);
+	$_SESSION['history'][] = $_SERVER['REQUEST_URI'];
+}
+
+function redirectToLast() {
+	$search = func_get_args();
+
+	foreach (array_reverse($_SESSION['history']) as $page) {
+		foreach ($search as $term) {
+			if (stripos($page, $term) !== FALSE) {
+				redirect($page);
+			}
+		}
+	}
+
+	redirect('index.php');
+}
+
+function getRemoteConfigService($id) {
+	$sql = 'SELECT s.id, s.name FROM remote_config_services s WHERE s.id = :id';
+	$stmt = stmt($sql);
+	$stmt->bindValue(':id', $id);
+	$stmt->execute();
+
+	return $stmt->fetchRow();
+}
+
+function touchConfigService($service, $config, $reason) {
+	$service = getRemoteConfigService($service);
+	$nodes = getConfigNodes($config);
+
+	$sql = 'INSERT IGNORE INTO services (identifier, node, output, karma, lastUpdated) VALUES (:identifier, :node, :output, "SKIPPED", utc_timestamp()) ';	
+	$stmtServices = stmt($sql);
+
+	$sql = 'INSERT INTO service_check_results (service, node, checked, karma, output) VALUES (:service, :node, utc_timestamp(), "SKIPPED", :reason) ';
+	$stmtServiceResult = stmt($sql);
+
+	foreach ($nodes as $node) {
+		$stmtServices->bindValue(':identifier', $service['name']);
+		$stmtServices->bindValue(':node', $node['identifier']);
+		$stmtServices->bindValue(':output', $reason);
+		$stmtServices->execute();
+
+		$stmtServiceResult->bindValue(':service', $service['name']);
+		$stmtServiceResult->bindValue(':node', $node['identifier']);
+		$stmtServiceResult->bindValue(':reason', $reason);
+		$stmtServiceResult->execute();
+	}
+}
 
 ?>

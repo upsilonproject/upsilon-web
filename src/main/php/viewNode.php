@@ -124,7 +124,7 @@ $filters->addString("name");
 $filters->setHiddenValue('identifier', $node['identifier']);
 
 $tpl->assign('filters', $filters->getAll());
-$tpl->assign('listServices', getServicesForNode($node['identifier']), $filters);
+$tpl->assign('listServices', getServicesForNode($node['identifier']));
 $tpl->display('listServices.tpl');
 
 require_once 'includes/widgets/footer.php';

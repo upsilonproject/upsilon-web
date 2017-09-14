@@ -17,6 +17,7 @@ rm -rf target/dojo-upsilon/dijit/themes/nihilo
 rm -rf target/dojo-upsilon/dijit/themes/soria
 rm -rf target/dojo-upsilon/dijit/themes/tundra
 rm -rf target/dojo-upsilon/dojox/mobile
+rm -rf target/dojo-upsilon/dojox/editor/
 
 #find target/dojo-upsilon/dijit/form/nls -maxdepth 1 -type d ! -name uk ! -name '.' | xargs rm -rf {} \;
 #find target/dojo-upsilon/dijit/_editor/nls -maxdepth 1 -type d ! -name uk ! -name '.' | xargs rm -rf {} \;

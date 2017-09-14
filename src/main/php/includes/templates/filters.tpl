@@ -40,9 +40,9 @@
 	{/foreach}
 	</script>
 
+		<a href = "#" role = "button" onclick = "filteringSelectClear()">Reset</a>
 	{if isset($filterCallback)}
 			<a href = "#" role = "button" onclick = "{$filterCallback}()">Update filter</a>
-			<a href = "#" role = "button" onclick = "filteringSelectClear()">X</a>
 		</div>
 	{else}
 			<button type = "submit">Update filter</button>

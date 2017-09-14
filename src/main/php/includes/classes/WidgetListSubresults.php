@@ -23,6 +23,10 @@ class WidgetListSubresults extends Widget {
 		parseOutputJson($this->service);
 	}
 
+	public function getHeaderLink() {
+		return 'viewService.php?id=' . $this->service['id'];
+	}
+
 	public function render() {
 		global $tpl;
 
