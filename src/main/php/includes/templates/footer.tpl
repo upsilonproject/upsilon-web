@@ -14,7 +14,7 @@
 	{/if}
 	</p>
 	<p>
-		<a href = "http://upsilon-project.co.uk">Upsilon Project</a> &bull;
+		<a href = "http://www.upsilonproject.io">Upsilon Project</a> &bull;
 		<a href = "https://github.com/upsilonproject/upsilon/issues?">Raise Issue (bug, suggestion or feature request)</a> &bull;
 		 <a href = "mailto:upsilonproject@googlegroups.com">Email the developers</a>
 	</p>
