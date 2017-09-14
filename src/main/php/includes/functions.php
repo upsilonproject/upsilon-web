@@ -1091,6 +1091,8 @@ function getRooms() {
 	$stmt = DatabaseFactory::getInstance()->prepare($sql);
 	$stmt->bindValue(':id', Sanitizer::getInstance()->filterUint('id'));
 	$stmt->execute();
+
+	return $stmt->fetchAll();
 }
 
 function getMaintPeriodById($id) {
