@@ -121,6 +121,10 @@ function connectDatabase() {
                 throw new Exception('Could not connect to database. Check the username, password, host, port and database name.<br />' . $e->getMessage(), null, $e);
         }
 
+		$sql = 'SET sql_mode = "NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION" ';
+		$stmt = $db->prepare($sql);
+		$stmt->execute();
+
         try {
                 $maint = getSiteSetting('maintenanceMode', 'NONE');
         } catch (Exception $e) {
