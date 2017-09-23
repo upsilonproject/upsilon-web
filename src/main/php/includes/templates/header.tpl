@@ -14,7 +14,7 @@
 
 	<link rel = "{if $isNighttime}stylesheet{/if}" type = "text/css" href = "resources/stylesheets/main-nighttime.css" title = "nighttime" />
 
-	<link rel = "shortcut icon" href = "resources/images/icons/logo96pxdarkbg.png" title = "Shortcut icon" type = "image/png" />
+	<link rel = "shortcut icon" href = "resources/images/icons/logo96pxdarkbg.webp" title = "Shortcut icon" type = "image/webp" />
 
 	<meta name="viewport" content="width=device-width" />
 	<meta name="theme-color" content="#000000" />
@@ -27,7 +27,7 @@
 <div id = "header">
 	{if $sessionOptions->drawHeader}
 	<div class = "title">
-		<img alt = "upsilon logo" src = "resources/images/icons/logo96pxdarkbg.png" width = "16" style = "margin-right: 1em; margin-bottom: 4px; display: inline-block; vertical-align: middle;" />
+		<img alt = "upsilon logo" src = "resources/images/icons/logo96pxdarkbg.webp" width = "16" style = "margin-right: 1em; margin-bottom: 4px; display: inline-block; vertical-align: middle;" />
 		<h1 style = "display: inline-block">
 			<a href = "index.php">{$siteTitle}</a>
 			&raquo;
