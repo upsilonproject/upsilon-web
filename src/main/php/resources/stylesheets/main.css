@@ -24,12 +24,13 @@ div.serviceDetail, div.box, div.block {
 	padding: 1em;
 }
 
+div.block:first-child {
+	margin-top: 0;
+}
+
 div.block {
 	padding: 1em;
-	width: 10em;
 	vertical-align: top;
-	margin: auto;
-	margin-top: 1em;
 	text-align: left;
 	min-width: 360px;
 }
@@ -180,7 +181,7 @@ a:hover {
 }
 
 a:focus {
-	background-color: purple;
+	background-color: maroon;
 	color: white;
 }
 
