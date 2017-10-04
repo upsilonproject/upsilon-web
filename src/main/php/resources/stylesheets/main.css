@@ -5,6 +5,7 @@ body {
 	text-align: center;
 	cursor: default;
 	margin: 0;
+	background-color: #dee3e7;
 }
 
 input, button, select, option {
@@ -15,11 +16,29 @@ input:focus {
 	border: 2px inset purple;
 }
 
+
+.claro .dijitMenuBar {
+	background-color: #444;
+	background-image: none !important;
+	border: 0;
+}
+
+.claro .dijitMenuBar > .dijitMenuItem:not(.dijitMenuItemSelected) {
+	color: white;
+}
+
+
+.dijitMenuItem.dijitMenuItem,
+.dijitMenuBar .dijitHover.dijitMenuItemSelected 
+{
+	color: black;
+}
+
 div.serviceDetail, div.box, div.block {
 	display: block;
 	text-align: left;
-	background-color: #dee3e7;
-	border: 1px solid #999;
+	background-color: #fff;
+	border: 1px solid #bbb;
 	margin: 1em;
 	padding: 1em;
 }
@@ -272,17 +291,27 @@ form {
 	border: 2px solid white;
 }
 
+.labelHolder {
+	display: inline-block;
+	min-width: 120px;
+	vertical-align: top;
+}
+
+.elementHolder {
+	display: inline-block;
+	width: 50%;
+}
+
 label {
 	display: inline-block;
 	width: 120px;
 	text-align: right;
 	margin-right: 1em;
 	vertical-align: top;
-	margin-top: .3em;
 }
 
 fieldset {
-	padding: 1em;
+	padding: .5em;
 	margin: 0;
 }
 
@@ -401,9 +430,11 @@ table.taskList tr {
 }
 
 div.navigationMenuItems {
+	vertical-align: middle;
+	display: table-cell;
+	background-color: #444;
 	color: black;
 	text-align: left;
-	margin-bottom: 1em;
 	display: none;
 }
 
