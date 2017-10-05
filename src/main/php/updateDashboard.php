@@ -10,13 +10,15 @@ use \libAllure\ElementCheckbox;
 
 class FormUpdateDashboard extends Form {
 	public function __construct($id) {
+		parent::__construct('updateDashboard', 'Update Dashboard');
+
 		$this->dashboard = new Dashboard($id);
 
 		$this->addElementHidden('id', $id);
 		$this->addElement(new ElementInput('title', 'Title', $this->dashboard->getTitle()));
 		$this->addelement(new ElementCheckbox('serviceGrouping', 'Service Grouping', $this->dashboard->isServicesGrouped()));
 
-		$this->addDefaultButtons();
+		$this->addDefaultButtons('Save');
 	}
 
 	public function process() {

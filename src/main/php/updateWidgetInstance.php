@@ -18,6 +18,7 @@ class FormUpdateWidgetInstance extends Form {
 
 		$this->getWidgetInstance($id);
 		$this->addElementReadOnly('Widget Class', get_class($this->widgetInstance));
+		$this->addElementReadOnly('Dashboard ID', $this->rowWidgetInstance['dashboard']);
 		$this->addElement(new ElementHidden('id', 'ID', $id));
 
 		$this->addElementsWidgetOptions($this->widgetInstance);
@@ -69,12 +70,13 @@ class FormUpdateWidgetInstance extends Form {
 			$stmt->bindValue(':value2', $val);
 			$stmt->execute();
 		}
+
+		redirect('viewDashboard.php?id=' . $this->rowWidgetInstance['dashboard'], 'Redirecting');
 	}
 }
 
 
 $fh = new FormHandler('FormUpdateWidgetInstance');
-$fh->setRedirect("index.php");
 $fh->handle();
 
 ?>

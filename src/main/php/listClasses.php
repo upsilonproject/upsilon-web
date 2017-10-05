@@ -43,6 +43,7 @@ $tpl->assign('listRequirements', getClassRequirements($id));
 $tpl->assign('listParents', getClassParents($itemClass));
 
 $tpl->display('listClasses.tpl');
+
 require_once 'includes/widgets/footer.php';
 
 ?>

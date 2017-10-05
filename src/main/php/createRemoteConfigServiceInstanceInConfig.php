@@ -9,7 +9,12 @@ use \libAllure\ElementSelect;
 
 class FormCreateRemoteConfigServiceInstanceInConfig extends \libAllure\Form {
 	public function __construct() {
-		$this->addElementReadOnly('Service ID', san()->filterUint('serviceInstanceId'), 'serviceInstanceId');
+		parent::__construct('createServiceInConfig', 'Allocate Service to Config');
+
+		$service = getRemoteConfigService(san()->filterUint('serviceInstanceId'));
+
+		$this->addElementHidden('serviceInstanceId', $service['id']);
+		$this->addElementReadOnly('Service', $service['name']);
 		$this->addElementNodeConfig();
 		$this->addDefaultButtons('Allocate Service');
 	}

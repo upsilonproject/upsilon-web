@@ -16,7 +16,7 @@ $tpl->display('index.tpl');
 foreach (getGroups() as $itemGroup) {
 	$tpl->assign('itemGroup', $itemGroup);
 	$tpl->assign('hidden', false);
-	$tpl->display('group.tpl');
+	//$tpl->display('group.tpl');
 }
 
 $tpl->display('hudJavascript.tpl');

@@ -425,13 +425,23 @@ function setupSortableTables() {
 }
 
 function serviceIconChanged() {
-	var icon = $('select[name$="-icon"]').val();
+	require([
+		"dojo/query",
+		"dojo/dom-construct"
+	], function(query, cons) {
+		generate = cons.toDom;
 
-	if (icon != '') {
-		icon = 'resources/images/serviceIcons/' + icon;
-		
-		$('span#serviceIconPreview').html('<img src = "' + icon + '" alt = "serviceIcon" />');
-	}
+		var icon = query('select[name$="-icon"]')[0].value;
+
+		console.log(icon);
+
+		if (icon != '') {
+			icon = 'resources/images/serviceIcons/' + icon;
+			
+			query('span#serviceIconPreview')[0].innerHTML = ('<img src = "' + icon + '" alt = "serviceIcon" />');
+		}
+
+	});
 }
 
 function menuButtonClick(address) {
@@ -528,14 +538,18 @@ function renderClassInstances(data, owner) {
 				domRequirement = construct.toDom('<p>&nbsp;</p>');
 				indicator = construct.place('<span class = "metricIndicator">&nbsp;</span>', domRequirement);
 
-				construct.place(' <span><a href = "addInstanceCoverage.php?requirementId=' + requirement['requirementId'] + '&instanceId=' + requirement['instanceId'] + '">' + requirement['requirementTitle'] + '</a></span> - ', domRequirement);
+				txt = construct.place('<div class = "metricText"></div>', domRequirement);
+
+				txt.append(generate(' <span><a href = "addInstanceCoverage.php?requirementId=' + requirement['requirementId'] + '&instanceId=' + requirement['instanceId'] + '">' + requirement['requirementTitle'] + '</a></span> - '));
 
 				if (requirement['serviceIdentifier'] != null) {
 					query(indicator).addClass(requirement['karma'].toLowerCase());
-					construct.place('<span><a href = "viewService.php?id=' + requirement['service'] + '">' + requirement['serviceIdentifier'] + '</a></span>', domRequirement);
+					txt.append(generate('<span><a href = "viewService.php?id=' + requirement['service'] + '">' + requirement['serviceIdentifier'] + '</a></span>'));
 				} else {
-					construct.place('<span class = "bad">Not covered</span>', domRequirement)
+					txt.append(generate('<span class = "bad">Not covered</span>'))
 				}
+
+				txt.append(generate('<div class = "subtle">' + requirement['output'] + '</div>'));
 
 				dom.append(domRequirement)
 			});
@@ -591,6 +605,7 @@ function renderServiceList(data, owner) {
 			text = query(generate('<div class = "metricText" />'));
 			text.append('<span class = "metricDetail">' + service.estimatedNextCheckRelative + '</span>');
 			text.append('<a href = "viewService.php?id=' + service.id + '"><span class = "metricTitle">' + service.alias + '</span></a>');
+			text.append('<div class = "subtle">' + service.output + '</div>');
 			metric.append(text);
 
 			query(list).append(metric);

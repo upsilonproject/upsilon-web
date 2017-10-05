@@ -52,7 +52,7 @@ class UserSettings extends Form {
 		$this->simpleSettings[] = array('configSourceIdentifier', 'Config Source Identifier', 'upsilon-web');
 		$this->addSimpleSettings();
 
-                $this->addDefaultButtons();
+                $this->addDefaultButtons('Save');
         }
 
 	private function addSimpleSettings() {

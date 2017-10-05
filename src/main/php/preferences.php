@@ -43,7 +43,7 @@ class UserPreferences extends Form {
 			$this->addElementReadOnly('Password', 'Password modification is not supported by backend (' . get_class(AuthBackend::getInstance()) . ')');	
 		}
 
-		$this->addDefaultButtons();
+		$this->addDefaultButtons('Save');
 	}
 
 	private function supportsPasswords() {

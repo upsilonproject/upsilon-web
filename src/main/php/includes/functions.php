@@ -1306,6 +1306,7 @@ SELECT DISTINCT
 	a.service,
 	s.identifier,
 	s.karma,
+	LEFT(s.output, 50) AS output,
 	s.identifier AS serviceIdentifier,
 	s.lastUpdated AS serviceLastUpdated,
 	m.icon
@@ -1437,6 +1438,14 @@ SQL;
 	return $stmt->fetchall();
 }
 
+function getClasses() {
+	$sql = 'SELECT c.* FROM classes c';
+	$stmt = stmt($sql);
+	$stmt->execute();
+
+	return $stmt->fetchAll();
+}
+
 function getClass($id) {
 	$sql = 'SELECT c.* FROM classes c WHERE c.id = :id';
 	$stmt = stmt($sql);
@@ -1446,6 +1455,16 @@ function getClass($id) {
 	$class = $stmt->fetchRowNotNull();
 
 	return $class;
+}
+
+function getClassInstancesUsingService($serviceId) {
+	$sql = 'SELECT i.instance AS id FROM class_service_assignments i WHERE i.service = :id ';
+
+	$stmt = DatabaseFactory::getInstance()->prepare($sql);
+	$stmt->bindValue(':id', $serviceId);
+	$stmt->execute();
+
+	return $stmt->fetchAll();
 }
 
 function getClassRequirements($id) {
@@ -1898,6 +1917,15 @@ function touchConfigService($service, $config, $reason) {
 		$stmtServiceResult->bindValue(':reason', $reason);
 		$stmtServiceResult->execute();
 	}
+}
+
+function getClassCandidate($id) {
+	$sql = 'SELECT id, externalAlias FROM class_candidates WHERE id = :id';
+	$stmt = DatabaseFactory::getInstance()->prepare($sql);
+	$stmt->bindValue(':id', $id);
+	$stmt->execute();
+
+	return $stmt->fetchRowNotNull();
 }
 
 ?>
