@@ -63,9 +63,9 @@ class FormInstallationQuestions extends Form {
                 if ($this->isDatabaseEnvVarsSpecified()) {
 						$this->addElementReadOnly('DSN', getenv('CFG_DB_DSN'), 'dsn');
                         $this->getElement('dbHost')->setValue('ignored');
-						$this->getElement('dbHost')->setDescription('The DSN will be used.');
+						$this->getElement('dbHost')->description = 'The DSN will be used.';
                         $this->getElement('dbName')->setValue('ignored');
-						$this->getElement('dbName')->setDescription('The DSN will be used.');
+						$this->getElement('dbName')->description = 'The DSN will be used.';
 
                         $this->getElement('dbUser')->setValue(getenv('CFG_DB_USER'));
                         $this->getElement('dbPass')->setValue(getenv('CFG_DB_PASS'));
