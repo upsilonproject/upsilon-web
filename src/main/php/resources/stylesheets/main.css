@@ -158,8 +158,12 @@ ul.metricList > li:last-child {
 	background-color: gray;
 }
 
-.poor, .bad, .formValidationError {
-	color: red !important;
+.poor, .bad {
+	background-color: salmon !important;
+}
+
+.formValidationError {
+	color: red;
 }
 
 .timeout, .warning {
