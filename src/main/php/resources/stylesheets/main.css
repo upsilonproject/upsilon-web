@@ -159,7 +159,7 @@ ul.metricList > li:last-child {
 }
 
 .poor, .bad, .formValidationError {
-	background-color: salmon !important;
+	color: red !important;
 }
 
 .timeout, .warning {

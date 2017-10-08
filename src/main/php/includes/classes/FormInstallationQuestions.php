@@ -17,9 +17,10 @@ class FormInstallationQuestions extends Form {
 		        if ($this->isDatabaseEnvVarsSpecified()) {
 					$this->addElement(new ElementHtml('dialog', 'Database credentials provided', '<p>Your database credentials have been provided by environment variables, so the installer has completed the database section of the installer. You still need to setup your initial administrator.</p>'));
 
-					$this->addElementReadOnly('DSN', getenv('CFG_DB_DSN'), 'dsn');
+					$this->addElement(new ElementInput('dsn', 'DSN', getenv('CFG_DB_DSN')));
 					$this->addElementReadOnly('Database user', getenv('CFG_DB_USER'), 'dbUser');
 					$this->addElementReadOnly('Database pass', getenv('CFG_DB_PASS'), 'dbPass');
+                
 				} else {
 					$this->addElement(new ElementInput('dbHost', 'Database host or unix socket', 'localhost'));
                 	$this->getElement('dbHost')->setMinMaxLengths(0, 128);
@@ -34,7 +35,7 @@ class FormInstallationQuestions extends Form {
                 $this->addElement(new ElementPassword('adminPassword1', 'First Admin Password'));
                 $this->addElement(new ElementPassword('adminPassword2', 'First Admin Password (confirm)'));
 
-                $this->requireFields('dbName', 'dbUser', 'adminUsername', 'adminPassword1', 'adminPassword2');
+				$this->requireFields('adminUsername', 'adminPassword1', 'adminPassword2');
 
                 $this->addDefaultButtons('Start install');
         }
@@ -79,7 +80,15 @@ class FormInstallationQuestions extends Form {
                 try {
                         $this->validateDatabaseConnection();
                 } catch (Exception $e) {
-                        $this->getElement('dbName')->setValidationError('Could not connect to database: ' . $e->getMessage());
+						$el = null;
+						try {
+							$el = $this->getElement('dbName');
+						} catch (Exception $e2) {
+							$el = $this->getElement('dsn');
+						}
+
+                        $el->setValidationError('Could not connect to database: ' . $e->getMessage());
+
                         return;
                 }
 
