@@ -1,3 +1,4 @@
+{if $links->hasLinks()}
 {if not empty($sub)}
 <div data-dojo-type = "dijit/DropDownMenu">
 {else}
@@ -33,3 +34,4 @@
 		{/if}
 	{/foreach}
 </div>
+{/if}

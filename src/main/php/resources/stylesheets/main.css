@@ -13,9 +13,13 @@ input, button, select, option {
 }
 
 input:focus {
-	border: 2px inset purple;
+	border: 2px solid maroon;
+	outline: none;
 }
 
+input[type = "checkbox"]:focus {
+	outline: 2px solid maroon;
+}
 
 .claro .dijitMenuBar {
 	background-color: #444;
@@ -27,12 +31,26 @@ input:focus {
 	color: white;
 }
 
+.claro .dijitMenuTable {
+	border-color: #373737;
+}
 
 .dijitMenuItem.dijitMenuItem,
 .dijitMenuBar .dijitHover.dijitMenuItemSelected 
 {
 	color: black;
 }
+
+.claro .dijitMenuBar .dijitMenuItemHover,
+.claro .dijitMenuBar .dijitMenuItemSelected,
+.claro .dijitMenu .dijitMenuItemSelected td
+{
+	border-color: maroon;
+	background-color: maroon;
+	background-image: none !important;
+	color: white;
+}
+
 
 div.serviceDetail, div.box, div.block {
 	display: block;
@@ -502,7 +520,7 @@ input[type="text"], input[type="password"], input:not([type]) {
 	padding: .2em;
 }
 
-input[type="button"], button, a[role="button"] {
+input[type="button"], button, a[role="button"], .claro .dijitDropDownButton .dijitButtonNode {
 	border: 1px solid #666;
 	padding: .2em;
 	display: inline-block;
@@ -512,6 +530,8 @@ input[type="button"], button, a[role="button"] {
 	margin-right: .5em;
 	display: inline-block;
 	min-width: 2em;
+	font-size: 9pt;
+	line-height: 1.4em;
 }
 
 input[type="button"]:hover, button:hover, a[role="button"]:hover {
@@ -522,8 +542,8 @@ input[type="button"]:hover, button:hover, a[role="button"]:hover {
 	cursor: pointer;
 }
 
-input[type="button"]:focus, button:focus {
-	border: 1px solid purple;
+input[type="button"]:focus, a[role="button"]:focus, button:focus {
+	outline: 2px solid maroon;
 }
 
 fieldset button[style != "nonFormButton"] {
@@ -645,4 +665,22 @@ div.smartFilterDescription {
 	border-right: 1px solid white;
 	margin-left: 1em;
 	margin-right: 1em;
+}
+
+div#header a#a11yContentSkip {
+	width: 1px;
+	height: 1px;
+	position: absolute;
+	overflow: hidden;
+	top: -10px;
+}
+
+div#header a#a11yContentSkip:focus { 
+	padding: 1em;
+	width: auto;
+	height: auto;
+	overflow: auto;
+	top: auto;
+	background-color: cyan;
+	color: black;
 }

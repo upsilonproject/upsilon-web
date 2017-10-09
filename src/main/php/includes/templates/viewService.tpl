@@ -22,6 +22,9 @@
 		{if isset($metadata.goodCast)}
 		<p><strong>Good Cast:</strong> <span class = "metricIndicator {$metadata.goodCast|strtolower}">{$metadata.goodCast|default:'none'}</span></p>
 		{/if}
+
+		<p><strong>Last output:</strong></p>
+		<pre>{$itemService.output}</pre>
 	</div>
 
 	<div style = "float: right; vertical-align: top;">

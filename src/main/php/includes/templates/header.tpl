@@ -38,7 +38,10 @@
 	!-->
 	{if $sessionOptions->drawNavigation}
 	<div id = "header">
+		<a href = "#content" id = "a11yContentSkip">Skip to content</a>
+
 		<div class = "navigationMenuItems">
+
 		<table id = "headerStruct"><tr>
 			<td class = "media-width-prio-low" rowspan = "2" style = "width: 1%; padding-right: 0em; padding-left: 1em;">
 				<a href = "index.php">
