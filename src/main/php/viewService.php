@@ -21,6 +21,17 @@ require_once 'includes/widgets/header.php';
 
 $tpl->assign('listGroupMemberships', getMembershipsFromServiceIdentifier($service['identifier']));
 
+$classList = array();
+
+foreach (getClassInstancesUsingService($service['id']) as $class) {
+	$ci = getClassInstance($class['id']);
+	$ci['requirements'] = getInstanceRequirements($ci['id']);
+
+	$classList[] = $ci;
+}
+
+$tpl->assign('listClassInstances', $classList);
+
 $configSource = getConfigSourceFromServiceResultIdentifier($service['identifier'], $service['node']);
 
 $tpl->assign('metadata', getServiceMetadata($service['identifier']));
@@ -29,10 +40,6 @@ $tpl->assign('configSource', $configSource);
 if (isset($configSource['remote_config_command_id'])) {
 	$tpl->assign('commandLineClickable', getClickableCommandLine($configSource));
 }
-
-$listResults = getServiceResultsMostRecent($service['identifier'], $service['node']);
-
-$tpl->assign('listResults', $listResults);
 
 $tpl->assign('instanceChartIndex', 0);
 $tpl->assign('listServiceId', array($service['id']));

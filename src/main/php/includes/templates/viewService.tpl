@@ -48,6 +48,32 @@
 	</div>
 
 	<div style = "float: right; vertical-align: top; margin-right: 2em;">
+		<h3>Classes</h3>
+
+		{if empty($listClassInstances)}
+			<em>No classes.</em>
+		{else}
+			{foreach from = $listClassInstances item = itemClass}
+				<strong><a href = "viewClassInstance.php?id={$itemClass.id}">{$itemClass.title}</a></strong>
+				<table>
+					<tr>
+						<th>Requirement</th>
+						<th>Service</th>
+						<th>Karma</th>
+					</tr>
+					{foreach from = $itemClass.requirements item = requirement}
+					<tr>
+						<td>{$requirement.requirementTitle}</td>
+						<td><a href = "viewService.php?id={$requirement.service}">{$requirement.serviceIdentifier}</a></td>
+						<td class = "{$requirement.karma|strtolower}">{$requirement.karma}</td>
+					</tr>
+					{/foreach}
+				</table>
+			{/foreach}
+		{/if}
+	</div>
+
+	<div style = "float: right; vertical-align: top; margin-right: 2em;">
 		<h3>Group Memberships</h3>
 		<p>
 		{if $listGroupMemberships|@count eq 0}
@@ -79,42 +105,4 @@
 	<h2 id = "chartTitle">Chart</h2>
 
 	{include file = "widgetChartMetric.tpl"}
-
-	<p>
-
-	{if !empty($metadata.metrics)}
-		<strong>Metric:</strong>
-		{foreach from = $metadata.metrics item = metric}
-			<a href = "#chartContainer" onclick = "javascript:fetchServiceMetricResultChart('{$metric|trim}', {literal}{{/literal}node: '{$itemService.node}', serviceIds: ['{$itemService.id}']{literal}}{/literal}, 0)">{$metric|trim}</a>&nbsp;&nbsp;&nbsp;&nbsp;
-		{/foreach}
-	{/if}
-	</p>
-</div>
-
-<div class = "recentResults box">
-	<h2>Results ({$listResults|@count})</h2>
-
-{if $listResults|@count == 0}
-	<p>No results stored in the results table.</p>
-{else}
-	<table class = "hover dataTable" />
-		<thead>
-			<tr>
-				<th>Timestamp</th>
-				<th>Output</th>
-				<th>Karma</th>
-			</tr>
-		</thead>
-
-		<tbody>
-			{foreach from = $listResults item = itemResult}
-			<tr>
-				<td><span class = "date">{$itemResult.checked}</span></td>
-				<td><pre>{$itemResult.output|htmlspecialchars|wordwrap}</pre></td>
-				<td class = "{$itemResult.karma|strtolower}">{$itemResult.karma}</td>
-			</tr>
-			{/foreach}
-		</tbody>
-	</table>
-{/if}
 </div>

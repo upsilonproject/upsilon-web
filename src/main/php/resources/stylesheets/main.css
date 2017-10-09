@@ -5,6 +5,7 @@ body {
 	text-align: center;
 	cursor: default;
 	margin: 0;
+	background-color: #dee3e7;
 }
 
 input, button, select, option {
@@ -15,21 +16,40 @@ input:focus {
 	border: 2px inset purple;
 }
 
+
+.claro .dijitMenuBar {
+	background-color: #444;
+	background-image: none !important;
+	border: 0;
+}
+
+.claro .dijitMenuBar > .dijitMenuItem:not(.dijitMenuItemSelected) {
+	color: white;
+}
+
+
+.dijitMenuItem.dijitMenuItem,
+.dijitMenuBar .dijitHover.dijitMenuItemSelected 
+{
+	color: black;
+}
+
 div.serviceDetail, div.box, div.block {
 	display: block;
 	text-align: left;
-	background-color: #dee3e7;
-	border: 1px solid #999;
+	background-color: #fff;
+	border: 1px solid #bbb;
 	margin: 1em;
 	padding: 1em;
 }
 
+div.block:first-child {
+	margin-top: 0;
+}
+
 div.block {
 	padding: 1em;
-	width: 10em;
 	vertical-align: top;
-	margin: auto;
-	margin-top: 1em;
 	text-align: left;
 	min-width: 360px;
 }
@@ -138,8 +158,12 @@ ul.metricList > li:last-child {
 	background-color: gray;
 }
 
-.poor, .bad, .formValidationError {
+.poor, .bad {
 	background-color: salmon !important;
+}
+
+.formValidationError {
+	color: red;
 }
 
 .timeout, .warning {
@@ -180,7 +204,7 @@ a:hover {
 }
 
 a:focus {
-	background-color: purple;
+	background-color: maroon;
 	color: white;
 }
 
@@ -271,26 +295,29 @@ form {
 	border: 2px solid white;
 }
 
+.labelHolder {
+	display: inline-block;
+	min-width: 120px;
+	vertical-align: top;
+}
+
+.elementHolder {
+	display: inline-block;
+	width: 50%;
+}
+
 label {
 	display: inline-block;
 	width: 120px;
 	text-align: right;
 	margin-right: 1em;
 	vertical-align: top;
-	margin-top: .3em;
 }
 
 fieldset {
-	padding: 1em;
+	padding: .5em;
+	padding-left: 0;
 	margin: 0;
-}
-
-form fieldset:nth-of-type(even) {
-	background-color: #efefef;
-}
-
-form fieldset:nth-of-type(odd) {
-	background-color: white;
 }
 
 #footer {
@@ -384,10 +411,23 @@ div#header {
 	border-bottom: 1px solid #3f3f3f;
 	text-align: left;
 	background-color: #444;
-	height: 3em;
-	display: table;
-	width: 100%;
 	padding: 0;
+}
+
+div.header a {
+	color: white;
+}
+
+table#headerStruct, table#headerStruct td {
+	background-color: #444;
+}
+
+table#headerStruct td {
+	padding: 0;
+}
+
+div.headerBlock {
+	display: inline-block;
 }
 
 
@@ -400,9 +440,11 @@ table.taskList tr {
 }
 
 div.navigationMenuItems {
-	color: black;
+	vertical-align: middle;
+	display: table-cell;
+	background-color: #444;
+	color: white;
 	text-align: left;
-	margin-bottom: 1em;
 	display: none;
 }
 
@@ -597,4 +639,10 @@ div.smartFilterDescription {
 
 .formElementHtmlContainer {
 	margin-top: .3em;
+}
+
+.vseparator {
+	border-right: 1px solid white;
+	margin-left: 1em;
+	margin-right: 1em;
 }

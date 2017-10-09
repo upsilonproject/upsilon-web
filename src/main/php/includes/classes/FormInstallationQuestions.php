@@ -15,26 +15,29 @@ class FormInstallationQuestions extends Form {
                 $this->addSection('Database');
 
 		        if ($this->isDatabaseEnvVarsSpecified()) {
-    	                $this->addElement(new ElementHtml('dialog', 'Database credentials provided', '<p class = "formSection">Your database credentials have been provided by environment variables, so the installer has completed the database section of the installer. You still need to setup your initial administrator.</p>'));
+					$this->addElement(new ElementHtml('dialog', 'Database credentials provided', '<p>Your database credentials have been provided by environment variables, so the installer has completed the database section of the installer. You still need to setup your initial administrator.</p>'));
+
+					$this->addElement(new ElementInput('dsn', 'DSN', getenv('CFG_DB_DSN')));
+					$this->addElementReadOnly('Database user', getenv('CFG_DB_USER'), 'dbUser');
+					$this->addElementReadOnly('Database pass', getenv('CFG_DB_PASS'), 'dbPass');
+                
+				} else {
+					$this->addElement(new ElementInput('dbHost', 'Database host or unix socket', 'localhost'));
+                	$this->getElement('dbHost')->setMinMaxLengths(0, 128);
+	                $this->addElement(new ElementAlphaNumeric('dbName', 'Database name', 'upsilon'));
+    	            $this->addElement(new ElementAlphaNumeric('dbUser', 'Database username'));
+					$this->addElement(new ElementPassword('dbPass', 'Database user password'));
+					$this->getElement('dbPass')->setOptional(true);
 				}
 
-                $this->addElement(new ElementInput('dbHost', 'Database host or unix socket', 'localhost'));
-                $this->getElement('dbHost')->setMinMaxLengths(0, 128);
-                $this->addElement(new ElementAlphaNumeric('dbName', 'Database name', 'upsilon'));
-                $this->addElement(new ElementAlphaNumeric('dbUser', 'Database username'));
-                $this->addElement(new ElementPassword('dbPass', 'Database user password'));
-                $this->getElement('dbPass')->setOptional(true);
-        
-				$this->autofillEnvVarValues();
-
                 $this->addSection('Administrator');
-                $this->addElement(new ElementAlphaNumeric('adminUsername', 'First Admin Username', 'administrator'));
+                $this->addElement(new ElementAlphaNumeric('adminUsername', 'First Admin Username', 'admin'));
                 $this->addElement(new ElementPassword('adminPassword1', 'First Admin Password'));
                 $this->addElement(new ElementPassword('adminPassword2', 'First Admin Password (confirm)'));
 
-                $this->requireFields('dbName', 'dbUser', 'adminUsername', 'adminPassword1', 'adminPassword2');
+				$this->requireFields('adminUsername', 'adminPassword1', 'adminPassword2');
 
-                $this->addDefaultButtons();
+                $this->addDefaultButtons('Start install');
         }
 
         public function getDsn() {
@@ -59,19 +62,6 @@ class FormInstallationQuestions extends Form {
                 return !empty($dsn);
         }
 
-        public function autofillEnvVarValues() {
-                if ($this->isDatabaseEnvVarsSpecified()) {
-						$this->addElementReadOnly('DSN', getenv('CFG_DB_DSN'), 'dsn');
-                        $this->getElement('dbHost')->setValue('ignored');
-						$this->getElement('dbHost')->setDescription('The DSN will be used.');
-                        $this->getElement('dbName')->setValue('ignored');
-						$this->getElement('dbName')->setDescription('The DSN will be used.');
-
-                        $this->getElement('dbUser')->setValue(getenv('CFG_DB_USER'));
-                        $this->getElement('dbPass')->setValue(getenv('CFG_DB_PASS'));
-                }
-        }
-
         public function validateExtended() {
                 $this->validateDatabase();
                 $this->validateAdministrator();
@@ -90,7 +80,15 @@ class FormInstallationQuestions extends Form {
                 try {
                         $this->validateDatabaseConnection();
                 } catch (Exception $e) {
-                        $this->getElement('dbName')->setValidationError('Could not connect to database: ' . $e->getMessage());
+						$el = null;
+						try {
+							$el = $this->getElement('dbName');
+						} catch (Exception $e2) {
+							$el = $this->getElement('dsn');
+						}
+
+                        $el->setValidationError('Could not connect to database: ' . $e->getMessage());
+
                         return;
                 }
 

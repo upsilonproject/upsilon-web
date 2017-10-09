@@ -1,3 +1,5 @@
+	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/driveway.min.css" />
+
 {if $tutorialMode}
 <div class = "box tutorialMessage">
 	<p><strong>Dashboards</strong> are useful for grouping up lots of information in to one easy to view place. <strong>Widgets</strong> on dashboards are responsible for showing information.</p>
@@ -14,7 +16,7 @@
 			<div class = "block dw-panel">
 				{if $sessionOptions->drawNavigation}
 				<div style = "float: right" data-dojo-type = "dijit/form/DropDownButton">
-					<span>Widget</span>
+					<span>&#9881;</span>
 
 						{include file = "links.tpl" links = $widget.instance->getLinks() skipTitle = true sub = true}
 				</div>

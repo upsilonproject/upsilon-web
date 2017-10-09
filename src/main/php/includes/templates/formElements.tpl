@@ -19,7 +19,11 @@
 				{/if}
 
 				{if $element->getValidationError() ne ''}
-				<p class = "formValidationError">{$element->getValidationError()}</p>
+				<br />
+				<div class = "labelHolder" style = "margin-left: .8em">&nbsp;</div>
+				<div class = "elementHolder">
+					<p class = "formValidationError">{$element->getValidationError()}</p>
+				</div>
 				{/if}
 			</fieldset>
 		{/if}
