@@ -41,8 +41,10 @@ cp setup/upsilon-alias-apache.conf %{buildroot}/etc/httpd/conf.d/upsilon-web-ali
 mkdir -p %{buildroot}/etc/upsilon-web/
 
 %post 
+%if "%{?dist}" != "el7scl"
 service httpd restart
 rm -rf /var/lib/php/session/*
+%endif
 
 %files
 %doc /usr/share/doc/upsilon-web/README.md
