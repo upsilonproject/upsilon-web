@@ -41,9 +41,9 @@ class FormInstallationQuestions extends Form {
         }
 
         public function getDsn() {
-				try {
+		        if ($this->isDatabaseEnvVarsSpecified()) {
 					$dsn = $this->getElementValue('dsn');
-				} catch (Exception $e) {
+				} else { 
 					$hostOrSocket = $this->getElementValue('dbHost');
 
 					if (stripos($hostOrSocket, '/') !== FALSE) {
@@ -76,17 +76,23 @@ class FormInstallationQuestions extends Form {
                 }
         }
 
+		private function getElementForDatabaseError() {
+				$el = null;
+				try {
+					$el = $this->getElement('dbName');
+				} catch (Exception $e2) {
+					$el = $this->getElement('dsn');
+				}
+
+				return $el;
+		}
+
         private function validateDatabase() {
+				$el = $this->getElementForDatabaseError();
+
                 try {
                         $this->validateDatabaseConnection();
                 } catch (Exception $e) {
-						$el = null;
-						try {
-							$el = $this->getElement('dbName');
-						} catch (Exception $e2) {
-							$el = $this->getElement('dsn');
-						}
-
                         $el->setValidationError('Could not connect to database: ' . $e->getMessage());
 
                         return;
@@ -95,7 +101,7 @@ class FormInstallationQuestions extends Form {
                 try {
                         $this->validateDatabaseTables();
                 } catch (Exception $e) {
-                        $this->getElement('dbName')->setValidationError('Settings table does not exist. Did you import the setup/databases/schema.sql file?');
+                        $el->setValidationError('Settings table does not exist. Did you import the setup/databases/schema.sql file?');
                         return;
                 }
 
@@ -123,7 +129,7 @@ class FormInstallationQuestions extends Form {
                 $settings = $stmt->fetchAll();
 
                 if (count($settings) == 0) {
-                        $this->getElement('dbName')->setValidationError('There is nothing in the settings table. Did you import the setup/databases/initialData.sql file?');
+                        $this->getElementForDatabaseError()->setValidationError('There is nothing in the settings table. Did you import the setup/databases/initialData.sql file?');
                 }
         }
 
