@@ -134,8 +134,11 @@ class FormInstallationQuestions extends Form {
         }
 
         public function process() {
-                // Assign salt to $this, so others can call generateConfigFile later.
-                $this->saltPrefix = uniqid();
+				$this->saltPrefix = getenv('CFG_PASSWORD_SALT');
+
+				if (empty($this->saltPrefix)) {
+					$this->saltPrefix = uniqid();
+				}
 
                 try {
                         $this->createAdministratorAccount();
