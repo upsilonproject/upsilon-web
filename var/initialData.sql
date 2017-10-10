@@ -1,6 +1,6 @@
 INSERT INTO settings (`key`, `value`) VALUES ('maintenanceMode', 0);
 INSERT INTO settings (`key`, `value`) VALUES ('warnNotUsingHttps', 0);
-INSERT INTO rooms (title, filename) VALUES ('sample', 'sample.svg') 
+INSERT INTO rooms (title, filename) VALUES ('sample', 'sample.svg'); 
 INSERT INTO widgets (`class`) VALUES ('ListMetrics');
 INSERT INTO widgets (`class`) VALUES ('GraphMetrics');
 INSERT INTO widgets (`class`) VALUES ('ProblemServices');
