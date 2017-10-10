@@ -11,3 +11,4 @@ composer.lock
 /vendor/
 src/main/php/includes/libraries/
 .buildid.rpmmacro
+**/.directory

@@ -215,7 +215,7 @@ function deleteConfigAllocatedNode($id) {
 }
 
 function getNodesUsingRemoteService($serviceId) {
-	$sql = 'SELECT n.id, n.identifier, c.id AS configId, c.name AS configName FROM remote_config_allocated_services ass RIGHT JOIN remote_configs c ON ass.config = c.id RIGHT JOIN remote_config_allocated_nodes an ON an.config = c.id RIGHT JOIN nodes n ON an.node = n.identifier WHERE ass.service = :serviceId';
+	$sql = 'SELECT n.id, n.identifier, c.id AS configId, c.name AS configName, s.identifier AS reportedServiceIdentifier, s.id AS reportedServiceId, s.karma AS reportedServiceKarma FROM remote_config_allocated_services ass RIGHT JOIN remote_configs c ON ass.config = c.id RIGHT JOIN remote_config_allocated_nodes an ON an.config = c.id RIGHT JOIN nodes n ON an.node = n.identifier RIGHT JOIN remote_config_services rcs ON ass.service = rcs.id RIGHT JOIN services s ON s.node = n.identifier AND s.identifier = rcs.name WHERE ass.service = :serviceId';
 	$stmt = stmt($sql);
 	$stmt->bindValue(':serviceId', $serviceId);
 	$stmt->execute();

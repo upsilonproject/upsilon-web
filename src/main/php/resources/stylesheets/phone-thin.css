@@ -65,7 +65,8 @@ a.node abbr {
 
 div.block {
 	min-width: 100%;
-	border: 1px solid black;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
 }
 
 hr {
@@ -90,8 +91,4 @@ h2 {
 	padding: .2em;
 	border-top: 1px solid black;
 	font-size: smaller;
-}
-
-.blockContainer {
-	margin: 0;
 }

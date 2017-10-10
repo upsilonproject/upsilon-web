@@ -1,8 +1,8 @@
 <div class = "box">
-	<h2>Services</h2>
+	<h2>Services Definitions</h2>
 	
 	{include "filters.tpl"}
-	<table>
+	<table class = "hover">
 		<thead>
 			<tr>
 				<th class = "small media-width-prio-low">ID</th>

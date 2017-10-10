@@ -8,6 +8,7 @@ use \libAllure\HtmlLinksCollection;
 
 global $tpl, $title;
 
+
 if (Session::isLoggedIn()) {
 	$dtBegin = Session::getUser()->getData('daytimeBegin');
 	$dtEnd = Session::getUser()->getData('daytimeEnd');
@@ -21,6 +22,8 @@ if (Session::isLoggedIn()) {
 } else {
 	$tpl->assign('isNighttime', false);
 }
+
+savePageInHistory();
 
 $tpl->assign('siteTitle', getSiteSetting('siteTitle', 'Upsilon'));
 
@@ -68,9 +71,9 @@ $tpl->assign('datetime', date('D H:i'));
 $tpl->assign('apiClient', isset($_SESSION['apiClient']) ? $_SESSION['apiClient'] : false);
 
 $generalLinks = linksCollection();
+$userLinks = linksCollection();
 
 if (Session::isLoggedIn()) {
-	$generalLinks = linksCollection();
 
 	global $links, $title;
 	$generalLinks->add('#', 'Actions &blacktriangledown;');
@@ -140,8 +143,6 @@ if (Session::isLoggedIn()) {
 
 	$systemLinks = linksCollection();
 	$systemLinks->addIf(Session::getUser()->getData('enableDebug'), 'viewDebugInfo.php', 'Debug');
-	$systemLinks->add('preferences.php', 'Preferences');
-	$systemLinks->addSeparator();
 	$systemLinks->add('listUsergroups.php', 'Usergroups');
 	$systemLinks->add('listUsers.php', 'Users');
 	$systemLinks->add('listApiClients.php', 'API Clients');
@@ -150,16 +151,26 @@ if (Session::isLoggedIn()) {
 	$systemLinks->add('listLogs.php', 'Logs');
 	$systemLinks->addSeparator();
 	$systemLinks->add('html5app.html', 'HTML5 Console (testing)');
-	$systemLinks->addSeparator();
-	$systemLinks->add('logout.php', 'Logout');
 
 	$generalLinks->add('#', 'System &blacktriangledown;');
 	$generalLinks->addChildCollection('System &blacktriangledown;', $systemLinks);
+
+
+	$userLinks = linksCollection();
+	$userPersonalLinks = linksCollection();
+	$userPersonalLinks->add('feedback.php', 'Give feedback about Upsilon!');
+	$userPersonalLinks->addSeparator();
+	$userPersonalLinks->add('preferences.php', 'Preferences');
+	$userPersonalLinks->add('logout.php', 'Logout');
+	$userLinks->add('#', Session::getUser()->getUsername() . ' &blacktriangledown;');
+	$userLinks->addChildCollection(Session::getUser()->getUsername() . ' &blacktriangledown;', $userPersonalLinks);
 }
 
 
 
 $tpl->assign('generalLinks', $generalLinks);
+$tpl->assign('userLinks', $userLinks);
+$tpl->assign('lang', getUiLanguage());
 
 $tpl->display('header.tpl');
 

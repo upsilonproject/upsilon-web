@@ -186,6 +186,7 @@ function updateChart(results) {
 
 			seriesName = "service " + service.serviceId + "_" + service.field;
 			seriesName = service.field;
+			seriesName = service.metrics[0].caption;
 			c.addSeries(seriesName, axisData);
 
 		});
@@ -203,13 +204,14 @@ function updateChart(results) {
 			}
 		});
 
-		/**
-		c.addPlot("threshhold", { type: ind, 
-			vertical: false,
-			lineStroke: { color: "red", style: "ShortDash" },
-			values: 100,
-		});
-		*/
+		window.chartMarkings[results.chartIndex].forEach(function(v)  {
+			c.addPlot("threshhold", { type: ind, 
+				vertical: false,
+				lineStroke: { color: "red", style: "ShortDash" },
+				values: v,
+			});
+		}
+		);
 
 		new ZaP(c, "default", {axis: "x" });
 
@@ -423,13 +425,23 @@ function setupSortableTables() {
 }
 
 function serviceIconChanged() {
-	var icon = $('select[name$="-icon"]').val();
+	require([
+		"dojo/query",
+		"dojo/dom-construct"
+	], function(query, cons) {
+		generate = cons.toDom;
 
-	if (icon != '') {
-		icon = 'resources/images/serviceIcons/' + icon;
-		
-		$('span#serviceIconPreview').html('<img src = "' + icon + '" alt = "serviceIcon" />');
-	}
+		var icon = query('select[name$="-icon"]')[0].value;
+
+		console.log(icon);
+
+		if (icon != '') {
+			icon = 'resources/images/serviceIcons/' + icon;
+			
+			query('span#serviceIconPreview')[0].innerHTML = ('<img src = "' + icon + '" alt = "serviceIcon" />');
+		}
+
+	});
 }
 
 function menuButtonClick(address) {
@@ -526,14 +538,18 @@ function renderClassInstances(data, owner) {
 				domRequirement = construct.toDom('<p>&nbsp;</p>');
 				indicator = construct.place('<span class = "metricIndicator">&nbsp;</span>', domRequirement);
 
-				construct.place(' <span><a href = "addInstanceCoverage.php?requirementId=' + requirement['requirementId'] + '&instanceId=' + requirement['instanceId'] + '">' + requirement['requirementTitle'] + '</a></span> - ', domRequirement);
+				txt = construct.place('<div class = "metricText"></div>', domRequirement);
+
+				txt.append(generate(' <span><a href = "addInstanceCoverage.php?requirementId=' + requirement['requirementId'] + '&instanceId=' + requirement['instanceId'] + '">' + requirement['requirementTitle'] + '</a></span> - '));
 
 				if (requirement['serviceIdentifier'] != null) {
 					query(indicator).addClass(requirement['karma'].toLowerCase());
-					construct.place('<span><a href = "viewService.php?id=' + requirement['service'] + '">' + requirement['serviceIdentifier'] + '</a></span>', domRequirement);
+					txt.append(generate('<span><a href = "viewService.php?id=' + requirement['service'] + '">' + requirement['serviceIdentifier'] + '</a></span>'));
 				} else {
-					construct.place('<span class = "bad">Not covered</span>', domRequirement)
+					txt.append(generate('<span class = "bad">Not covered</span>'))
 				}
+
+				txt.append(generate('<div class = "subtle">' + requirement['output'] + '</div>'));
 
 				dom.append(domRequirement)
 			});
@@ -589,6 +605,7 @@ function renderServiceList(data, owner) {
 			text = query(generate('<div class = "metricText" />'));
 			text.append('<span class = "metricDetail">' + service.estimatedNextCheckRelative + '</span>');
 			text.append('<a href = "viewService.php?id=' + service.id + '"><span class = "metricTitle">' + service.alias + '</span></a>');
+			text.append('<div class = "subtle">' + service.output + '</div>');
 			metric.append(text);
 
 			query(list).append(metric);
@@ -689,22 +706,12 @@ function showFullscreenButton() {
 	});
 }
 
-function filteringTestLoad(dat) {
-	console.log("loaded", dat);
+function createOption(val, txt) {
+	opt = document.createElement("option");
+	opt.value = val;
+	opt.text = txt;
 
-	select = document.getElementById('update-service');
-
-	for (i = select.options.length -1; i >= 0; i--) {
-		select.remove(i);
-	}
-
-	dat.forEach(function(v) {
-		opt = document.createElement("option");
-		opt.value = v.id;
-		opt.text = v.identifier;
-
-		select.add(opt);
-	});
+	return opt;
 }
 
 function filterGetFieldValues() {
@@ -723,10 +730,43 @@ function filterGetFieldValues() {
 	return fields;
 }
 
-function filterInstanceCoverageOptions() {
-	fields = filterGetFieldValues();
+function loadFilterResultsIntoSelect(sel, dat) {
+	select = document.getElementById(sel);
+	
+	console.log(select);
 
-	request('json/addInstanceCoverage.php', fields, filteringTestLoad)
+	for (i = select.options.length -1; i >= 0; i--) {
+		select.remove(i);
+	}
+
+	dat.forEach(function(v) {
+		select.add(createOption(v.id, v.identifier));
+	});
+
+}
+
+function filterClassInstance() {
+	window.filterFunc = function() {
+		fields = filterGetFieldValues()
+
+		request('json/getClassInstances.php', fields, function(dat) {
+			loadFilterResultsIntoSelect('formAddMembership-classInstance', dat);
+		});
+	}
+
+	window.filterFunc();
+}
+
+function filterInstanceCoverageOptions() {
+	window.filterFunc = function() {
+		fields = filterGetFieldValues();
+
+		request('json/addInstanceCoverage.php', fields, function(dat) {
+			loadFilterResultsIntoSelect('update-service', dat);
+		});
+	}
+
+	window.filterFunc();
 }
 
 function filteringSelectClear() {
@@ -744,7 +784,7 @@ function filteringSelectClear() {
 }
 
 function filteringSelectBlur() {
-	filterInstanceCoverageOptions()
+	window.filterFunc();
 }
 
 function filteringSelectChanged() {

@@ -8,6 +8,6 @@ $stmt = stmt($sql);
 $stmt->bindValue(':id', san()->filterUint('id'));
 $stmt->execute();
 
-redirect('listRemoteConfigurations.php', 'Deleted');;
+redirectToLast('listServiceDefinitions', 'listRemoteConfigurations');
 
 ?>

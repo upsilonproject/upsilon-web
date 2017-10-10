@@ -6,7 +6,7 @@
 		<a href = "createRemoteConfiguration.php">Create</a>
 	</p>
 	
-	<table>
+	<table class = "hover">
 		<thead>
 			<tr>
 				<th class = "small">ID</th>

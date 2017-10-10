@@ -1,0 +1,14 @@
+{
+	"name": "upsilon",
+	"short_name": "upsilon",
+	"start_url": ".",
+	"display": "standalone",
+	"description": "The Upsilon Project is a distributed, flexible and extensible monitoring system.",
+	"icons": [
+		{
+			"src": "resources/images/icons/logo96pxdarkbg.webp",
+			"sizes": "96x96",
+			"type": "image/webp"
+		}
+	]
+}
