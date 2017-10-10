@@ -131,7 +131,7 @@ class FormInstallationQuestions extends Form {
 
         public function process() {
                 // Assign salt to $this, so others can call generateConfigFile later.
-                $this->saltSuffix = uniqid();
+                $this->saltPrefix = uniqid();
 
                 try {
                         $this->createAdministratorAccount();
@@ -165,7 +165,7 @@ class FormInstallationQuestions extends Form {
                 $ret .= "define('CFG_DB_USER', '{$this->getElementValue('dbUser')}');\n";
                 $ret .= "define('CFG_DB_PASS', '{$this->getElementValue('dbPass')}');\n";
                 $ret .= "\n// The following is configuration for advanced users only.\n";
-                $ret .= "define('CFG_PASSWORD_SALT', '" . $this->saltSuffix . "'); // If you change this value, you will break all existing user passwords.  \n";
+                $ret .= "define('CFG_PASSWORD_SALT', '" . $this->saltPrefix . "'); // If you change this value, you will break all existing user passwords.  \n";
                 $ret .= '?' . '>';
 
                 return $ret;
@@ -178,7 +178,7 @@ class FormInstallationQuestions extends Form {
                 $sql = 'INSERT INTO users (username, password, `group`) VALUES (:adminUsername, :adminPassword, 1) ';
                 $stmt = $this->db->prepare($sql);
                 $stmt->bindValue(':adminUsername', $this->getElementValue('adminUsername'));
-                $stmt->bindValue(':adminPassword', sha1($this->getElementValue('adminPassword1') . $this->saltSuffix));
+                $stmt->bindValue(':adminPassword', sha1($this->saltPrefix . $this->getElementValue('adminPassword1')));
                 $stmt->execute();
         }
 
