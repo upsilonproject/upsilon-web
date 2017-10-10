@@ -5,7 +5,7 @@ require_once 'includes/classes/Widget.php';
 use \libAllure\ElementNumeric;
 use \libAllure\ElementTextbox;
 
-class WidgetGraphMetrics extends Widget {
+class WidgetChartMetrics extends Widget {
 	private static $graphIndex = 0;
 
 	public function __construct() {

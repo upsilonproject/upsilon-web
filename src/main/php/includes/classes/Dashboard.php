@@ -22,8 +22,9 @@ class Dashboard {
 			include_once 'includes/classes/Widget' . $itemInstance['class'] . '.php';
 		
 			$itemInstance['instance'] = new $wi();
-			$itemInstance['instance']->loadArguments($itemInstance['id']);
+			$itemInstance['instance']->dashboard = $this;
 			$itemInstance['instance']->init();
+			$itemInstance['instance']->loadArguments($itemInstance['id']);
 		
 			if (!$itemInstance['instance']->isShown()) {
 				$hiddenWidgets[] = $itemInstance;
@@ -33,7 +34,7 @@ class Dashboard {
 		$this->widgetInstances = $listInstances;
 		$this->hiddenWidgetInstances = $hiddenWidgets;
 	}
-	
+
 	public function getWidgetInstances() {
 		return $this->widgetInstances;
 	}

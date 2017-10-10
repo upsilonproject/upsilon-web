@@ -504,6 +504,7 @@ DROP TABLE IF EXISTS `services`;
 CREATE TABLE `services` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `identifier` varchar(128) DEFAULT NULL,
+  `alias` varchar(128) DEFAULT NULL,
   `description` varchar(128) NOT NULL,
   `karma` varchar(64) DEFAULT NULL,
   `secondsRemaining` int(10) DEFAULT '0',
