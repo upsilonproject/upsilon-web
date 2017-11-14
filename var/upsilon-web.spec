@@ -12,9 +12,9 @@ URL:		http://upsilon-project.co.uk
 Source0:	upsilon-web.zip
 
 %if "%{?dist}" == "el7scl"
-Requires: httpd24-httpd rh-php56-php rh-php56-php-pdo rh-php56-php-mysqlnd rh-php56-php-mbstring rh-php56-php-bcmath
+Requires: upsilon-database-sql httpd24-httpd rh-php56-php rh-php56-php-pdo rh-php56-php-mysqlnd rh-php56-php-mbstring rh-php56-php-bcmath
 %else
-Requires: httpd php php-pdo php-mysql php-mbstring php-bcmath
+Requires: upsilon-database-sql httpd php php-pdo php-mysql php-mbstring php-bcmath
 %endif
 
 %description
@@ -31,8 +31,6 @@ cp .buildid %{buildroot}/usr/share/upsilon-web/
 
 mkdir -p %{buildroot}/usr/share/doc/upsilon-web/
 cp README.md %{buildroot}/usr/share/doc/upsilon-web/
-cp setup/initialData.sql %{buildroot}/usr/share/doc/upsilon-web/
-cp setup/schema.sql %{buildroot}/usr/share/doc/upsilon-web/
 
 mkdir -p %{buildroot}/etc/httpd/conf.d
 cp setup/upsilon-apache.conf %{buildroot}/etc/httpd/conf.d/upsilon-web.conf
@@ -48,8 +46,6 @@ rm -rf /var/lib/php/session/*
 
 %files
 %doc /usr/share/doc/upsilon-web/README.md
-%doc /usr/share/doc/upsilon-web/initialData.sql
-%doc /usr/share/doc/upsilon-web/schema.sql
 /usr/share/upsilon-web/*
 /usr/share/upsilon-web/.buildid
 %config(noreplace) /etc/httpd/conf.d/upsilon-web.conf

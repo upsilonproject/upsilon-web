@@ -35,7 +35,7 @@ if (isEssentialConfigurationProvided()) {
 	$db = connectDatabase();
 
 	$backend = new AuthBackendDatabase();
-	$backend->setSalt(null, CFG_PASSWORD_SALT);
+	$backend->setSalt(CFG_PASSWORD_SALT);
 	$backend->registerAsDefault();
 
 	Session::setCookieLifetimeInSeconds(31104000);

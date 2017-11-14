@@ -1,5 +1,5 @@
 <?php
 
-header("Location: http://upsilonproject.io/feedback");
+header("Location: http://www.upsilonproject.io/feedback");
 
 ?>
