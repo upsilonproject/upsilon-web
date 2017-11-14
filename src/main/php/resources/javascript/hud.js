@@ -27,7 +27,7 @@ function makeDateHumanReadable(element) {
 	if (element.textContent == "now") {
 		utcDate = new Date((new Date()).toUTCString());
 	} else {
-		utcDate = new Date(element.textContent + " UTC")
+		utcDate = new Date(element.textContent + "Z")
 	}
 
 	elementUnixTimestamp = utcDate / 1000
@@ -549,6 +549,11 @@ function renderClassInstances(data, owner) {
 					txt.append(generate('<span class = "bad">Not covered</span>'))
 				}
 
+				if (requirement['node'] != null) {
+					txt.append(' on ');
+					txt.append(generate('<a href = "viewNode.php?identifier=' + requirement['node'] + '">' + requirement['node'] + '</a>'));
+				}
+
 				txt.append(generate('<div class = "subtle">' + requirement['output'] + '</div>'));
 
 				dom.append(domRequirement)
@@ -793,4 +798,44 @@ function filteringSelectChanged() {
 	lblClasses.remove("good")
 	lblClasses.remove("unknown")
 	lblClasses.add("warning")
+}
+
+function searchSelect(selectedItem) {
+	console.log(selectedItem);
+	window.location.href = selectedItem.url;
+}
+
+function setupSearchBox() {
+	require([
+		"dijit/form/FilteringSelect", "dojo/store/JsonRest", "dojo/domReady!"
+	], function(FilteringSelect, JsonRest) {
+		var searchStore = new JsonRest({
+			idProperty: "identifier",
+			data: [
+				{ value: "AL", identifier: "Alabama" },
+				{ value: "UK", identifier: "United Kingdom" },
+				{ value: "DE", identifier: "Germany" },
+			],
+			target: "/json/search.php"
+		});
+
+		window.ss = searchStore;
+
+		var fs = new FilteringSelect({
+			id: "searchBox",
+			autoComplete: false,
+			highlightMatch: "all",
+			required: false,
+			queryExpr: "*${0}*",
+			sortByLabel: true,
+			store: searchStore,
+			hasDownArrow: false,
+			placeholder: 'Search',
+			pageSize: 10,
+			searchAttr: "identifier",
+			onChange: function(state) {
+				searchSelect(dijit.byId("searchBox").get("item"));
+			},
+		}, "searchBox").startup();
+	});
 }
