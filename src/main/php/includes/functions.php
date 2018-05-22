@@ -547,6 +547,8 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 	$qb->fields(array('rc.name', 'remote_config_name'));
 	$qb->groupBy('s.id');
 
+	header("SQL: " . $qb->build());
+
 	$stmt = DatabaseFactory::getInstance()->prepare($qb->build());
 	$stmt->execute();
 	$listServices = $stmt->fetchAll();
@@ -558,12 +560,12 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 
 function getServices($groupId = null) {
 	if ($groupId == null) {
-		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.alias, s.commandLine, s.output, s.karma, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id ORDER BY s.identifier';
+		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, s.identifier, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.commandLine, s.output, s.karma, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id ORDER BY s.identifier';
 		$stmt = DatabaseFactory::getInstance()->prepare($sqlSubservices);
 		$stmt->execute();
 
 	} else {
-		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.alias, s.commandLine, s.output, s.karma, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id WHERE g.id = :groupId ORDER BY s.identifier';
+		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, s.identifier, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.commandLine, s.output, s.karma, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id WHERE g.id = :groupId ORDER BY s.identifier';
 		$stmt = DatabaseFactory::getInstance()->prepare($sqlSubservices);
 		$stmt->bindValue(':groupId', $groupId);
 		$stmt->execute();
@@ -991,6 +993,11 @@ function getWidgetInstance($id) {
 function deleteWidgetInstance($id) {
 	$widgetInstance = getWidgetInstance($id);
 
+	$sql = 'DELETE FROM widget_instance_arguments WHERE instance = :widget';
+	$stmt = stmt($sql);
+	$stmt->bindValue(':widget', $id);
+	$stmt->execute();
+
 	$sql = 'DELETE FROM widget_instances WHERE id = :id';
 	$stmt = stmt($sql);
 	$stmt->bindValue(':id', $id);
@@ -1306,6 +1313,7 @@ SELECT DISTINCT
 	a.service,
 	s.identifier,
 	s.karma,
+	s.node,
 	LEFT(s.output, 50) AS output,
 	s.identifier AS serviceIdentifier,
 	s.lastUpdated AS serviceLastUpdated,
@@ -1587,7 +1595,7 @@ if (!function_exists('array_column')) {
 }
 
 function getAllCommands() {
-	$sql = 'SELECT c.id, c.command_Line, c.identifier, c.command_line, count(s.id) AS instanceCount, c.metadata AS metadataId, m.commandIdentifier AS metadataIdentifier, m.icon FROM remote_config_commands c LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_services s ON s.command = c.id GROUP BY c.id';
+	$sql = 'SELECT c.id, c.command_Line, c.identifier, c.command_line, count(s.id) AS instanceCount, c.metadata AS metadataId, m.commandIdentifier AS metadataIdentifier, m.icon FROM remote_config_commands c LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_services s ON s.command = c.id GROUP BY c.id ORDER BY c.identifier';
 	$stmt = stmt($sql)->execute();
 
 	$commands = $stmt->fetchAll();

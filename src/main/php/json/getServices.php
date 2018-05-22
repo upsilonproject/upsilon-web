@@ -9,7 +9,7 @@ switch ($status) {
 	case '!GOOD':
 		outputJson(getServicesBad());
 	default:
-		outputJson(getServices());
+		outputJson(getServicesWithFilter());
 }
 
 
