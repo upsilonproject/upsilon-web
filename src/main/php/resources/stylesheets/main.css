@@ -229,10 +229,12 @@ a:focus {
 table {
 	width: 100%;
 	background-color: white;
+	border-collapse: collapse;
 }
 
 td, th {
 	text-align: left;
+	border: 1px solid #999;
 }
 
 th {
