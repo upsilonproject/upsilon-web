@@ -229,8 +229,9 @@ a:focus {
 table {
 	width: 100%;
 	background-color: white;
-	border-collapse: collapse;
 }
+
+
 
 div#content td, div#content th {
 	text-align: left;
@@ -256,6 +257,10 @@ td.centered {
 
 tr td {
 	padding: .4em;
+}
+
+table.hover {
+	border-collapse: collapse;
 }
 
 table.hover tr:hover td {
