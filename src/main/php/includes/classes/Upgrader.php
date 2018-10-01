@@ -475,4 +475,20 @@ class LotsOfForeignKeys extends DatabaseUpgradeTask {
 
 Upgrader::registerTask(new LotsOfForeignKeys());
 
+class InstallWidgetChartSingleMetrics extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->tableHasRow('widgets', 'class', 'ChartSingleMetrics');
+	}
+
+	public function perform() {
+		$sql = 'INSERT INTO widgets (class) VALUES (:name)';
+		$stmt = stmt($sql);
+		$stmt->bindValue(':name', 'ChartSingleMetrics');
+		$stmt->execute();
+	}
+}
+
+upgrader::registerTask(new InstallWidgetChartSingleMetrics());
+
+
 ?>

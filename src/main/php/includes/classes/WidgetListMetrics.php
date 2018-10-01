@@ -28,7 +28,7 @@ class WidgetListMetrics extends Widget {
 		global $tpl;
 
 		if ($this->service == null) {
-			$tpl->assign('message', 'Service is not set.');
+			$tpl->assign('message', 'Service is not set. <a href = "updateWidgetInstance.php?id=' . $this->id. '">Set Service</a> ');
 			$tpl->display('message.tpl');
 		} else {
 			$tpl->assign('service', $this->service);

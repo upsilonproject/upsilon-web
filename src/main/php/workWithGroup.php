@@ -17,6 +17,9 @@ switch ($_REQUEST['action']) {
 		}
 }
 
+$sidList = implode($_REQUEST['services'], ',');
 var_dump($_REQUEST['services']);
+
+echo '<a href = "addGroupMembership.php?serviceId[]=' . $sidList . '">Add to group</a>';
 
 ?>

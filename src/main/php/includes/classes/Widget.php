@@ -7,6 +7,8 @@ use \libAllure\ElementInput;
 use \libAllure\DatabaseFactory;
 use \libAllure\HtmlLinksCollection;
 
+require_once 'includes/classes/ElementFilteringSelect.php';
+
 class Widget {
 	protected $arguments = array();
 
@@ -40,8 +42,10 @@ class Widget {
 	}
 
 	private function getFormElementService($multi = false) {
+		$filters = getFilterServices();
+
 		if (!$multi) {
-			$el = new ElementSelect('service', 'Service');
+			$el = new ElementFilteringSelect('service', 'Service', $filters, 'filterService');
 		} else if ($multi) {
 			$el = new ElementSelect('serviceList', 'Services');
 			$el->setSize(5);
@@ -55,7 +59,7 @@ class Widget {
 		$stmt->execute();
 
 		foreach ($stmt->fetchAll() as $service) {
-			$el->addOption($service['identifier'], $service['id']);
+#			$el->addOption($service['identifier'], $service['id']);
 		}
 
 		return $el;

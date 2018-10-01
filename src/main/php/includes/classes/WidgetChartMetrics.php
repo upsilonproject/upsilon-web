@@ -35,7 +35,6 @@ class WidgetChartMetrics extends Widget {
 		$tpl->assign('yAxisMarkings', $v);
 		$tpl->assign('instanceChartIndex', $this->instanceGraphIndex);
 		$tpl->display('widgetChartMetric.tpl');
-
 	}
 
 	public function getArgumentFormElement($optionName) {

@@ -7,7 +7,7 @@ use \libAllure\HtmlLinksCollection;
 $links = new HtmlLinksCollection();
 $links->add('createRemoteConfigCommand.php?', 'Create Command');
 
-$title = 'Command Definitions';
+$title = 'Commands';
 require_once 'includes/widgets/header.php';
 
 $tpl->assign('listCommands', getAllCommands());

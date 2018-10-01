@@ -27,7 +27,7 @@ function makeDateHumanReadable(element) {
 	if (element.textContent == "now") {
 		utcDate = new Date((new Date()).toUTCString());
 	} else {
-		utcDate = new Date(element.textContent + "Z")
+		utcDate = new Date(element.textContent.replace(" ", "T") + "Z")
 	}
 
 	elementUnixTimestamp = utcDate / 1000
@@ -134,6 +134,14 @@ function formatUnixTimestamp(timestamp, range) {
 	return dojo.date.locale.format(d, {selector:"date", datePattern: dp });
 }
 
+function updateMultipleServiceChart(results) {
+	updateChart(results)
+}
+
+function updateSingleMetricChart(results) {
+	updateChart(results)
+}
+
 function updateChart(results) {
 	require([
 		"dojox/charting/Chart",
@@ -156,7 +164,7 @@ function updateChart(results) {
 		{colors: ["#cecece", '#cecece'] }
 		*/
 
-		if (window.charts[results.chartIndex] == undefined) {
+		if (typeof(window.charts[results.chartIndex]) == "undefined") {
 			window.charts[results.chartIndex] = new Chart("chartService" + results.chartIndex, {
 				title: "Metric: " + results.metric,
 				titleFont: "sans-serif",
@@ -180,13 +188,17 @@ function updateChart(results) {
 
 			console.log("plotting service", service);
 
+			if (typeof(service.listMetrics) != "undefined") {
+				service.metrics = service.listMetrics;
+			}
+
 			service.metrics.forEach(function(result, index) {
-				axisData.push({y: result.value, x: result.date, karma: result.karma })
+				axisData.push({y: result.value, x: result.date, karma: result.karma, tooltip: result.name + ": " + result.value + "<br /><br />" + formatUnixTimestamp(result.date, "week") })
 			});
 
 			seriesName = "service " + service.serviceId + "_" + service.field;
 			seriesName = service.field;
-			seriesName = service.metrics[0].caption;
+			//seriesName = service.metrics[0].caption;
 			c.addSeries(seriesName, axisData);
 
 		});
@@ -204,14 +216,16 @@ function updateChart(results) {
 			}
 		});
 
-		window.chartMarkings[results.chartIndex].forEach(function(v)  {
-			c.addPlot("threshhold", { type: ind, 
-				vertical: false,
-				lineStroke: { color: "red", style: "ShortDash" },
-				values: v,
-			});
+		if (typeof(results.chartIndex) === "number") {
+			window.chartMarkings[results.chartIndex].forEach(function(v)  {
+				c.addPlot("threshhold", { type: ind, 
+					vertical: false,
+					lineStroke: { color: "red", style: "ShortDash" },
+					values: v,
+				});
+			}
+			);
 		}
-		);
 
 		new ZaP(c, "default", {axis: "x" });
 
@@ -242,12 +256,27 @@ function fetchServiceMetricResultChart(metric, dataset, chartIndex) {
 		"serviceIds[]": dataset.serviceIds,
 		"node": dataset.node,
 		"metrics[]": metric.split(","),
-		"chartIndex": chartIndex
+		"chartIndex": chartIndex,
+		"resolution": window.chartResolution,
+		"interval": window.chartInterval
 	}
 
 	window.serviceResultChartUrl = 'json/viewServiceResultChart.php';
 
-	request(window.serviceResultChartUrl, data, updateChart);
+	request(window.serviceResultChartUrl, data, updateMultipleServiceChart);
+}
+
+function fetchServiceSingleMetricResultChart(metric, dataset, chartIndex) {
+	console.log("chart single metric" + chartIndex + " datasets", dataset)
+	
+	data = {
+		"serviceIds[]": dataset.serviceIds,
+		"node": dataset.node,
+		"metrics[]": metric.split(","),
+		"chartIndex": chartIndex
+	}
+
+	request("json/getServiceMetrics.php", data, updateSingleMetricChart)
 }
 
 function cookieOrDefault(cookieName, defaultValue) {
@@ -480,7 +509,7 @@ function renderSubresults(data, ref) {
 
 			row.append(generate("<span>" + result.name + "</span>"));
 
-			if (typeof result.comment != "undefined" && result.comment.length > 0) {
+			if (typeof result.comment != "undefined" && result.comment != null && result.comment.length > 0) {
 				desc = generate('<span class = "subtle">');
 				desc.innerHTML = " (" + result.comment + ")";
 				row.append(desc);
@@ -510,7 +539,7 @@ function renderGroup(data, ref) {
 		}
 
 		if (data['listClassInstances'].length > 0) {
-			container.append(generate('<h2>Class Instances'));
+			container.appendChild(generate('<h2>Class Instances'));
 			renderClassInstances(data['listClassInstances'], container);
 		}
 	});
@@ -526,7 +555,7 @@ function renderClassInstances(data, owner) {
 	], function(construct, domClass, query) {
 		if (!domClass.contains(owner, ".classInstances")) {
 			container = generate('<p class = "classInstances" />');
-			owner.append(container);
+			owner.appendChild(container);
 		} else {
 			container = owner.children('.classInstances');
 		}
@@ -540,26 +569,26 @@ function renderClassInstances(data, owner) {
 
 				txt = construct.place('<div class = "metricText"></div>', domRequirement);
 
-				txt.append(generate(' <span><a href = "addInstanceCoverage.php?requirementId=' + requirement['requirementId'] + '&instanceId=' + requirement['instanceId'] + '">' + requirement['requirementTitle'] + '</a></span> - '));
+				txt.appendChild(generate(' <span><a href = "addInstanceCoverage.php?requirementId=' + requirement['requirementId'] + '&instanceId=' + requirement['instanceId'] + '">' + requirement['requirementTitle'] + '</a></span> - '));
 
 				if (requirement['serviceIdentifier'] != null) {
 					query(indicator).addClass(requirement['karma'].toLowerCase());
-					txt.append(generate('<span><a href = "viewService.php?id=' + requirement['service'] + '">' + requirement['serviceIdentifier'] + '</a></span>'));
+					txt.appendChild(generate('<span><a href = "viewService.php?id=' + requirement['service'] + '">' + requirement['serviceIdentifier'] + '</a></span>'));
 				} else {
-					txt.append(generate('<span class = "bad">Not covered</span>'))
+					txt.appendChild(generate('<span class = "bad">Not covered</span>'))
 				}
 
 				if (requirement['node'] != null) {
-					txt.append(' on ');
-					txt.append(generate('<a href = "viewNode.php?identifier=' + requirement['node'] + '">' + requirement['node'] + '</a>'));
+					txt.appendChild(document.createTextNode(' on '));
+					txt.appendChild(generate('<a href = "viewNode.php?identifier=' + requirement['node'] + '">' + requirement['node'] + '</a>'));
 				}
 
-				txt.append(generate('<div class = "subtle">' + requirement['output'] + '</div>'));
+				txt.appendChild(generate('<div class = "subtle">' + requirement['output'] + '</div>'));
 
-				dom.append(domRequirement)
+				dom.appendChild(domRequirement)
 			});
 
-			container.append(dom);
+			container.appendChild(dom);
 		});
 	});
 }
@@ -588,10 +617,10 @@ function renderServiceList(data, owner) {
 		container = generate('<div class = "metricListContainer" />');
 		owner.append(container);
 
-		container.append(generate('<p class = "metricListDescription"></p>'));
+		container.appendChild(generate('<p class = "metricListDescription" />'));
 
 		list = generate('<ul class = "metricList"></ul>');
-		container.append(list);
+		container.appendChild(list);
 
 		data.forEach(function(service, index) {
 			indicator = query(generate('<span class = "metricIndicator" />'));
@@ -610,6 +639,8 @@ function renderServiceList(data, owner) {
 			text = query(generate('<div class = "metricText" />'));
 			text.append('<span class = "metricDetail">' + service.estimatedNextCheckRelative + '</span>');
 			text.append('<a href = "viewService.php?id=' + service.id + '"><span class = "metricTitle">' + service.alias + '</span></a>');
+			text.append(' on ');
+			text.append('<a href = "viewNode.php?identifier=' + service.node + '"><spa>' + service.node + '</span></a>');
 			text.append('<div class = "subtle">' + service.output + '</div>');
 			metric.append(text);
 
@@ -706,8 +737,11 @@ function showFullscreenButton() {
 	], function(construct, query) {
 		button = construct.toDom('<button id = "fullscreen" onclick = "requestFullScreen(document.body)">Fullscreen</button>');
 
-		query("#header")[0].appendChild(button);
+		header = query("#header")
 
+		if (header.length > 0) {
+			header[0].appendChild(button);
+		}
 	});
 }
 
@@ -723,7 +757,15 @@ function filterGetFieldValues() {
 	fields = {};
 
 	window.filters.forEach(function(v) {
-		fields[v] = document.getElementById('filterInput-' + v).value
+		htmlInput = document.getElementById('filterInput-' + v)
+
+		if (htmlInput.type == "checkbox") {
+			if (htmlInput.checked) {
+				fields[v] = true
+			}
+		} else {
+			fields[v] = document.getElementById('filterInput-' + v).value
+		}
 
 		if (fields[v] != "" && fields[v] != null) {
 			document.getElementById('filterLabel-' + v).classList.add("good");
@@ -738,16 +780,36 @@ function filterGetFieldValues() {
 function loadFilterResultsIntoSelect(sel, dat) {
 	select = document.getElementById(sel);
 	
-	console.log(select);
+	console.log("Loading results into", select, dat);
 
 	for (i = select.options.length -1; i >= 0; i--) {
 		select.remove(i);
 	}
 
-	dat.forEach(function(v) {
-		select.add(createOption(v.id, v.identifier));
-	});
+	if (dat.length == 0) {
+		select.disabled = true;
+		select.add(createOption(null, 'Nothing to select...'))
+	} else {
+		select.disabled = false;
 
+		dat.forEach(function(v) {
+			select.add(createOption(v.id, v.identifier));
+		});
+	}
+	
+	filteringSelectLoaded(dat.length);
+}
+
+function filterCommands() {
+	window.filterFunc = function() {
+		fields = filterGetFieldValues();
+
+		request('json/getCommands.php', fields, function(dat) {
+			loadFilterResultsIntoSelect('UpdateRemoteConfig-command', dat);
+		});
+	}
+
+	window.filterFunc()
 }
 
 function filterClassInstance() {
@@ -756,6 +818,18 @@ function filterClassInstance() {
 
 		request('json/getClassInstances.php', fields, function(dat) {
 			loadFilterResultsIntoSelect('formAddMembership-classInstance', dat);
+		});
+	}
+
+	window.filterFunc();
+}
+
+function filterService() {
+	window.filterFunc = function() {
+		fields = filterGetFieldValues();
+
+		request('json/getServices.php', fields, function(dat) {
+			loadFilterResultsIntoSelect('updateWidgetInstance-service', dat);
 		});
 	}
 
@@ -788,7 +862,20 @@ function filteringSelectClear() {
 	filteringSelectBlur();
 }
 
+function filteringSelectLoading() {
+	document.getElementsByClassName('filterTracker')[0].disabled = true;
+	document.getElementsByClassName('filterTracker')[0].style.backgroundColor = "lightgray";
+	document.getElementById("filteringSelectLoadingIndicator").innerText = "LOADING"
+}
+
+function filteringSelectLoaded(count) {
+	document.getElementsByClassName('filterTracker')[0].disabled = false;
+	document.getElementsByClassName('filterTracker')[0].style.backgroundColor = "white";
+	document.getElementById("filteringSelectLoadingIndicator").innerText = count + " results found";
+}
+
 function filteringSelectBlur() {
+	filteringSelectLoading();
 	window.filterFunc();
 }
 
@@ -811,11 +898,6 @@ function setupSearchBox() {
 	], function(FilteringSelect, JsonRest) {
 		var searchStore = new JsonRest({
 			idProperty: "identifier",
-			data: [
-				{ value: "AL", identifier: "Alabama" },
-				{ value: "UK", identifier: "United Kingdom" },
-				{ value: "DE", identifier: "Germany" },
-			],
 			target: "/json/search.php"
 		});
 
@@ -837,5 +919,29 @@ function setupSearchBox() {
 				searchSelect(dijit.byId("searchBox").get("item"));
 			},
 		}, "searchBox").startup();
+	});
+}
+
+window.chartResolution = 7 * 50;
+
+function changeChartResolution(val) {
+	window.chartResolution += val;
+
+	require([
+		"dojo/query"
+	], function(query) {
+		query("#lblResolution").text(window.chartResolution);
+	});
+}
+
+
+window.chartInterval = 7;
+function changeChartInterval(i) {
+	window.chartInterval += i;
+
+	require([
+		"dojo/query"
+	], function(query) {
+		query("#lblInterval").text(window.chartInterval);
 	});
 }

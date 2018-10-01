@@ -21,6 +21,7 @@
 </div>
 
 <script type = "text/javascript">
+setupSearchBox();
 setupSortableTables();
 setupEnhancedSelectBoxes();
 </script>

@@ -13,9 +13,17 @@
 	{/if}
 
 	<a class = "fakeButton" href = "viewServiceResultChart.php?serviceIds[]={$listServiceId|implode:','}">Larger</a>
+	<span id = "lblResolution">?</span>
+	<button onclick = "changeChartResolution(-10)">Res -</button>
+	<button onclick = "changeChartResolution(+10)">Res +</button>
+
+	<span id = "lblInterval">?</span>
+	<button onclick = "changeChartInterval(-1)">Int -</button>
+	<button onclick = "changeChartInterval(+1)">Int +</button>
 
 	<br />
 	
+	<noscript>JavaScript is required to view this chart.</noscript>
 	<script type = "text/javascript">
 dataset = {
 	serviceIds: []

@@ -24,6 +24,26 @@ function extractNagiosMetric($service, $field) {
 	return $metric;
 }
 
+function getResolution() {
+	if (isset($_REQUEST['resolution'])) {
+		$resolution = intval($_REQUEST['resolution']);
+	} else {
+		$resolution = null;
+	}
+
+	return $resolution;
+}
+
+function getInterval() {
+	if (isset($_REQUEST['interval'])) {
+		$interval = intval($_REQUEST['interval']);
+	} else {
+		$interval = null;;
+	}
+
+	return $interval;
+}
+
 if (empty($_REQUEST['metrics'])) {
 	$fields = array('karma');
 } else {
@@ -37,10 +57,10 @@ if (empty($_REQUEST['metrics'])) {
 $metrics = array();
 
 foreach ($_REQUEST['serviceIds'] as $serviceId) {
-	$service = getServiceById($serviceId);
+	$service = getServiceById($serviceId);	
 
 	foreach ($fields as $field) {
-		$results = getServiceResults($service['identifier'], $service['node'], 7);
+		$results = getServiceResults($service['identifier'], $service['node'], getInterval(), getResolution());
 		$results = array_reverse($results);
 
 		$metrics[] = array(

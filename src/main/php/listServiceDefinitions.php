@@ -5,7 +5,7 @@ require_once 'includes/common.php';
 $links = linksCollection();
 $links->add('createRemoteConfigService.php?', 'Create Service');
 
-$title = 'Service definitions';
+$title = 'Services';
 require_once 'includes/widgets/header.php';
 
 $filters = new \libAllure\FilterTracker();
@@ -27,7 +27,6 @@ if ($filters->isUsed('identifier')) {
 if ($filters->isUsed('command')) {
 	$qb->where('c.identifier', 'LIKE', '"%' . $filters->getValue('command') . '%"');
 }
-
 
 $stmt = stmt($qb->build())->execute();
 

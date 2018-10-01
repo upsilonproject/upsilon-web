@@ -33,6 +33,10 @@
 			{
 				name:"gridx",
 				location:"./gridx"
+			},
+			{
+				name:"upsilon",
+				location:"./../../src/main/upsilonui"
 			}
 		],
 
@@ -117,6 +121,7 @@
 					"dojox/charting/axis2d/Invisible",
 					"dojox/charting/axis2d/Default",
 					"dojox/charting/plot2d/Base",
+					"upsilon/*"
 				],
 				customBase: true,
 				boot: true
