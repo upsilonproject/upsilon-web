@@ -12,7 +12,11 @@ input, button, select, option {
 	font-family: sans-serif;
 }
 
-input:focus {
+select:focus {
+	border: 1px solid maroon;
+}
+
+input:focus, select:focus {
 	border: 2px solid maroon;
 	outline: none;
 }
@@ -684,3 +688,11 @@ div#header a#a11yContentSkip:focus {
 	background-color: cyan;
 	color: black;
 }
+
+#widget_searchBox:active, #widget_searchBox:focus {
+	width: 100%;
+}
+
+div:disabled, select:disabled, input:disabled  {
+	background-color: lightgray;
+	cursor: no-drop;
