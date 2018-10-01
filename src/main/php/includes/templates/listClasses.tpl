@@ -50,9 +50,10 @@
 
 <div class = "box">
 <h2>All Instances</h2>
+	<a href = "createClassInstance.php?parent={$itemClass.id}">Create class instance</a>
 
 {if $listInstances|@count == 0}
-	<p>No class instances. <a href = "createClassInstance.php?parent={$itemClass.id}">Create class instance</a></p>
+	<p>No class instances. </p>
 {else}
 <table class = "dataTable hover">
 	<thead>

@@ -235,8 +235,11 @@ table {
 	background-color: white;
 }
 
-td, th {
+
+
+div#content td, div#content th {
 	text-align: left;
+	border: 1px solid #999;
 }
 
 th {
@@ -258,6 +261,10 @@ td.centered {
 
 tr td {
 	padding: .4em;
+}
+
+table.hover {
+	border-collapse: collapse;
 }
 
 table.hover tr:hover td {
