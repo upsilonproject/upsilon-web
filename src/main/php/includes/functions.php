@@ -568,8 +568,6 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 	$qb->fields(array('rc.name', 'remote_config_name'));
 	$qb->groupBy('s.id');
 
-	header("SQL: " . $qb->build());
-
 	$stmt = DatabaseFactory::getInstance()->prepare($qb->build());
 	$stmt->execute();
 	$listServices = $stmt->fetchAll();
