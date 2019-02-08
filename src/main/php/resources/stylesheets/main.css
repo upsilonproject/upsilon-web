@@ -169,7 +169,7 @@ ul.metricList > li:last-child {
 }
 
 .old {
-	background-color: yellow !important;
+	background-color: wheat !important;
 }
 
 .good {
@@ -189,7 +189,7 @@ ul.metricList > li:last-child {
 }
 
 .timeout, .warning {
-	background-color: orange;
+	background-color: #fffa66;
 }
 
 .stale {
@@ -233,6 +233,7 @@ a:focus {
 table {
 	width: 100%;
 	background-color: white;
+	border-collapse: collapse;
 }
 
 
@@ -301,6 +302,7 @@ div.scheduleLine {
 }
 
 div.blockContainer {
+	display: flex;
 	margin: auto;
 }
 
@@ -497,8 +499,7 @@ table.dataTable {
 }
 
 table.dataTable th:hover, p.collapseable:hover {
-	background-color: #444;
-	color: white;
+	background-color: #eaf1f7;
 	cursor: pointer;
 }
 
@@ -692,8 +693,8 @@ div#header a#a11yContentSkip:focus {
 	height: auto;
 	overflow: auto;
 	top: auto;
-	background-color: cyan;
-	color: black;
+	background-color: maroon;
+	color: white;
 }
 
 #widget_searchBox:active, #widget_searchBox:focus {

@@ -149,11 +149,21 @@ function insertId() {
 function stmt($sql) {
 	return DatabaseFactory::getInstance()->prepare($sql);
 }
- 
-function san() {
-	return Sanitizer::getInstance();
+
+function vde() {
+	var_dump(func_get_args()); exit;
 }
 
+function san() {
+	global $san;;
+
+	if (!isset($san)) {
+		$san = new libAllure\Sanitizer();
+	}
+
+	return $san;
+}
+ 
 function db() { 
 	return DatabaseFactory::getInstance();
 }
@@ -291,7 +301,7 @@ function addStatusToNodes($nodes) {
 			if ($itemNode['instanceApplicationVersion'] == $latestVersion) {
 				$itemNode['versionKarma'] = 'GOOD';
 			} else {
-				$itemNode['versionKarma'] = 'OLD';
+				$itemNode['versionKarma'] = 'WARNING';
 			}
 		} else {
 			$itemNode['versionKarma'] = 'UNKNOWN';
@@ -555,7 +565,7 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 	}
 
 	if ($filters->isUsed('node')) {
-		$qb->whereEquals('node', $filters->getValue('node'));
+		$qb->whereEquals('node', 'node');
 	}
 
 	$qb->leftJoin('remote_config_allocated_nodes', 'rn')->on('s.node', 'rn.node');
@@ -568,7 +578,9 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 	$qb->fields(array('rc.name', 'remote_config_name'));
 	$qb->groupBy('s.id');
 
+
 	$stmt = DatabaseFactory::getInstance()->prepare($qb->build());
+	$stmt->bindValue('node', $filters->getValue('node'));
 	$stmt->execute();
 	$listServices = $stmt->fetchAll();
 
