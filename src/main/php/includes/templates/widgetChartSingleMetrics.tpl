@@ -11,18 +11,19 @@
 	<div id = "legend{$instanceChartIndex}">legend</div>
 	{/if}
 
+
 	<a class = "fakeButton" href = "viewServiceResultChart.php?serviceIds[]={$service}">Larger</a>
 
-	<br />
+	<br />{$service} {$metric}
 	
 	<script type = "text/javascript">
 dataset = {
 	serviceIds: []
 }
 
-{foreach from = $listServiceId item = serviceId}
+{if isset($service)}
 dataset.serviceIds.push("{$service}");
-{/foreach}
+{/if}
 
 	fetchServiceSingleMetricResultChart('{$metric}', dataset, '{$instanceChartIndex}');
 

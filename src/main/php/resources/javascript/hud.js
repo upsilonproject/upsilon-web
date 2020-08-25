@@ -779,6 +779,8 @@ function filterGetFieldValues() {
 
 function loadFilterResultsIntoSelect(sel, dat) {
 	select = document.getElementById(sel);
+	currentValue = select.getAttribute("initialvalue");
+	window.sel = select;
 	
 	console.log("Loading results into", select, dat);
 
@@ -793,7 +795,13 @@ function loadFilterResultsIntoSelect(sel, dat) {
 		select.disabled = false;
 
 		dat.forEach(function(v) {
-			select.add(createOption(v.id, v.identifier));
+			let opt = createOption(v.id, v.identifier);
+
+			select.add(opt);
+
+			if (v.id == currentValue) {
+				opt.setAttribute('selected', true);
+			}
 		});
 	}
 	

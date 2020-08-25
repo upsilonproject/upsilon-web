@@ -12,6 +12,7 @@ class WidgetChartSingleMetrics extends Widget {
 		$this->instanceChartIndex = uniqid();
 
 		$this->arguments['service'] = null;
+		$this->arguments['metric'] = null;
 	}
 
 	public function render() {
@@ -23,13 +24,6 @@ class WidgetChartSingleMetrics extends Widget {
 		
 		$tpl->assign('instanceChartIndex', $this->instanceChartIndex);
 		$tpl->display('widgetChartSingleMetrics.tpl');
-	}
-
-	public function getArgumentFormElement($optionName) {
-		switch ($optionName) {
-		default:
-			return parent::getArgumentFormElement($optionName);
-		}
 	}
 
 	public function addLinks() {

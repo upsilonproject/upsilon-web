@@ -1,6 +1,9 @@
 <div class = "box">
 	<h2>Maintenence Periods</h2>
 
+	{if empty($listMaintPeriods)}
+	<p>0 maintenance periods have been defined.</p>
+	{else}
 	<table class = "sortable">
 		<thead>
 			<tr>
@@ -22,4 +25,5 @@
 		{/foreach}
 		</tbody>
 	</table>
+	{/if}
 </div>

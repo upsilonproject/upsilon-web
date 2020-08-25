@@ -1,5 +1,5 @@
 <div class = "box">
-	<h2>Command Metadata</h2>
+	<h2>Command Metadata (of Command Instances)</h2>
 
 	{if empty($listCommands)}
 		<p>There are 0 commands.</p>

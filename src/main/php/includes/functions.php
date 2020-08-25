@@ -424,7 +424,6 @@ function invalidateOldServices(&$service) {
 
 	if ($diff > intval(Session::getUser()->getData('oldServiceThreshold'))) {
 		$service['karma'] = 'OLD';
-		$service['output'] = "WARNING: This result of this service check was older than the user's preference threshold." . $service['output'];
 	}
 }
 
@@ -1570,14 +1569,14 @@ function getCommands() {
 	$filters = getFilterCommands();
 
 	$qb = new \libAllure\QueryBuilder();
-	$qb->from('command_metadata', 'c')->fields('commandIdentifier', array('commandIdentifier', 'identifier'), 'id', 'icon', array('count(s.id)', 'serviceCount'));
+	$qb->from('remote_config_commands', 'c')->fields('identifier', array('identifier', 'commandIdentifier'), 'id', 'm.icon', array('id', 'serviceCount'), array('count(c.id)', 'remoteConfigCommandCount'));
+	$qb->leftJoin('command_metadata', 'm')->on('c.metadata', 'm.id');
 
 	if ($filters->isUsed('identifier')) {
 		$qb->whereLikeValue('commandIdentifier', $filters->getValue('identifier'));
 	}
 
-	$qb->leftJoin('services')->on('c.commandIdentifier', 's.identifier');
-	$qb->leftJoin('remote_config_commands', 'ac')->on('ac.metadata', 'c.id');
+//	$qb->leftJoin('services')->on('c.Identifier', 's.identifier');
 	$qb->groupBy('c.id');
 
 

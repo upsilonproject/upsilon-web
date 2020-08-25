@@ -1,8 +1,7 @@
 <?php
 
 define('ANONYMOUS_PAGE', true);
-set_include_path('../' . PATH_SEPARATOR . get_include_path());
-require_once 'includes/common.php';
+require_once 'jsonCommon.php';
 
 use \libAllure\Session;
 

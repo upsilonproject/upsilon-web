@@ -49,6 +49,7 @@ class UpdateRemoteConfigService extends Form {
 
 	private function addElementCommand($command) {
 		$el = new ElementFilteringSelect('command', 'Command', getFilterCommands(), 'filterCommands');
+		$el->setValue($command);
 		
 		$this->addElement($el);
 	}

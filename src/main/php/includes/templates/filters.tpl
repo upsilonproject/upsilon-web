@@ -7,10 +7,10 @@
 	{/if}
 
 	{foreach from = $filters item = filter}
-			<span id = "filterLabel-{$filter.name}" class = "{if $filter.isUsed}good{else}unknown{/if}">{$filter.label}</span>
+			<span id = "filterLabel-{$filter.name}" class = "{if $filter.isUsed}good{else}unused{/if}">{$filter.label}</span>
 
 			{if $filter.type == "hidden"}
-				<input type = "hidden" id = "filterInput-{$filter.name}" name = "{$filter.name}" value = "{$filter.value}" />
+				<input type = "hidden" id = "filterInput-{$filter.name}" name = "{$filter.varName}" value = "{$filter.value}" />
 			{/if}
 
 			{if $filter.type == "bool"}

@@ -14,5 +14,5 @@
 	{/foreach}
 	</ul>
 	{/if}
-	<a href = "createRemoteConfigServiceInstanceInConfig.php?serviceInstanceId={$service.id}" role = "button">Allocate To Drone</a>
+	<a href = "createRemoteConfigServiceInstanceInConfig.php?serviceInstanceId={$service.id}" role = "button">Allocate To Config</a>
 </div>
