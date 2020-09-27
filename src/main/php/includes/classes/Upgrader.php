@@ -209,7 +209,7 @@ class NodesTableHasConfigsColumn extends DatabaseUpgradeTask {
 	}
 
 	public function perform() {
-		$sql = 'ALTER TABLE nodes ADD configs varchar(255) ';
+		$sql = 'ALTER TABLE nodes ADD configs lontext ';
 		$stmt = stmt($sql);
 		$stmt->execute();
 	}
