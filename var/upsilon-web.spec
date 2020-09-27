@@ -12,7 +12,7 @@ URL:		http://upsilon-project.co.uk
 Source0:	upsilon-web.zip
 
 %if "%{?dist}" == "el7scl"
-Requires: upsilon-database-sql httpd24-httpd rh-php56-php rh-php56-php-pdo rh-php56-php-mysqlnd rh-php56-php-mbstring rh-php56-php-bcmath rh-php56-php-xml
+Requires: upsilon-database-sql httpd24-httpd rh-php72-php rh-php72-php-pdo rh-php72-php-mysqlnd rh-php72-php-mbstring rh-php72-php-bcmath rh-php72-php-xml
 %else
 Requires: upsilon-database-sql httpd php php-pdo php-mysql php-mbstring php-bcmath
 %endif

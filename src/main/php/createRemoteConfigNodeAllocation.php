@@ -6,12 +6,12 @@ use \libAllure\FormHandler;
 
 class FormRemoteConfigNodeAllocation extends \libAllure\Form {
 	public function __construct() {
-		parent::__construct('nodeAllocation');
+		parent::__construct('nodeAllocation', 'Allocated config to node');
 
 		$this->addElementReadOnly('Config ID', san()->filterUint('id'), 'id');
 		$this->addElementSelectNode();
 
-		$this->addDefaultButtons();
+		$this->addDefaultButtons('Allocate');
 	}
 
 	private function addElementSelectNode() {

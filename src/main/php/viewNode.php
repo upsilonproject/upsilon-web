@@ -121,10 +121,10 @@ function getServicesForNode($node) {
 
 $filters = new \libAllure\FilterTracker();
 $filters->addString("name");
-$filters->setHiddenValue('identifier', $node['identifier']);
+$filters->setHiddenValue("node", $node['identifier'], 'identifier');
 
 $tpl->assign('filters', $filters->getAll());
-$tpl->assign('listServices', getServicesForNode($node['identifier']));
+$tpl->assign('listServices', getServicesWithFilter(null, $filters));
 $tpl->display('listServices.tpl');
 
 require_once 'includes/widgets/footer.php';

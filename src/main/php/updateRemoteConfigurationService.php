@@ -2,6 +2,7 @@
 
 require_once 'includes/common.php';
 require_once 'includes/functions.remoteConfig.php';
+require_once 'includes/classes/ElementFilteringSelect.php';
 
 setNav(array('listServiceDefinitions.php' => 'Service definitions'), 'Update remote configuration service');
 
@@ -9,7 +10,6 @@ use \libAllure\Form;
 use \libAllure\FormHandler;
 use \libAllure\ElementInput;
 use \libAllure\ElementInputRegex;
-use \libAllure\ElementSelect;
 
 class UpdateRemoteConfigService extends Form {
 	private $arguments;
@@ -48,13 +48,9 @@ class UpdateRemoteConfigService extends Form {
 	}
 
 	private function addElementCommand($command) {
-		$el = new ElementSelect('command', 'Command', $command);
-		$el->addOption('-- none --', '0');
-
-		foreach (getAllCommands() as $command) {
-			$el->addOption($command['identifier'], $command['id']);
-		}
-
+		$el = new ElementFilteringSelect('command', 'Command', getFilterCommands(), 'filterCommands');
+		$el->setValue($command);
+		
 		$this->addElement($el);
 	}
 

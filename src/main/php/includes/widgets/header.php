@@ -105,7 +105,8 @@ if (Session::isLoggedIn()) {
 	$generalLinks->add('#', 'Services &blacktriangledown;');
 
 	$generalLinksServices = linksCollection();
-	$generalLinksServices->add('listServiceDefinitions.php', 'Service Definitions');
+	$generalLinksServices->add('listServiceDefinitions.php', 'Services');
+	$generalLinksServices->add('listGroups.php', 'Groups');
 	$generalLinksServices->add('#', 'Results');
 
 	$generalLinksServicesList = linksCollection();
@@ -115,9 +116,8 @@ if (Session::isLoggedIn()) {
 	$generalLinksServicesList->add('viewList.php?ungrouped', 'Services Without Group');
 	$generalLinksServices->addChildCollection('Results', $generalLinksServicesList);
 
-	$generalLinksServices->add('listGroups.php', 'Groups');
 	$generalLinksServices->addSeparator();
-	$generalLinksServices->add('listCommandDefinitions.php', 'Command Definitions');
+	$generalLinksServices->add('listCommandDefinitions.php', 'Commands');
 	$generalLinksServices->add('listCommands.php', 'Command Metadata');
 	$generalLinksServices->addSeparator();
 	$generalLinksServices->add('listMaintPeriods.php', 'Maintenance Periods');

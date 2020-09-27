@@ -56,11 +56,14 @@
 				</span>
 				{$navTitle}
 			</td>
+			<td style = "text-align: right">
+				<input id = "searchBox" />
+			</td>
 		</tr><tr>
 			<td class = "headerBlock">
 				{include file = "links.tpl" links = $generalLinks skipTitle = true}
 			</td>
-			<td class = "headerBlock media-width-prio-low" style = "text-align: right">
+			<td class = "headerBlock media-width-prio-low" style = "text-align: right" colspan = "2">
 				{include file = "links.tpl" links = $userLinks skipTitle = true}
 			</div>
 		</tr></table>

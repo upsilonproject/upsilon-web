@@ -179,7 +179,7 @@ class FormInstallationQuestions extends Form {
         }
 
         private function createAdministratorAccount() {
-                $sql = 'TRUNCATE users';
+                $sql = 'DELETE FROM users';
                 $this->db->query($sql);
 
                 $sql = 'INSERT INTO users (username, password, `group`) VALUES (:adminUsername, :adminPassword, 1) ';

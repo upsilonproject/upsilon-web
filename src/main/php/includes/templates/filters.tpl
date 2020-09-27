@@ -5,11 +5,12 @@
 	{else}
 		<div class = "filterTracker">
 	{/if}
+
 	{foreach from = $filters item = filter}
-			<span id = "filterLabel-{$filter.name}" class = "{if $filter.isUsed}good{else}unknown{/if}">{$filter.label}</span>
+			<span id = "filterLabel-{$filter.name}" class = "{if $filter.isUsed}good{else}unused{/if}">{$filter.label}</span>
 
 			{if $filter.type == "hidden"}
-				<input type = "hidden" id = "filterInput-{$filter.name}" name = "{$filter.name}" value = "{$filter.value}" />
+				<input type = "hidden" id = "filterInput-{$filter.name}" name = "{$filter.varName}" value = "{$filter.value}" />
 			{/if}
 
 			{if $filter.type == "bool"}
@@ -32,6 +33,7 @@
 			&nbsp;&nbsp;&nbsp;&nbsp;
 	{/foreach}
 
+	<br />
 	<script type = "text/javascript">
 	window.filters = [];
 
@@ -48,6 +50,9 @@
 			<button type = "submit">Update filter</button>
 		</form>
 		<br />
+
 	<hr />
 	{/if}
+
+	<br /><p id = "filteringSelectLoadingIndicator" class = "subtle">..</p>
 	{/if}

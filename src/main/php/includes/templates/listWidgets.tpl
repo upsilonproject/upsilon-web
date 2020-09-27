@@ -1,7 +1,7 @@
 <div class = "box">
 	<h2>Widgets</h2>
 	
-	<table>
+	<table class = "hover">
 		<thead>
 		<tr>
 			<th>Classes</th>

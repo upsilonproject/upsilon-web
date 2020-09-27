@@ -21,14 +21,14 @@ class FormUpdateInstanceCoverage extends Form {
 		$inst = $this->getClassInstance($instId);
 
 		$reqId = Sanitizer::getInstance()->filterUint('requirement');
-		$req = $this->getRequirement($reqId);
+		$req = $this->getRequirement($reqId, $inst);
 
 		$this->addElementHidden('instance', Sanitizer::getInstance()->filterUint('instance'));
 		$this->addElementReadOnly('Instance title', $inst['title']);
 
 		$this->addElementHidden('requirement', Sanitizer::getInstance()->filterUint('requirement'));
 		$this->addElementReadOnly('Requirement', $req['title']);
-		$this->addElementSelectServiceCheck($req, $inst);
+		$this->addElementSelectServiceCheck($req, $inst, $req['service']);
 		$this->addDefaultButtons('Associate');
 	}
 
@@ -41,19 +41,21 @@ class FormUpdateInstanceCoverage extends Form {
 		return $stmt->fetchRow();
 	}
 
-	private function getRequirement($id) { 
-		$sql = 'SELECT r.* FROM class_service_requirements r WHERE r.id = :id';
+	private function getRequirement($id, $inst) { 
+		$sql = 'SELECT r.*, a.service FROM class_service_requirements r LEFT JOIN class_service_assignments a ON r.id = a.requirement AND a.instance = :inst WHERE r.id = :id';
 		$stmt = DatabaseFactory::getInstance()->prepare($sql);
+		$stmt->bindValue(':inst', $inst['id']);
 		$stmt->bindValue(':id', $id);
 		$stmt->execute();
 	
 		return $stmt->fetchRow();
 	}
 
-	private function addElementSelectServiceCheck($requirement, $inst) {
+	private function addElementSelectServiceCheck($requirement, $inst, $val) {
 		$filters = instanceCoverageFilter();
 
 		$el = new ElementFilteringSelect('service', 'Service', $filters, 'filterInstanceCoverageOptions');
+		$el->setValue($val);
 		$el->description = 'Cannot find an existing service? <a href = "createRemoteConfigService.php?commandId=' . $requirement['command'] . '&requirementId=' . $requirement['id'] . '&classInstanceId=' . $inst['id'] . '">Create</a>';
 
 		$this->addElement($el);

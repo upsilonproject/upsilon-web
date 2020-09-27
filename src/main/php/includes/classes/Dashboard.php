@@ -23,8 +23,8 @@ class Dashboard {
 		
 			$itemInstance['instance'] = new $wi();
 			$itemInstance['instance']->dashboard = $this;
-			$itemInstance['instance']->init();
 			$itemInstance['instance']->loadArguments($itemInstance['id']);
+			$itemInstance['instance']->init();
 		
 			if (!$itemInstance['instance']->isShown()) {
 				$hiddenWidgets[] = $itemInstance;

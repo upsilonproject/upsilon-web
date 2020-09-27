@@ -14,7 +14,7 @@ function getClickableCommandLine($configSource) {
 		$line = str_replace('$' . $name, '<a href = "updateRemoteConfigurationService.php?id=' . $configSource['remote_configuration_service_id'] . '"><abbr class = "commandArg" title = "' . $name . '">' . $value . '</abbr></a>', $line);
 	}
 
-	$line = preg_replace('#\$(\w+)#i', '<a href = "updateRemoteConfigurationCommand.php?id=' . $configSource['remote_configuration_service_id'] . '">$<strong class = "bad">\1</strong></a>', $line);
+	$line = preg_replace('#\$(\w+)#i', '<a href = "updateRemoteConfigurationService.php?id=' . $configSource['remote_configuration_service_id'] . '">$<strong class = "bad">\1</strong></a>', $line);
 
 	return $line;
 

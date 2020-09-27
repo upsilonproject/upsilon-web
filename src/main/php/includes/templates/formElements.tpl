@@ -10,6 +10,12 @@
 			{$element->getValue()}
 		{elseif $element->getType() eq 'submit'}
 			<button value = "{$form->getName()}" name = "{$element->getName()}" type = "submit">{$element->getCaption()}</button>
+		{elseif $element->getType() eq 'ElementCheckbox'}
+			<label style = for = "{$element->getName()}">{$element->getCaption()}</label>
+			<div class = "checkboxHolder">
+				<input type = "checkbox" {if $element->getValue()}checked{/if} id = "{$element->getName()}" />
+				<label for = "{$element->getName()}" style = "width: auto;"></label>
+			</div>
 		{else}
 			<fieldset>				
 				{$element->render()}

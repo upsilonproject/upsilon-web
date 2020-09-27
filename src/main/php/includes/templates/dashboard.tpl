@@ -1,4 +1,3 @@
-	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/driveway.min.css" />
 
 {if $tutorialMode}
 <div class = "box tutorialMessage">
@@ -7,13 +6,13 @@
 </div>
 {/if}
 
-<div class = "blockContainer dw">
+<div class = "blockContainer">
 {if empty($listInstances)}
 	<p>This dashboard is empty. Select <strong>Actions</strong> &raquo; <strong>Add Widget</strong> from the Dashboard menu.</p>
 {else}
 		{foreach from = $listInstances item = widget}
 			{if $widget.instance->isShown()}
-			<div class = "block dw-panel">
+			<div class = "block">
 				{if $sessionOptions->drawNavigation}
 				<div style = "float: right" data-dojo-type = "dijit/form/DropDownButton">
 					<span>&#9881;</span>

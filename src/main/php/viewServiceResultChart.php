@@ -5,7 +5,7 @@ require_once 'includes/widgets/header.php';
 
 foreach ($_REQUEST['serviceIds'] as $serviceId) {
 	$service = getServiceById($serviceId);
-
+	
 	$results = getServiceResults($service['identifier'], $service['node'], 7);
 	$results = array_reverse($results);
 

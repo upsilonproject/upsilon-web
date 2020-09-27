@@ -12,7 +12,11 @@ input, button, select, option {
 	font-family: sans-serif;
 }
 
-input:focus {
+select:focus {
+	border: 1px solid maroon;
+}
+
+input:focus, select:focus {
 	border: 2px solid maroon;
 	outline: none;
 }
@@ -57,19 +61,9 @@ div.serviceDetail, div.box, div.block {
 	text-align: left;
 	background-color: #fff;
 	border: 1px solid #bbb;
-	margin: 1em;
+	margin: 1em .6em 1em .6em;
 	padding: 1em;
-}
-
-div.block:first-child {
-	margin-top: 0;
-}
-
-div.block {
-	padding: 1em;
-	vertical-align: top;
-	text-align: left;
-	min-width: 360px;
+	box-shadow: 0px 0px 6px 5px #ccc;
 }
 
 div.metricgroup:hover {
@@ -165,7 +159,7 @@ ul.metricList > li:last-child {
 }
 
 .old {
-	background-color: yellow !important;
+	background-color: wheat !important;
 }
 
 .good {
@@ -174,6 +168,10 @@ ul.metricList > li:last-child {
 
 .neut, .unknown  {
 	background-color: gray;
+}
+
+.unused {
+	background-color: beige;
 }
 
 .poor, .bad {
@@ -185,7 +183,7 @@ ul.metricList > li:last-child {
 }
 
 .timeout, .warning {
-	background-color: orange;
+	background-color: #fffa66;
 }
 
 .stale {
@@ -229,6 +227,7 @@ a:focus {
 table {
 	width: 100%;
 	background-color: white;
+	border-collapse: collapse;
 }
 
 
@@ -293,11 +292,23 @@ div.scheduleLine {
 
 #content {
 	margin: auto;
-	padding: 1em;
+	padding-top: 1em;
 }
 
 div.blockContainer {
+	display: grid;
+	grid-auto-rows: minmax(auto, auto);
+	grid-auto-columns: minmax(auto, auto);
+	grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+	grid-template-rows: repeat(auto-fill, minmax(auto, 1fr));
+
 	margin: auto;
+}
+
+div.block {
+	padding: 1em;
+	vertical-align: top;
+	text-align: left;
 }
 
 ul.subresults {
@@ -436,6 +447,7 @@ div#header {
 	border-bottom: 1px solid #3f3f3f;
 	text-align: left;
 	background-color: #444;
+	box-shadow: 0px 0px 6px 5px #aaa;
 	padding: 0;
 }
 
@@ -493,8 +505,7 @@ table.dataTable {
 }
 
 table.dataTable th:hover, p.collapseable:hover {
-	background-color: #444;
-	color: white;
+	background-color: #eaf1f7;
 	cursor: pointer;
 }
 
@@ -688,6 +699,54 @@ div#header a#a11yContentSkip:focus {
 	height: auto;
 	overflow: auto;
 	top: auto;
-	background-color: cyan;
-	color: black;
+	background-color: maroon;
+	color: white;
 }
+
+#widget_searchBox:active, #widget_searchBox:focus {
+	width: 100%;
+}
+
+.claro .dijitMenuBar .dijitMenuItem {
+	margin: 0 !important;
+}
+
+div:disabled, select:disabled, input:disabled  {
+	background-color: lightgray;
+	cursor: no-drop;
+}
+
+
+.checkboxHolder {
+  display: inline-block; 
+  min-width: 40px;
+}
+
+.checkboxHolder label {
+  padding-left: .4em;
+  padding-right: .4em;
+  margin-left: -2em;
+  border: 1px solid #999;
+  position: absolute; 
+  text-align: center;
+}
+  
+.checkboxHolder label:hover:after {
+  opacity: 0.3;
+}
+
+.checkboxHolder label:after {
+  content: '\2714'; 
+  display: block;
+  vertical-align: middle;
+  opacity: 0;
+}
+    
+.checkboxHolder input[type=checkbox] {
+  visibility: hidden;
+}
+
+.checkboxHolder input:checked + label:after {
+  opacity: 1;
+}    
+

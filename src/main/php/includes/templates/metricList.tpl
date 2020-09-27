@@ -33,7 +33,7 @@
 					{/if}
 
 					{if $sessionOptions->drawNavigation}<a href = "viewService.php?id={$itemService.id}">{/if}
-						<span class = "metricTitle" title = "{$itemService.description}">{if empty($itemService.alias)}{$itemService.description|default:'nodesc'|truncate:18}{else}{$itemService.alias}{/if}{if empty($itemService.alias) && isset($itemService.executableShort)}cmd:{$itemService.executableShort|default:'nocmd'|truncate:16}{/if}</span>
+						<span class = "metricTitle" title = "{$itemService.alias}">{if empty($itemService.alias)}{$itemService.description|default:'nodesc'|truncate:18}{else}{$itemService.alias}{/if}{if empty($itemService.alias) && isset($itemService.executableShort)}cmd:{$itemService.executableShort|default:'nocmd'|truncate:16}{/if}</span>
 					{if $sessionOptions->drawNavigation}</a>{/if}
 					{if not empty($itemService.output)}
 					<p class = "metricOutput"><small>{$itemService.output|truncate:32}</small></p>

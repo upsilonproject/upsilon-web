@@ -21,7 +21,8 @@ class ElementFilteringSelect extends Element {
 		$tpl->assign('filterCallback', $this->filterFunc);
 		$tpl->display('filters.tpl');
 
-		echo '<br /><br /><select style = "width: 100%" multiple size = "10" id = "' . $this->name . '" name = "' . $this->name . '"></select>';
+		echo '<br /><br /><select initialvalue = "' . $this->value . '" style = "width: 100%" multiple size = "10" id = "' . $this->name . '" name = "' . $this->name . '"></select>';
+		echo '<span class = "subtle">Initial value: ' . $this->value . '</span>';
 		echo '</div>';
 		echo '<script>' . $this->filterFunc . '()</script>';
 	}

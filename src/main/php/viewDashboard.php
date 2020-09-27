@@ -9,6 +9,8 @@ use \libAllure\DatabaseFactory;
 $id = san()->filterUint('id');
 
 $links = new HtmlLinksCollection('Dashboard &nabla;');
+$links->add('createRemoteConfigService.php?', 'Monitor new service...');
+$links->addSeparator();
 $links->add('createWidgetInstance.php?dashboard=' . $id, 'Add Widget');
 $links->add('updateDashboard.php?id=' . $id, 'Update this dashboard');
 $links->add('deleteDashboard.php?id=' . $id, 'Delete this dashboard');

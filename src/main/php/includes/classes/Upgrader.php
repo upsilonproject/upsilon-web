@@ -61,122 +61,6 @@ abstract class UpgradeTask {
 	}
 }
 
-abstract class DatabaseUpgradeTask extends UpgradeTask {
-	protected function getFieldLength($field, $table) {
-		$def = $this->getFieldDefinition($field, $table);
-		$def = $def['Type'];
-
-		$matches = array();
-		if (preg_match('#\((.+)\)#i', $def, $matches)) {
-			return $matches[1];
-		} else {
-			throw new Exception('Could not find field length for ' . $table . ' ' . $field . ' ' . print_r($matches, true));
-		}
-	}
-
-	protected function getFieldDefinition($field, $table) {
-		$sql = 'DESC ' . $table .  ' :field';
-		$stmt = stmt($sql);
-		$stmt->bindValue(':field', $field);
-		$stmt->execute();
-
-		if ($stmt->numRows() == 0) {
-			return null;
-		} else {
-			return $stmt->fetch();
-		}
-	}
-
-	protected function doesFieldExistInTable($field, $table) {
-		if ($this->getFieldDefinition($field, $table) == null) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	protected function tableHasUniqueKey($table, $name) {
-		$sql = 'SHOW CREATE TABLE ' . $table;
-		$stmt = stmt($sql);
-		$res = $stmt->execute()->fetchRow();
-		$res = $res['Create Table'];
-
-		if (stripos($res, "UNIQUE KEY `" . $name . "`") === FALSE) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	public function tableHasRow($table, $pkey, $value) {
-		$sql = "SELECT $pkey FROM $table WHERE $pkey = :value ";
-		$stmt = stmt($sql);
-		$stmt->bindValue(':value', $value);
-		$stmt->execute();
-
-		return $stmt->numRows() != 0;
-	}
-
-	public function isPossible() {
-		return true;
-	}
-
-	protected function doesTableExist($tbl) {
-		try {
-			$sql = 'DESC ' . $tbl;
-			$stmt = stmt($sql);
-			$stmt->execute();
-
-			if ($stmt->numRows() == false) {
-				return false;
-			}
-		} catch (Exception $e) {
-			return false;
-		}
-
-		return true;
-	}
-}
-
-class NodeGroupMembershipTableExists extends DatabaseUpgradeTask {
-	public function isNecessary() {
-		return !$this->doesTableExist('node_group_memberships');
-	}
-
-	public function isPossible() {
-		return true;
-	}
-
-	public function perform() {
-		$sql = 'CREATE TABLE node_group_memberships (id int not null primary key auto_increment, gid int not null, node int not null)';
-		$stmt = stmt($sql);
-		$stmt->execute();
-	}
-}
-
-Upgrader::registerTask(new NodeGroupMembershipTableExists());
-
-/**
-class UsersNeedCake extends DatabaseUpgradeTask {
-	public function isNecessary() {
-		return !$this->doesFieldExistInTable('cake', 'users');
-	}
-
-	public function isPossible() {
-		return true;
-	}
-
-	public function perform() {
-		$sql = 'ALTER TABLE users ADD cake varchar(32)';
-		$stmt = stmt($sql);
-		$stmt->execute();
-	}
-
-};
-
-Upgrader::registerTask(new UsersNeedCake());
-*/
-
 class HttpdCanNetworkConnect extends UpgradeTask {
 	public function isNecessary() {
 		if (trim(`getenforce`) == 'Enforcing') {
@@ -472,6 +356,124 @@ class LotsOfForeignKeys extends DatabaseUpgradeTask {
 
 	}
 }
+
+abstract class DatabaseUpgradeTask extends UpgradeTask {
+	protected function getFieldLength($field, $table) {
+		$def = $this->getFieldDefinition($field, $table);
+		$def = $def['Type'];
+
+		$matches = array();
+		if (preg_match('#\((.+)\)#i', $def, $matches)) {
+			return $matches[1];
+		} else {
+			throw new Exception('Could not find field length for ' . $table . ' ' . $field . ' ' . print_r($matches, true));
+		}
+	}
+
+	protected function getFieldDefinition($field, $table) {
+		$sql = 'DESC ' . $table .  ' :field';
+		$stmt = stmt($sql);
+		$stmt->bindValue(':field', $field);
+		$stmt->execute();
+
+		if ($stmt->numRows() == 0) {
+			return null;
+		} else {
+			return $stmt->fetch();
+		}
+	}
+
+	protected function doesFieldExistInTable($field, $table) {
+		if ($this->getFieldDefinition($field, $table) == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	protected function tableHasUniqueKey($table, $name) {
+		$sql = 'SHOW CREATE TABLE ' . $table;
+		$stmt = stmt($sql);
+		$res = $stmt->execute()->fetchRow();
+		$res = $res['Create Table'];
+
+		if (stripos($res, "UNIQUE KEY `" . $name . "`") === FALSE) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	public function tableHasRow($table, $pkey, $value) {
+		$sql = "SELECT $pkey FROM $table WHERE $pkey = :value ";
+		$stmt = stmt($sql);
+		$stmt->bindValue(':value', $value);
+		$stmt->execute();
+
+		return $stmt->numRows() != 0;
+	}
+
+	public function isPossible() {
+		return true;
+	}
+
+	protected function doesTableExist($tbl) {
+		try {
+			$sql = 'DESC ' . $tbl;
+			$stmt = stmt($sql);
+			$stmt->execute();
+
+			if ($stmt->numRows() == false) {
+				return false;
+			}
+		} catch (Exception $e) {
+			return false;
+		}
+
+		return true;
+	}
+}
+
+class NodeGroupMembershipTableExists extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->doesTableExist('node_group_memberships');
+	}
+
+	public function isPossible() {
+		return true;
+	}
+
+	public function perform() {
+		$sql = 'CREATE TABLE node_group_memberships (id int not null primary key auto_increment, gid int not null, node int not null)';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+}
+
+Upgrader::registerTask(new NodeGroupMembershipTableExists());
+
+/**
+class UsersNeedCake extends DatabaseUpgradeTask {
+	public function isNecessary() {
+		return !$this->doesFieldExistInTable('cake', 'users');
+	}
+
+	public function isPossible() {
+		return true;
+	}
+
+	public function perform() {
+		$sql = 'ALTER TABLE users ADD cake varchar(32)';
+		$stmt = stmt($sql);
+		$stmt->execute();
+	}
+
+};
+
+Upgrader::registerTask(new UsersNeedCake());
+*/
+
+
 
 Upgrader::registerTask(new LotsOfForeignKeys());
 

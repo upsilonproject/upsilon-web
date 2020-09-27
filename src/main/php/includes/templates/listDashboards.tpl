@@ -11,7 +11,7 @@
 	{if empty($listDashboards)}
 		<p>You do not have any dashboards created at the moment. Select "Create Dashboard" from the actions menu to get started.</p>
 	{else}	
-	<table>
+	<table class = "hover">
 		<thead>
 			<tr>
 				<th>ID</th>

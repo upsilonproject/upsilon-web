@@ -149,11 +149,21 @@ function insertId() {
 function stmt($sql) {
 	return DatabaseFactory::getInstance()->prepare($sql);
 }
- 
-function san() {
-	return Sanitizer::getInstance();
+
+function vde() {
+	var_dump(func_get_args()); exit;
 }
 
+function san() {
+	global $san;;
+
+	if (!isset($san)) {
+		$san = new libAllure\Sanitizer();
+	}
+
+	return $san;
+}
+ 
 function db() { 
 	return DatabaseFactory::getInstance();
 }
@@ -291,7 +301,7 @@ function addStatusToNodes($nodes) {
 			if ($itemNode['instanceApplicationVersion'] == $latestVersion) {
 				$itemNode['versionKarma'] = 'GOOD';
 			} else {
-				$itemNode['versionKarma'] = 'OLD';
+				$itemNode['versionKarma'] = 'WARNING';
 			}
 		} else {
 			$itemNode['versionKarma'] = 'UNKNOWN';
@@ -335,7 +345,7 @@ function parseOutputJson(&$service) {
 				$service['listSubresults'][$key]['karma'] = strtolower($service['listSubresults'][$key]['karma']);
 
 				// name
-				if (isset($result['name'])) {
+				if (isset($result['name']) && is_string($result['name'])) {
 					$service['listSubresults'][$key]['name'] = san()->escapeStringForHtml($result['name']);
 					continue;
 				}	
@@ -353,6 +363,20 @@ function parseOutputJson(&$service) {
 
 		if (isset($json['metrics'])) {
 			$service['listMetrics'] = $json['metrics'];
+
+			$dates = array();
+			foreach ($service['listMetrics'] as $k => $metric) {
+				if (isset($metric['date'])) {
+					$d = strtotime($metric['date']);
+
+					$dates[$k] = $d;
+					$service['listMetrics'][$k]['date'] = $d;
+				} else {
+					$dates[$k] = 0;
+				}
+			}
+
+			array_multisort($service['listMetrics'], $dates);
 		}
 
 		if (isset($json['tasks'])) {
@@ -400,7 +424,6 @@ function invalidateOldServices(&$service) {
 
 	if ($diff > intval(Session::getUser()->getData('oldServiceThreshold'))) {
 		$service['karma'] = 'OLD';
-		$service['output'] = "WARNING: This result of this service check was older than the user's preference threshold." . $service['output'];
 	}
 }
 
@@ -470,6 +493,13 @@ function getFailedDowntimeRule(array $downtime) {
 	return false;
 }
 
+function getFilterCommands() {
+	$filters = new FilterTracker();
+	$filters->addString('identifier');
+
+	return $filters;
+}
+
 function getFilterServices() {
 	$filters = new FilterTracker();
 	$filters->addBool('problems', 'Problems');
@@ -508,6 +538,7 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 
 	$qb = new \libAllure\QueryBuilder();
 	$qb->from('services')->fields('id', 'identifier', array('ifnull(s.alias, s.identifier)', 'alias'), 'commandLine executable', 'estimatedNextCheck', 'lastChanged', 'output', 'lastUpdated', 'karma', 'node');
+	$qb->leftJoin('service_metadata', 'm')->on('s.identifier', 'm.service')->fields('m.goodCast', 'm.criticalCast');
 
 	if ($filters->isUsed('problems')) {
 		$qb->whereNotEquals('karma', 'good');
@@ -523,7 +554,6 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 	if ($filters->isUsed('maintPeriod')) {
 		$id = san()->filterUint('maintPeriod');
 
-		$qb->leftJoin('service_metadata', 'm')->on('s.identifier', 'm.service');
 		$qb->whereEquals('m.acceptableDowntimeSla', $id);
 
 		$activeFilters[] = 'Maint Period';
@@ -534,7 +564,7 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 	}
 
 	if ($filters->isUsed('node')) {
-		$qb->whereEquals('node', $filters->getValue('node'));
+		$qb->whereEquals('node', 'node');
 	}
 
 	$qb->leftJoin('remote_config_allocated_nodes', 'rn')->on('s.node', 'rn.node');
@@ -547,13 +577,21 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 	$qb->fields(array('rc.name', 'remote_config_name'));
 	$qb->groupBy('s.id');
 
-	header("SQL: " . $qb->build());
 
 	$stmt = DatabaseFactory::getInstance()->prepare($qb->build());
+	$stmt->bindValue('node', $filters->getValue('node'));
 	$stmt->execute();
 	$listServices = $stmt->fetchAll();
 
 	$listServices = enrichServices($listServices);
+
+	if ($filters->isUsed('problems')) {
+		foreach ($listServices as $k => $v) {
+			if ($v['karma'] == 'GOOD') {
+				unset ($listServices[$k]);	
+			}
+		}
+	}
 
 	return $listServices;
 }
@@ -579,8 +617,9 @@ function getServices($groupId = null) {
 }
 
 function castService(&$service) {
-	echo 'Warning: Service Cast';
-	var_dump($service['castServiceCritical']);
+	if ($service['karma'] != 'GOOD' && !empty($service['criticalCast'])) {
+		$service['karma'] = $service['criticalCast'];
+	}
 }
 
 function enrichService($service, $parseOutput = true, $parseMetadata = true, $invalidateOldServices = true, $parseAcceptableDowntime = true, $castServices = false) {
@@ -589,7 +628,7 @@ function enrichService($service, $parseOutput = true, $parseMetadata = true, $in
 	return $services[0];
 }
 
-function enrichServices($listServices, $parseOutput = true, $parseMetadata = true, $invalidateOldServices = true, $parseAcceptableDowntime = true, $castServices = false) {
+function enrichServices($listServices, $parseOutput = true, $parseMetadata = true, $invalidateOldServices = true, $parseAcceptableDowntime = true, $castServices = true) {
 	foreach ($listServices as $k => $itemService) {
 		$listServices[$k]['stabilityProbibility'] = 0;
 		$listServices[$k]['executableShort'] = str_replace(array('.pl', '.py', 'check_'), null, basename($listServices[$k]['executable']));
@@ -1527,8 +1566,23 @@ function getDashboards() {
 }
 
 function getCommands() {
-	$sql = 'SELECT c.id, c.commandIdentifier, c.icon, count(s.id) AS serviceCount, count(ac.id) AS remoteConfigCommandCount FROM command_metadata c LEFT JOIN services s ON s.commandIdentifier = c.commandIdentifier LEFT JOIN remote_config_commands ac ON ac.metadata = c.id GROUP BY c.id';
-	$stmt = stmt($sql);
+	$filters = getFilterCommands();
+
+	$qb = new \libAllure\QueryBuilder();
+	$qb->from('remote_config_commands', 'c')->fields('identifier', array('identifier', 'commandIdentifier'), 'id', 'm.icon', array('id', 'serviceCount'), array('count(c.id)', 'remoteConfigCommandCount'));
+	$qb->leftJoin('command_metadata', 'm')->on('c.metadata', 'm.id');
+
+	if ($filters->isUsed('identifier')) {
+		$qb->whereLikeValue('commandIdentifier', $filters->getValue('identifier'));
+	}
+
+//	$qb->leftJoin('services')->on('c.Identifier', 's.identifier');
+	$qb->groupBy('c.id');
+
+
+//	$sql = 'SELECT c.id, c.commandIdentifier, c.commandIdentifier AS identifier, c.icon, count(s.id) AS serviceCount, count(ac.id) AS remoteConfigCommandCount FROM command_metadata c LEFT JOIN services s ON s.commandIdentifier = c.commandIdentifier LEFT JOIN remote_config_commands ac ON ac.metadata = c.id GROUP BY c.id';
+//          SELECT c.commandIdentifier, c.id, c.icon, count(s.id) AS serviceCount FROM command_metadata c LEFT JOIN services s ON c.commandIdentifier = s.identifier LEFT JOIN remote_config_commands ac ON ac.metadata = c.id GROUP BY c.id ORDER BY c.commandIdentifier
+	$stmt = stmt($qb->build());
 	$stmt->execute();
 
 	return $stmt->fetchAll();
@@ -1651,7 +1705,6 @@ function getServiceResultsMostRecent($serviceIdentifier, $nodeIdentifier) {
 function getServiceResults($serviceIdentifier, $nodeIdentifier, $interval = 7, $resolution = null) {
 	$interval = intval($interval);
 
-	$interval = 2;
 	if ($resolution == null) {
 		$resolution = $interval * 50;
 	}

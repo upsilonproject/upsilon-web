@@ -1,12 +1,12 @@
 <div class = "box">
-	<h2>Command Metadata</h2>
+	<h2>Command Metadata (of Command Instances)</h2>
 
 	{if empty($listCommands)}
 		<p>There are 0 commands.</p>
 		<p>Commands are used to add common metadata to services, like add a "ping" icon to all ping commands.</p>
 		<p>To create a command, go to <strong>Actions</strong> &raquo; <strong>Create Command</strong>.</p>
 	{else}
-	<table>
+	<table class = "hover">
 		<thead>
 			<tr>
 				<th>Command Identifier</th>
