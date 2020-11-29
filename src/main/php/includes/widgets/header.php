@@ -70,8 +70,8 @@ $tpl->assign('sessionOptions', sessionOptions());
 $tpl->assign('datetime', date('D H:i'));
 $tpl->assign('apiClient', isset($_SESSION['apiClient']) ? $_SESSION['apiClient'] : false);
 
-$generalLinks = linksCollection();
-$userLinks = linksCollection();
+$generalLinks = linksCollection('General links');
+$userLinks = linksCollection('User links');
 
 if (Session::isLoggedIn()) {
 
@@ -107,14 +107,11 @@ if (Session::isLoggedIn()) {
 	$generalLinksServices = linksCollection();
 	$generalLinksServices->add('listServiceDefinitions.php', 'Services');
 	$generalLinksServices->add('listGroups.php', 'Groups');
-	$generalLinksServices->add('#', 'Results');
 
-	$generalLinksServicesList = linksCollection();
-	$generalLinksServicesList->add('viewList.php', 'All Service Results');
-	$generalLinksServicesList->addSeparator();
-	$generalLinksServicesList->add('viewList.php?problems', 'Services With Problems');
-	$generalLinksServicesList->add('viewList.php?ungrouped', 'Services Without Group');
-	$generalLinksServices->addChildCollection('Results', $generalLinksServicesList);
+	$generalLinksServices->addSeparator();
+	$generalLinksServices->add('viewList.php', 'Results: All');
+	$generalLinksServices->add('viewList.php?problems', 'Results: Problems');
+	$generalLinksServices->add('viewList.php?ungrouped', 'Results: Ungrouped');
 
 	$generalLinksServices->addSeparator();
 	$generalLinksServices->add('listCommandDefinitions.php', 'Commands');

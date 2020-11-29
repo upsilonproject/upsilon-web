@@ -4,8 +4,6 @@
 <head>
 	<title>{$pageTitle} &laquo; {$siteTitle}</title>
 
-	<link rel="stylesheet" href="resources/dojo/dijit/themes/claro/claro.css" />
-
 	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/main.css" />
 	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/phone-thin.css" title = "mobile" media = "(max-width: 366px)" />
 	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/phone-wide.css" title = "mobile" media = "(max-width: 400px)" />
@@ -21,7 +19,7 @@
 	<meta name="theme-color" content="#000000" />
 </head>
 
-<body class = "claro">
+<body>
 	<!--
 <div id = "header">
 	{if $sessionOptions->drawHeader}
@@ -37,43 +35,33 @@
 </div>
 	!-->
 	{if $sessionOptions->drawNavigation}
-	<div id = "header">
+	<header title = "header">
 		<a href = "#content" id = "a11yContentSkip">Skip to content</a>
 
-		<div class = "navigationMenuItems">
+		<a id = "headerLogo" href = "index.php">
+			<img alt = "upsilon logo" src = "resources/images/icons/logo96pxdarkbg.webp" width = "24" id = "logo" />
+		</a>
 
-		<table id = "headerStruct"><tr>
-			<td class = "media-width-prio-low" rowspan = "2" style = "width: 1%; padding-right: 0em; padding-left: 1em;">
-				<a href = "index.php">
-					<img alt = "upsilon logo" src = "resources/images/icons/logo96pxdarkbg.webp" width = "24" style = "margin-right: 1em; margin-bottom: 4px; display: inline-block; vertical-align: middle;" />
-				</a>
-			</td>
-
-			<td class = "headerBlock" style = "padding-left: .6em; padding-top: .2em; font-size: 120%; font-weight: bold;" colspan = "2">
-				<span class = "media-width-prio-low">
-				<a href = "index.php">{$siteTitle}</a>
-				&raquo;
-				</span>
-				{$navTitle}
-			</td>
-			<td style = "text-align: right">
-				<input id = "searchBox" />
-			</td>
-		</tr><tr>
-			<td class = "headerBlock">
-				{include file = "links.tpl" links = $generalLinks skipTitle = true}
-			</td>
-			<td class = "headerBlock media-width-prio-low" style = "text-align: right" colspan = "2">
-				{include file = "links.tpl" links = $userLinks skipTitle = true}
-			</div>
-		</tr></table>
+		<h1><a href = "index.php">{$siteTitle}</a>
+			&raquo; {$navTitle}
+		</h1>
+		
+		<div title = "search box" id = "searchBox">
+			<input placeholder = "Search">
 		</div>
-	</div>
+
+		<div id = "generalLinks" role = "none">
+			{include file = "links.tpl" links = $generalLinks skipTitle = true}
+		</div>
+
+		<div id = "adminLinks" role = "none">
+			{include file = "links.tpl" links = $userLinks skipTitle = true}
+		</div>
+	</header>
 	{/if}
 
 {if $isNighttime && $sessionOPtions->drawBigClock}<p style = "margin: 0; font-size:9em; font-weight: bold; background-color: white; color: black;">{$datetime}</p>{/if}
-<div id = "content">
+<main title = "content" id = "content">
 
-<script src="resources/dojo/dojo/dojo.js.uncompressed.js"></script>
 <script src="resources/javascript/hud.js"></script>
 

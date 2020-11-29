@@ -716,8 +716,6 @@ function loadDashboard(dashboard) {
 		});
 
 		setContentElement(container);
-		
-		layoutBoxes();
 	});
 
 }

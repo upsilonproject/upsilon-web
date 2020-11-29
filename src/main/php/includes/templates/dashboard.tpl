@@ -14,7 +14,7 @@
 			{if $widget.instance->isShown()}
 			<div class = "block">
 				{if $sessionOptions->drawNavigation}
-				<div style = "float: right" data-dojo-type = "dijit/form/DropDownButton">
+				<div style = "float: right">
 					<span>&#9881;</span>
 
 						{include file = "links.tpl" links = $widget.instance->getLinks() skipTitle = true sub = true}
@@ -38,7 +38,7 @@
 
 <script type = "text/javascript">
 {literal}
-dojo.addOnLoad(function() {
+onDomReady(() => {
 	{/literal}
 	{if $itemDashboard->isServicesGrouped()}
 	toggleGroups();

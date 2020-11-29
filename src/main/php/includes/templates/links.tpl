@@ -1,36 +1,32 @@
 {if $links->hasLinks()}
-{if not empty($sub)}
-<div data-dojo-type = "dijit/DropDownMenu">
+{if not isset($sub)}
+<nav title = "{$links->getTitle()}">
+<ul class = "menu" role = "menubar">
 {else}
-<div data-dojo-type = "dijit/MenuBar" data-dojo-props = "passivePopupDelay: 1, popupDelay: 1">
+<ul class = "submenu">
 {/if}
 	{if not isset($skipTitle)}
-		<div data-dojo-type = "dijit/MenuItem">
-			{$links->getTitle()}
-		</div>
+		<h3>{$links->getTitle()}</h3>
 	{/if}
 
 	{foreach from = $links item = link}
 		{if $link.children|count > 0}
-			<div {if not $link.enabled}disabled = "disabled"{/if} data-dojo-type = "dijit/PopupMenu{if empty($sub)}Bar{/if}Item">
-				<span>{$link.title}</span>
-
-				{include file = "links.tpl" links = $link.children skipTitle = true sub = true}
-			</div>
-		{else}	
-			{if $link.separator}
-				<span data-dojo-type = "dijit/MenuSeparator"></span>
-			{else}
-				{if not empty($sub)}
-				<div {if not $link.enabled}disabled = "disabled"{/if} data-dojo-type = "dijit/MenuItem" data-dojo-props = "onClick: function() {literal}{{/literal} menuButtonClick('{$link.url}'){literal}}{/literal}" >
-				{else}
-					<div {if not $link.enabled}disabled = "disabled"{/if} data-dojo-type = "dijit/MenuBarItem" data-dojo-props = "onClick: function() {literal}{{/literal} menuButtonClick('{$link.url}'){literal}}{/literal}" >
-				{/if}
-
-				<span>{$link.title}</span>
+			<li class = "hasSubmenu" role = "none">
+				<a role = "menuitem" aria-expanded = "false" aria-haspopup = "true" {if not $link.enabled}disabled = "disabled"{/if} class = "menuItemLabel" href = "{$link.url}">{$link.title}</a>
+				<div class = "dropdownContent">
+						{include file = "links.tpl" links = $link.children skipTitle = true sub = true}
 				</div>
-			{/if}
+			</li>
+		{else if $link.separator}
+			<span role = "separator" class = "menuSeparator"></span>
+		{else}
+			<li role = "none">
+				<a role = "menuitem" {if not $link.enabled}disabled = "disabled"{/if} class = "menuItemLabel" href = "{$link.url}">{$link.title}</a>
+			</li>
 		{/if}
 	{/foreach}
-</div>
+</ul>
+{if not isset($sub)}
+</nav>
+{/if}
 {/if}

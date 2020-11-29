@@ -16,9 +16,14 @@ select:focus {
 	border: 1px solid maroon;
 }
 
+input, select {
+	border: 1px solid #efefef;
+	border-bottom: 1px solid #999;
+}
+
 input:focus, select:focus {
-	border: 2px solid maroon;
-	outline: none;
+	outline: 2px solid maroon;
+	border-bottom: 1px solid #efefef;
 }
 
 input[type = "checkbox"]:focus {
@@ -89,11 +94,10 @@ div.metricGroup h2 {
 
 /* header page titles */
 h2 {
-	color: #666;
 	margin: 0;
 	margin-bottom: 1em;
 	padding: 0;
-	font-size: 10pt;
+	font-weight: lighter;
 }
 
 /* page titles and major section titles */
@@ -232,7 +236,7 @@ table {
 
 
 
-div#content td, div#content th {
+main td, main th {
 	text-align: left;
 	border: 1px solid #999;
 }
@@ -333,7 +337,7 @@ form {
 
 .labelHolder {
 	display: inline-block;
-	min-width: 120px;
+	min-width: 20em;
 	vertical-align: top;
 }
 
@@ -344,7 +348,7 @@ form {
 
 label {
 	display: inline-block;
-	width: 120px;
+	width: 20em;
 	text-align: right;
 	margin-right: 1em;
 	vertical-align: top;
@@ -390,7 +394,6 @@ svg g[inkscape\:label="openings"] {
 
 .formSection {
 	font-weight: bold;
-	background-color: #dee3e7;
 	color: black;
 	padding: .4em;
 	margin: 0;
@@ -417,56 +420,49 @@ h1 {
 	margin: 0;
 }
 
-div#header div.title {
-	display: table-cell;
-	vertical-align: middle;
-	padding-left: 1em;
-	padding-top: 1em;
-	padding-bottom: 1em;
-}
-
-div#header, div#header a {
-	color: white;
-}
-
-div#header div.userMenuItems {
-	display: table-cell;;
-	vertical-align: middle;
-	text-align: right;
-	width: 25%;
-	padding-right: 1em;
-}
-
-div#header div.nodeList {
-	display: table-cell;
-	text-align: center;
-	width: 50%;
-}
-
-div#header {
+header {
 	border-bottom: 1px solid #3f3f3f;
 	text-align: left;
 	background-color: #444;
 	box-shadow: 0px 0px 6px 5px #aaa;
 	padding: 0;
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	grid-template-rows: auto auto;
+	gap: 0px 0px;
+	align-items: center;
 }
 
-div.header a {
+header #headerLogo {
+	grid-area: 1 / 1 / 3 / 2;
+}
+
+header #searchBox {
+	grid-area: 1 / 3 / 2 / 4;
+	padding: 1em;
+	text-align: right;
+}
+
+header h1 {
+	grid-area: 1 / 2 / 2 / 4; 
+}
+
+header #generalLinks {
+	grid-area: 2 / 2 / 3 / 3;
+}
+
+header #adminLinks {
+	grid-area: 2 / 3 / 3 / 4;
+	text-align: right;
+}
+
+header a, header a:visited {
 	color: white;
 }
 
-table#headerStruct, table#headerStruct td {
-	background-color: #444;
+header img#logo {
+	margin: 1em;
 }
-
-table#headerStruct td {
-	padding: 0;
-}
-
-div.headerBlock {
-	display: inline-block;
-}
-
 
 table.taskList td {
 	vertical-align: top;
@@ -477,12 +473,9 @@ table.taskList tr {
 }
 
 div.navigationMenuItems {
-	vertical-align: middle;
-	display: table-cell;
 	background-color: #444;
 	color: white;
 	text-align: left;
-	display: none;
 }
 
 textarea {
@@ -540,9 +533,13 @@ input[type="text"], input[type="password"], input:not([type]) {
 
 input[type="button"], button, a[role="button"], .claro .dijitDropDownButton .dijitButtonNode {
 	border: 1px solid #666;
-	padding: .2em;
+	padding-left: .6em;
+	padding-right: .6em;
+	padding-bottom: .2em;
+	padding-top: .2em;
 	display: inline-block;
-	background-color: beige;
+	background-color: #fff;
+	font-weight: bold;
 	color: black;
 	margin-left: .5em;
 	margin-right: .5em;
@@ -626,12 +623,25 @@ img.inlineIcon {
 }
 
 ul {
+	margin: 0;
 	list-style: none;
 	padding-left: 0;
 }
 
 .tooltip {
 	border-bottom: 1px dashed gray;
+	background-color: beige;
+	display: none;
+}
+
+.hasTooltip {
+	cursor: pointer;
+}
+
+.hasTooltip:hover .tooltip {
+	position: relative;
+	display: block;
+	float: right;
 }
 
 form.inline {
@@ -676,7 +686,7 @@ div.smartFilterDescription {
 }
 
 .formElementHtmlContainer {
-	margin-top: .3em;
+	margin-top: .6em;
 }
 
 .vseparator {
@@ -685,7 +695,7 @@ div.smartFilterDescription {
 	margin-right: 1em;
 }
 
-div#header a#a11yContentSkip {
+a#a11yContentSkip {
 	width: 1px;
 	height: 1px;
 	position: absolute;
@@ -693,7 +703,7 @@ div#header a#a11yContentSkip {
 	top: -10px;
 }
 
-div#header a#a11yContentSkip:focus { 
+a#a11yContentSkip:focus { 
 	padding: 1em;
 	width: auto;
 	height: auto;
@@ -750,3 +760,40 @@ div:disabled, select:disabled, input:disabled  {
   opacity: 1;
 }    
 
+.menu > li {
+	display: inline-block;
+	margin-right: .5em;
+}
+
+.menu a, .menu a:visited {
+	display: block;
+	padding: .2em;
+	cursor: pointer;
+}
+
+.menu a:active, .menu a:hover {
+	background-color: maroon;
+}
+
+.dropdownContent {
+	float: left; 
+	overflow: hidden;
+	position: absolute;
+	box-shadow: 0px 2px 2px 2px #000;
+	background-color: #444;
+}
+
+li.hasSubmenu:hover .dropdownContent {
+	display: block;
+}
+
+.dropdownContent {
+	display: none;
+}
+
+.menuSeparator {
+	display: block;
+	height: .1em;
+	background-color: #666;
+	text-align: center;
+}

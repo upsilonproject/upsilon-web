@@ -39,14 +39,14 @@ function makeDateHumanReadable(element) {
 	}
 
 	if ((nowUnixTimestamp - elementUnixTimestamp) > 3600) {
-		dojo.addClass(element.parentElement, "old");
+		element.parentElement.classList.add("old");
 	} else if ((nowUnixTimestamp - elementUnixTimestamp) < 0) {
-		dojo.addClass(element.parentElement, "bad");
+		element.parentElement.classList.add("bad");
 	} else {
-		dojo.addClass(element.parentElement, "good");
+		element.parentElement.classList.add("good");
 	}
 
-	if (dojo.hasClass(element, "relative")) {
+	if (element.classList.contains("relative")) {
 		description = "<strong>" + toLocalIsoLikeString(utcDate) + "</strong>";
 		element.textContent = secondsToString(nowUnixTimestamp - elementUnixTimestamp);
 	} else {
@@ -56,13 +56,13 @@ function makeDateHumanReadable(element) {
 
 	description += "<br />Original: " + utcDate.toString()
 
-	dojo.addClass(element, "tooltip")
+	var tooltip = document.createElement("div");
+	tooltip.classList.add("tooltip");
+	tooltip.innerHTML = description;
+	tooltip.setAttribute("role", "tooltip");
 
-	new dijit.Tooltip({
-		connectId: element,
-		label: description,
-		showDelay: 0
-	});
+	element.classList.add("hastooltip")
+	element.append(tooltip);
 }
 
 function secondsToString(seconds) {
@@ -280,15 +280,13 @@ function fetchServiceSingleMetricResultChart(metric, dataset, chartIndex) {
 }
 
 function cookieOrDefault(cookieName, defaultValue) {
-	require(["dojo/cookie"], function(cookie) {
-		cookieValue = cookie(cookieName)
-
-		if (cookieValue == null) {
-			return defaultValue;
-		} else {
-			return cookieValue;
+	const cookieValue = document.cookie.split('; ').find(row => {
+		if (row.startsWith(cookieName))  {
+			return row.split("=")[1];
 		}
-	});	
+	});
+
+	return defaultValue;
 }
 
 
@@ -377,8 +375,7 @@ window.shortcutToggleNighttime = 78;
 window.shortcutToggleEmptyGroups = 77;
 window.shortcutToggleGroups = 71;
 
-require(["dojo/dom-construct", "dojo/on", "dojo/query", "dojo/keys", "dojo/domReady!"],
-function(domConstruct, on, query, keys) {
+function setupKeyboardShortcuts() {
         query("body").on("keydown", function(event) {
                if (event.target.localName != "body") {
                         return;
@@ -411,10 +408,11 @@ function(domConstruct, on, query, keys) {
                         break;
                 }
         });
-});
+}
 
 
 function setupEnhancedSelectBoxes() {
+	/**
 	require(["dojo/query", "dijit/form/Select", "dojo/_base/array"], function(query, Select, array) {
 		var selects = query("select");
 
@@ -422,19 +420,13 @@ function setupEnhancedSelectBoxes() {
 	//		new Select({}, entry);
 		});
 	});
+	*/
 }
 
 
 function setupSortableTables() {
-	return;
-
-	require([
-		"dojo/query"
-	], function(query) {
-		query("table.dataTable").each(function(tbl) {
-			console.log("tbl", tbl);
-		});
-	});
+	/**
+	var tables = document.querySelectorAll('table.dataTable');
 
 	$('table.dataTable').dataTable({
 		'sDom': 'flpitpil',
@@ -451,6 +443,7 @@ function setupSortableTables() {
 	$('a.paginate_enabled_previous').html('&nbsp;');
 	$('a.paginate_disabled_next').html('&nbsp;');
 	$('a.paginate_disabled_previous').html('&nbsp;');
+	*/
 }
 
 function serviceIconChanged() {
@@ -471,15 +464,6 @@ function serviceIconChanged() {
 		}
 
 	});
-}
-
-function menuButtonClick(address) {
-	// Hide your eyes. This will be temporary.
-	if (address.indexOf(".php") != -1 || address.indexOf(".html") != -1) {
-		window.location = address;
-	} else {
-		eval(address);
-	}
 }
 
 function requestRescanWidgets() {
@@ -901,6 +885,7 @@ function searchSelect(selectedItem) {
 }
 
 function setupSearchBox() {
+	/*
 	require([
 		"dijit/form/FilteringSelect", "dojo/store/JsonRest", "dojo/domReady!"
 	], function(FilteringSelect, JsonRest) {
@@ -928,6 +913,7 @@ function setupSearchBox() {
 			},
 		}, "searchBox").startup();
 	});
+	*/
 }
 
 window.chartResolution = 7 * 50;
@@ -951,5 +937,11 @@ function changeChartInterval(i) {
 		"dojo/query"
 	], function(query) {
 		query("#lblInterval").text(window.chartInterval);
+	});
+}
+
+function onDomReady(evt) {
+	document.addEventListener("DOMContentLoaded", () => {
+		evt()
 	});
 }

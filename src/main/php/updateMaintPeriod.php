@@ -20,7 +20,7 @@ class FormUpdateMaintPeriod extends Form {
 
 		$sla = getMaintPeriodById($id);
 		$this->addElement(new ElementInput('title', 'Title', $sla['title']));
-		$this->addElement(new ElementTextbox('content', 'Content', $sla['content'], 'Current Week:' . date('W') . '. the <a href = "http://upsilon-project.co.uk/site/index.php/Maintenance_Periods">syntax used for maintenence window content</a> is described in the manual. '));
+		$this->addElement(new ElementTextbox('content', 'Content', $sla['content'], 'Current Week:' . date('W') . '. the <a href = "http://docs.upsilonproject.io/#_maintainance_periods">syntax used for maintenence window content</a> is described in the manual. '));
 
 
 		$this->addDefaultButtons();

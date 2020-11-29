@@ -5,23 +5,15 @@
 
 <script type = "text/javascript">
 	{literal}
-	function tick() {
-		var txt = window.locale.format(new Date(), {selector:"date", datePattern: "HH:mm:ss" });
+	function clockWidgetTick() {
+		var now = new Date();
+		var txt = now.toISOString().substr(11, 8);
 
-		require([
-			"dojo/query",
-		], function(query) {
-			query('#clock')[0].innerHTML = txt;
-		});
+		document.querySelector('#clock').innerHTML = txt;
 
-		setTimeout(function() { tick()}, 1000);
+		setTimeout(() => { clockWidgetTick() }, 1000);
 	}
 
-	require([
-		"dojo/date/locale",
-	], function(locale) {
-		window.locale = locale;
-		tick();
-	});
+	clockWidgetTick();
 	{/literal}
 </script>

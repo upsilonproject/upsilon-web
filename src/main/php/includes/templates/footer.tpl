@@ -1,5 +1,5 @@
-</div>
-<div id = "footer">
+</main>
+<footer title = "footer">
 	<p>
 		<strong>Version:</strong> <a href = "viewVersion.php">{$version}</a>
 		&nbsp;&nbsp;&nbsp;&nbsp;
@@ -18,7 +18,7 @@
 		<a href = "https://github.com/upsilonproject/upsilon/issues?">Raise Issue (bug, suggestion or feature request)</a> &bull;
 		 <a href = "mailto:upsilonproject@googlegroups.com">Email the developers</a>
 	</p>
-</div>
+</footer>
 
 <script type = "text/javascript">
 setupSearchBox();
@@ -27,16 +27,8 @@ setupEnhancedSelectBoxes();
 </script>
 <script type = "text/javascript">
 {literal}
-require(["dojo/parser", "dojo/query"], function(parser, query) {
-	parser.parse();	
-	query(".navigationMenuItems").style('display', 'block');
-
-	query('.date').forEach(makeDateHumanReadable);
-
-	{/literal}{if $apiClient}
-	showFullscreenButton();
-	{/if}{literal}
-
+onDomReady(() => {
+	document.querySelectorAll('.date').forEach(makeDateHumanReadable);
 });
 {/literal}
 

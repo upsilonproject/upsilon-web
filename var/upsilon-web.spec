@@ -8,7 +8,7 @@ BuildArch: 	noarch
 
 Group:		Applications/System
 License:	GPLv2
-URL:		http://upsilon-project.co.uk
+URL:		http://upsilonproject.io
 Source0:	upsilon-web.zip
 
 %if "%{?dist}" == "el7scl"

@@ -1,13 +1,12 @@
 #!groovy
 
 plugins {
-	id "com.github.jamesread.buildid" version "1.12"
+	id "com.github.jamesread.buildid" version "1.13.2"
 }
 
 apply plugin: 'distribution'
 
-delete "src/main/php/includes/libraries/Smarty"
-delete "src/main/php/resources/dojo"
+delete "src/main/php/includes/libraries/"
 
 buildid.newBuild()
 buildid.writeRpmMacro()
@@ -16,10 +15,6 @@ String version = buildid.get("tag")
 
 task setupLibraries(type: Exec) {
 	commandLine "./setupLibraries.sh"
-}
-
-task buildDojo(type: Exec) {
-	commandLine "./buildDojo.sh"
 }
 
 task phpUnit(type: Exec) {

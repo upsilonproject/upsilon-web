@@ -19,8 +19,6 @@ foreach (getGroups() as $itemGroup) {
 	//$tpl->display('group.tpl');
 }
 
-$tpl->display('hudJavascript.tpl');
-
 require_once 'includes/widgets/footer.php';
 
 ?>

@@ -42,7 +42,7 @@ This is the upsilon-web installer, it checks the system for any obvious errors a
 </tbody>
 </table>
 {/if}
-<p>Read the <a href = "http://upsilon-project.co.uk/site/index.php/Upsilon-web">installation guide</a> for more help.</p>
+<p>Read the <a href = "http://docs.upsilonproject.io/#_installation">installation guide</a> for more help.</p>
 {if isset($configFile)}
 <li><a href = "installer.php">Start from scratch</a>, loosing all changes. </li>
 <li><a href = "/">Return to index</a></li>
