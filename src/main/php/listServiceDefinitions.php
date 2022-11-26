@@ -28,7 +28,8 @@ if ($filters->isUsed('command')) {
 	$qb->where('c.identifier', 'LIKE', '"%' . $filters->getValue('command') . '%"');
 }
 
-$stmt = stmt($qb->build())->execute();
+$stmt = stmt($qb->build());
+$stmt->execute();
 
 $tpl->assign('listServices', $stmt->fetchAll());
 $tpl->assign('filters', $filters->getAll());

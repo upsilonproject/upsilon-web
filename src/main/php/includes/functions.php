@@ -147,7 +147,9 @@ function insertId() {
 }
 
 function stmt($sql) {
-	return DatabaseFactory::getInstance()->prepare($sql);
+        $stmt = DatabaseFactory::getInstance()->prepare($sql);
+
+        return $stmt;
 }
 
 function vde() {
@@ -329,7 +331,7 @@ function parseOutputJson(&$service) {
 
 
 	if ($res) {
-		$ret = preg_replace($pat, null, $service['output']);
+		$ret = preg_replace($pat, '', $service['output']);
 
 		//$service['output'] = $service['output']; 
 		$json = json_decode($matches[1], true);
@@ -419,6 +421,10 @@ $now = time();
 
 function invalidateOldServices(&$service) {
 	global $now;
+
+        if ($service['lastUpdated'] == null) {
+            $service['lastUpdated'] = '';
+        }
 	
 	$diff = $now - strtotime($service['lastUpdated']);
 
@@ -465,8 +471,9 @@ function getFailedDowntimeRule(array $downtime) {
 				case 'week':
 					$lval = intval(date('W'));
 					break;
-				default:
-					continue;
+                                default:
+                                        $lval = '';
+					break;
 			}
 
 			switch ($operator) {
@@ -577,9 +584,8 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 	$qb->fields(array('rc.name', 'remote_config_name'));
 	$qb->groupBy('s.id');
 
-
 	$stmt = DatabaseFactory::getInstance()->prepare($qb->build());
-	$stmt->bindValue('node', $filters->getValue('node'));
+	//$stmt->bindValue('node', $filters->getValue('node'));
 	$stmt->execute();
 	$listServices = $stmt->fetchAll();
 
@@ -629,9 +635,18 @@ function enrichService($service, $parseOutput = true, $parseMetadata = true, $in
 }
 
 function enrichServices($listServices, $parseOutput = true, $parseMetadata = true, $invalidateOldServices = true, $parseAcceptableDowntime = true, $castServices = true) {
-	foreach ($listServices as $k => $itemService) {
+                
+        foreach ($listServices as $k => $itemService) {
+                if ($listServices[$k]['executable'] == null) {
+                    $listServices[$k]['executable'] = '';
+                }
+
+                if ($itemService['estimatedNextCheck'] == null) {
+                    $itemService['estimatedNextCheck'] = '';
+                }
+
 		$listServices[$k]['stabilityProbibility'] = 0;
-		$listServices[$k]['executableShort'] = str_replace(array('.pl', '.py', 'check_'), null, basename($listServices[$k]['executable']));
+		$listServices[$k]['executableShort'] = str_replace(array('.pl', '.py', 'check_'), '', basename($listServices[$k]['executable']));
 		$listServices[$k]['isOverdue'] = (time() - strtotime($itemService['estimatedNextCheck'])) > 0;
 		$listServices[$k]['estimatedNextCheckRelative'] = getRelativeTime($itemService['estimatedNextCheck'], true);
 		$listServices[$k]['lastChangedRelative'] = getRelativeTime($itemService['lastChanged'], true);
@@ -1650,7 +1665,8 @@ if (!function_exists('array_column')) {
 
 function getAllCommands() {
 	$sql = 'SELECT c.id, c.command_Line, c.identifier, c.command_line, count(s.id) AS instanceCount, c.metadata AS metadataId, m.commandIdentifier AS metadataIdentifier, m.icon FROM remote_config_commands c LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_services s ON s.command = c.id GROUP BY c.id ORDER BY c.identifier';
-	$stmt = stmt($sql)->execute();
+        $stmt = stmt($sql);
+        $stmt->execute();
 
 	$commands = $stmt->fetchAll();
 
@@ -1772,8 +1788,9 @@ function associateRemoteAndReportedConfigs($configString, $remoteConfigs) {
 }
 
 function parseReportedConfigs($configString) {
-	$configs = array();
+    $configs = array();
 
+    if ($configString != null) {
 	$configString = str_replace(array('[', ']', ','), '', $configString);
 
 	$configLines = explode(" ", $configString);
@@ -1792,8 +1809,9 @@ function parseReportedConfigs($configString) {
 			);
 		}
 	}
+    }
 
-	return $configs;
+    return $configs;
 }
 
 function deleteNodeById($id) {

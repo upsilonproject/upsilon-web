@@ -19,11 +19,14 @@ add_include_path(dirname(__FILE__) . '/libraries/jwread/lib-allure/src/main/php/
 add_include_path('/etc/upsilon-web/');
 
 require_once 'includes/functions.php';
-require_once 'includes/libraries/autoload.php';
+if (!@include_once 'includes/libraries/autoload.php') {
+    die('Composer autoloader not found.');
+}
 
 \libAllure\ErrorHandler::getInstance()->beGreedy();
 
 $tpl = new \libAllure\Template('upsilonWeb');
+$tpl->registerModifier('strtolower', 'strtolower');
 
 use \libAllure\AuthBackend;
 use \libAllure\AuthBackendDatabase;

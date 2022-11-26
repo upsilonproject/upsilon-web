@@ -3,10 +3,8 @@
 </div>
 
 <script type = "text/Javascript">
-require(["dojo/domReady!"], function() {
 	var qp = {$queryParams};
 	request("{$url}", qp, {$callback}, "{$ref}", "{$repeat}");
-});
 </script>
 
 

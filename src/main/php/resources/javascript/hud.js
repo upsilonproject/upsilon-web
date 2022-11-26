@@ -577,37 +577,42 @@ function renderClassInstances(data, owner) {
 	});
 }
 
-function renderServiceList(data, owner) {
-	require([
-		"dojo/query",
-		"dojo/dom-construct",
-		"dojo/dom-class",
-		"dojo/NodeList-manipulate",
-		"dojo/NodeList-traverse"
-	], function(query, construct, domClass) {
-		generate = construct.toDom;
+function query(r) {
+  return document.querySelector(r)
+}
 
+function generateElClass(type, cls) {
+  let el = document.create(type);
+  el.classList += cls
+
+  return el
+}
+
+function renderServiceList(data, owner) {
 		if (typeof(owner) == "string") {
 			owner = query('.widgetRef' + owner)
 		}
 
-		if (!domClass.contains(owner, '.services')) {
-			owner.children('.loading').remove();
-			owner.append(generate('<p class = "services" />'))
+		if (!owner.classList.contains('.services')) {
+			owner.querySelector('.loading').remove();
+
+      let domSvc = document.createElement('p');
+      domSvc.classList += 'services'
+			owner.append(domSvc)
 		}
 
-		owner.children('.metricListContainer').remove();
+		owner.querySelector('.metricListContainer').remove();
 
-		container = generate('<div class = "metricListContainer" />');
+		container = generateElClass('div', 'metricListContainer');
 		owner.append(container);
 
-		container.appendChild(generate('<p class = "metricListDescription" />'));
+		container.appendChild(generateElClass('p', 'metricListDescription'));
 
-		list = generate('<ul class = "metricList"></ul>');
+		list = generateElClass('ul', 'metricList');
 		container.appendChild(list);
 
 		data.forEach(function(service, index) {
-			indicator = query(generate('<span class = "metricIndicator" />'));
+			indicator = query(generateElClass('span', 'metricIndicator'));
 			indicator.addClass(service.karma.toLowerCase());
 
 			if (service.icon != null) {
@@ -615,12 +620,12 @@ function renderServiceList(data, owner) {
 			}
 			
 			indicator.append(dojo.toDom('<span>' + service.lastChangedRelative + '</span>'));
-			indicator = query(generate('<div class = "metricIndicatorContainer" />')).append(indicator);
+			indicator = query(generateElClass('div', 'metricIndicatorContainer')).append(indicator);
 
-			metric = query(generate('<li />'));
+			metric = generateElClass('li', '');
 			metric.append(indicator);
 
-			text = query(generate('<div class = "metricText" />'));
+			text = generateElClass('div', 'metricText');
 			text.append('<span class = "metricDetail">' + service.estimatedNextCheckRelative + '</span>');
 			text.append('<a href = "viewService.php?id=' + service.id + '"><span class = "metricTitle">' + service.alias + '</span></a>');
 			text.append(' on ');
@@ -632,7 +637,6 @@ function renderServiceList(data, owner) {
 		});
 
 		toggleGroups();
-	});
 }
 
 function renderNewsList(data, ref) {
@@ -654,26 +658,22 @@ function renderNewsList(data, ref) {
 }
 
 function request(url, queryParams, callback, callbackObject, repeat) {
-	function doRequest() {
-		require([
-			"dojo/request/xhr"
-		], function (xhr) {
-			xhr(url, { handleAs: "json", query: queryParams }).then(
-				function(data) {
-					try{
-						callback(data, callbackObject);
-					} catch (err) {
-						console.log("err in ajax complete() handle", err)
-					}
-				},
-				function(err) {
-					console.log("err", url, err);
-				}
-			)
-		});
-	}
-	
-	doRequest();
+  function doRequest() {
+  fetch(url, { handleAs: "json", query: queryParams }).then(
+    function(data) {
+      try{
+        callback(data, callbackObject);
+      } catch (err) {
+        console.log("err in ajax complete() handle", err)
+      }
+    },
+    function(err) {
+      console.log("err", url, err);
+    }
+  )
+  }
+
+  doRequest()
 
 	if (repeat > 0) {
 		setInterval(doRequest, repeat);

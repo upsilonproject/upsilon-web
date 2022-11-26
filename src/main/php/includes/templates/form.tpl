@@ -1,4 +1,4 @@
-{assign var = "excludeBox" value = $excludeBox|default:false}
+{assign var = "excludeBox" value = false}
 
 {if $excludeBox eq true}
 	{if !empty($form->getTitle)}
