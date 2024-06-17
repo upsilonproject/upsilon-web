@@ -23,17 +23,11 @@ class UserSettings extends Form {
 
                 $this->addSection('General');
 
-                $warn = getSiteSetting('warnNotUsingHttps');
-                if ($warn == null) {
-                        $warn = false;
-                }
-
-                $this->addElement(new ElementCheckbox('warnNotUsingHttps', 'Warn when not using HTTPS', $warn));
                 $this->addElement(new ElementInput('siteTitle', 'Site title', getSiteSetting('siteTitle', 'Upsilon')));
                 $this->addElement(new ElementInput('loginBanner', 'Login Page Banner', getSiteSetting('loginPageBanner', getSiteSetting('loginBanner'))));
-				$this->getElement('loginBanner')->setMinMaxLengths(0, 512);
+		$this->getElement('loginBanner')->setMinMaxLengths(0, 512);
 
-				$this->addSection('AMQP');
+		$this->addSection('AMQP');
                 $this->addElement(new ElementInput('amqpHost', 'AMQP Host', getSiteSetting('amqpHost', 'localhost')));
                 $this->addElement(new ElementInput('amqpPort', 'AMQP Port', getSiteSetting('amqpPort', 5672)));
                 $this->addElement(new ElementInput('amqpUser', 'AMQP User', getSiteSetting('amqpUser', 'guest')));
@@ -48,6 +42,8 @@ class UserSettings extends Form {
 
                 
 		$this->addSection('Other');
+                $this->addElement(new ElementCheckbox('enableDroneConfig', 'Enable drone configuration', getSiteSetting('enableDroneConfig', false)));
+                $this->addElement(new ElementCheckbox('warnNotUsingHttps', 'Warn when not using HTTPS', getSiteSetting('warnNotUsingHttps', false)));
 
 		$this->simpleSettings[] = array('configSourceIdentifier', 'Config Source Identifier', 'upsilon-web');
 		$this->addSimpleSettings();
@@ -64,6 +60,7 @@ class UserSettings extends Form {
 	}
 
         public function process() {
+                setSiteSetting('enableDroneConfig', $this->getElementValue('enableDroneConfig'));
                 setSiteSetting('warnNotUsingHttps', $this->getElementValue('warnNotUsingHttps'));
                 setSiteSetting('siteTitle', $this->getElementValue('siteTitle'));
                 setSiteSetting('loginBanner', $this->getElementValue('loginBanner'));

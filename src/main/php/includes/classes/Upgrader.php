@@ -62,8 +62,8 @@ abstract class UpgradeTask {
 }
 
 class HttpdCanNetworkConnect extends UpgradeTask {
-	public function isNecessary() {
-		if (trim(`getenforce`) == 'Enforcing') {
+    public function isNecessary() {
+		if (trim("`getenforce`") == 'Enforcing') {
 			if (stripos(`getsebool httpd_can_network_connect`, '--> on') !== FALSE) {
 				return false;
 			} else {

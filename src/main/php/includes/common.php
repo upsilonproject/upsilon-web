@@ -11,7 +11,7 @@ bindtextdomain('messages', 'includes/locale/');
 textdomain('messages');
 
 function add_include_path($path) {
-	set_include_path($path . PATH_SEPARATOR . get_include_path());
+    set_include_path($path . PATH_SEPARATOR . get_include_path());
 }
 
 add_include_path(dirname(__FILE__) . '/libraries/');
@@ -27,32 +27,33 @@ if (!@include_once 'includes/libraries/autoload.php') {
 
 $tpl = new \libAllure\Template('upsilonWeb');
 $tpl->registerModifier('strtolower', 'strtolower');
+$tpl->registerModifier('implode', 'implode');
+$tpl->registerModifier('trim', 'trim');
 
-use \libAllure\AuthBackend;
 use \libAllure\AuthBackendDatabase;
 use \libAllure\Session;
 
 @include_once 'config.php';
 
 if (isEssentialConfigurationProvided()) {
-	$db = connectDatabase();
+    $db = connectDatabase();
 
-	$backend = new AuthBackendDatabase();
-	$backend->setSalt(CFG_PASSWORD_SALT);
-	$backend->registerAsDefault();
+    $backend = new AuthBackendDatabase();
+    $backend->setSalt(CFG_PASSWORD_SALT);
+    $backend->registerAsDefault();
 
-	Session::setCookieLifetimeInSeconds(31104000);
-	Session::start();
-		
-	if (!defined('ANONYMOUS_PAGE') && !Session::isLoggedIn()) {
-		if (isApiPage()) {
-			denyApiAccess();
-		} else {
-			require_once 'login.php';
-		}
-	}
+    Session::setCookieLifetimeInSeconds(31104000);
+    Session::start();
+
+    if (!defined('ANONYMOUS_PAGE') && !Session::isLoggedIn()) {
+        if (isApiPage()) {
+            denyApiAccess();
+        } else {
+            require_once 'login.php';
+        }
+    }
 } else if (!defined('INSTALLATION_IN_PROGRESS')) {
-	redirect('installer.php', 'Initial config not valid, assuming installation.');
+    redirect('installer.php', 'Initial config not valid, assuming installation.');
 }
 
 ?>

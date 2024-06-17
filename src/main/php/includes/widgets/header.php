@@ -82,7 +82,9 @@ if (Session::isLoggedIn()) {
 		$generalLinks->addChildCollection('Actions &blacktriangledown;', $links);
 	} else {
 		$generalLinks->setEnabled(0, false);
-	}
+        }
+
+        $enableDroneConfig = getSiteSetting('enableDroneConfig');
 
 	$generalLinks->add('listDashboards.php', 'Dashboards &blacktriangledown;');
 
@@ -104,18 +106,24 @@ if (Session::isLoggedIn()) {
 	
 	$generalLinks->add('#', 'Services &blacktriangledown;');
 
-	$generalLinksServices = linksCollection();
-	$generalLinksServices->add('listServiceDefinitions.php', 'Services');
-	$generalLinksServices->add('listGroups.php', 'Groups');
+        $generalLinksServices = linksCollection();
 
-	$generalLinksServices->addSeparator();
 	$generalLinksServices->add('viewList.php', 'Results: All');
 	$generalLinksServices->add('viewList.php?problems', 'Results: Problems');
-	$generalLinksServices->add('viewList.php?ungrouped', 'Results: Ungrouped');
+        $generalLinksServices->add('viewList.php?ungrouped', 'Results: Ungrouped');
 
-	$generalLinksServices->addSeparator();
-	$generalLinksServices->add('listCommandDefinitions.php', 'Commands');
-	$generalLinksServices->add('listCommands.php', 'Command Metadata');
+        $generalLinksServices->addSeparator();
+
+	$generalLinksServices->addIf($enableDroneConfig, 'listServiceDefinitions.php', 'Services');
+	$generalLinksServices->add('listGroups.php', 'Groups');
+
+
+        if ($enableDroneConfig) {
+            $generalLinksServices->addSeparator();
+            $generalLinksServices->add('listCommandDefinitions.php', 'Commands');
+            $generalLinksServices->add('listCommands.php', 'Command Metadata');
+        }
+
 	$generalLinksServices->addSeparator();
 	$generalLinksServices->add('listMaintPeriods.php', 'Maintenance Periods');
 	$generalLinksServices->addSeparator();
@@ -123,12 +131,16 @@ if (Session::isLoggedIn()) {
 
 	$generalLinks->addChildCollection('Services &blacktriangledown;', $generalLinksServices);
 
-	$generalLinks->add('#', 'Nodes &blacktriangledown;');
-	$generalLinksNodes = linksCollection();
-	$generalLinksNodes->add('listNodes.php', 'List');
-	$generalLinksNodes->add('listRemoteConfigurations.php', 'Configurations');
-	$generalLinks->addChildCollection('Nodes &blacktriangledown;', $generalLinksNodes);
-
+        if ($enableDroneConfig) {
+            $generalLinks->add('#', 'Nodes &blacktriangledown;');
+            $generalLinksNodes = linksCollection();
+            $generalLinksNodes->add('listNodes.php', 'List');
+            $generalLinksNodes->addIf($enableDroneConfig, 'listRemoteConfigurations.php', 'Configurations');
+            $generalLinks->addChildCollection('Nodes &blacktriangledown;', $generalLinksNodes);
+        } else {
+            $generalLinks->add('listNodes.php', 'Nodes');
+        }
+	
 	if (Session::getUser()->getData('experimentalFeatures')) {
 		$experimentalLinks = linksCollection();
 		$experimentalLinks->add('viewTasks.php', 'Tasks');

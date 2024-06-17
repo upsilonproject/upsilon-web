@@ -18,7 +18,7 @@ $stmt = $db->prepare($sql);
 $stmt->bindValue(':nodeId', $id);
 $stmt->execute();
 
-$node = $stmt->fetchRow();
+$node = $stmt->fetchRowNotNull();
 
 $links = new HtmlLinksCollection();
 $links->add('deleteNode.php?id=' . $node['id'], 'Delete');
@@ -59,7 +59,7 @@ function getServicesReportedForNode($node) {
 	$qb->where('node', '=', ':node');
 	$qb->whereLikeValue('identifier', 'waffles');
 
-	$sql = 'SELECT s.id, s.identifier, s.lastUpdated, s.output, s.karma, s.node FROM services s WHERE s.node = :node';
+	$sql = 'SELECT s.id, s.identifier, s.lastUpdated, trim(s.output), s.karma, s.node FROM services s WHERE s.node = :node';
 
 	$stmt = stmt($sql);
 	$stmt->bindValue(':node', $node);

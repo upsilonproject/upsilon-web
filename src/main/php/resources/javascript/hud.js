@@ -27,7 +27,7 @@ function makeDateHumanReadable(element) {
 	if (element.textContent == "now") {
 		utcDate = new Date((new Date()).toUTCString());
 	} else {
-		utcDate = new Date(element.textContent.replace(" ", "T") + "Z")
+		utcDate = new Date(element.textContent.replace(" ", "T"))
 	}
 
 	elementUnixTimestamp = utcDate / 1000
@@ -295,85 +295,33 @@ window.showGoodGroups = cookieOrDefault("groups", false);
 window.showEmptyGroups = cookieOrDefault("showEmptyGroups", false);
 
 function toggleEmptyGroups() {
-	require([
-		"dojo/query"
-	], function(query) {
-		query('.metricGroup').forEach(function(container, index) {
-			var services = query(container).query('.metricList li');
+	document.querySelectorAll('.metricGroup').forEach(function(container, index) {
+			var services = container.querySelector('.metricList li');
 
 			if (window.showEmptyGroups && services.length == 0) {
 				query(container).style('display', 'none');
 			}
-		});
-	});
+  });
 }
 
 function toggleNightVision() {
 	window.nighttime = !window.nighttime;
 
-	require([
-		"dojo/query",
-	], function (query) {
-		var stylesheet = query('link[title=nighttime]');
+  var stylesheet = document.querySelector('link[title=nighttime]');
 
-		if (window.nighttime) {
-			stylesheet.attr('rel', 'stylesheet');
-		} else {
-			stylesheet.attr('rel', 'disabled');
-		}
-	});
+  if (window.nighttime) {
+    stylesheet.attr('rel', 'stylesheet');
+  } else {
+    stylesheet.attr('rel', 'disabled');
+  }
 }
 
 function toggleSingleGroup(group) {
 //	console.log(group);
 }
 
-function toggleGroups() {
-	require([
-		"dojo/query",
-		"dojo/NodeList-manipulate",
-		"dojo/NodeList-traverse",
-	], function(query) {
-		query('.metricListContainer').forEach(function(container, index) {
-			var desc = query(container).query('.metricListDescription');
-			var services = query(container).query('.metricList li');
-
-			desc.empty();
-			services.style('display', 'block');
-
-			var servicesGood = services.query('div span.metricIndicator.good').parent().parent('li');
-			var servicesBad = services.query('div span.metricIndicator.bad').parent().parent('li');
-			var servicesSkipped = services.query('div span.metricIndicator.skipped').parent().parent('li');
-			var servicesWarning = services.query('div span.metricIndicator.warning').parent().parent('li');
-
-			if (!window.showGoodGroups) {
-				if ((servicesGood.length + servicesWarning.length) == services.length) {
-					servicesGood.style('display', 'none');
-					servicesWarning.style('display', 'none');
-					var indicator = dojo.toDom('<div style = "display:inline-block"><span class = "metricIndicator good grouped">~</span></div> <div class = "metricText">All <strong>' + servicesGood.length + '</strong> services are good.</div>');
-
-					if (query(desc).length > 0) {
-						query(desc)[0].appendChild(indicator);
-					}
-
-					if (servicesWarning.length > 0) {
-						desc.appendChild(dojo.toDom(' <br /><span class = "warning"><strong>' + servicesWarning.length + '</strong> have a warning</span>.'));
-					}
-				}
-
-				if (servicesSkipped.length > 0) {
-					servicesSkipped.style('display', 'none');
-					var indicator = dojo.toDom('<div style = "display:inline-block"><span class = "metricIndicator skipped grouped">~</span></div> <div class = "metricText">Skipped <strong>' + servicesSkipped.length + '</strong> services</div>');
-					desc.append(indicator);
-				}			
-			}
-		});
-	});
-}
-
 window.shortcutToggleNighttime = 78;
 window.shortcutToggleEmptyGroups = 77;
-window.shortcutToggleGroups = 71;
 
 function setupKeyboardShortcuts() {
         query("body").on("keydown", function(event) {
@@ -389,14 +337,6 @@ function setupKeyboardShortcuts() {
                 case window.shortcutToggleNighttime:
                         event.preventDefault();
                         toggleNightVision();
-                        break;
-                case window.shortcutToggleGroups:
-                        event.preventDefault();
-
-                        window.showGoodGroups = !window.showGoodGroups;
-
-                        toggleGroups();
-
                         break;
                 case window.shortcutToggleEmptyGroups:
                         event.preventDefault();
@@ -506,137 +446,139 @@ function renderSubresults(data, ref) {
 }
 
 function renderGroup(data, ref) {
-	require([
-		"dojo/query",
-		"dojo/dom-construct",
-		"dojo/NodeList-manipulate",
-		'dojo/NodeList-traverse'
-	], function(query, construct) {
-		generate = construct.toDom
-
-		container = query('.widgetRef' + ref);
-		container.empty()
+		let container = document.querySelector('.widgetRef' + ref)
+//		container.empty()
 
 		if (data['listServices'].length > 0) {
-			container.append(generate('<h2>Services</h2>'))
 			renderServiceList(data['listServices'], container)
 		}
 
 		if (data['listClassInstances'].length > 0) {
-			container.appendChild(generate('<h2>Class Instances'));
 			renderClassInstances(data['listClassInstances'], container);
 		}
-	});
 }
 
 function renderClassInstances(data, owner) {
-	require([
-		"dojo/dom-construct",
-		"dojo/dom-class",
-		"dojo/query",
-		"dojo/NodeList-manipulate",
-		"dojo/NodeList-traverse"
-	], function(construct, domClass, query) {
-		if (!domClass.contains(owner, ".classInstances")) {
-			container = generate('<p class = "classInstances" />');
+		if (!owner.classList.contains(".classInstances")) {
+			container = generateElClass('p', 'classInstances');
 			owner.appendChild(container);
 		} else {
 			container = owner.children('.classInstances');
 		}
+    
+    remove(owner.querySelector('.loading'))
 
 		data.forEach(function(classInstance, index) {
-			dom = construct.toDom('<p><a href = "viewClassInstance.php?id=' + classInstance['id'] + '">' + classInstance['title'] + "</a></p>")
+      let dom = document.createElement('p')
 
-			classInstance['requirements'].forEach(function(requirement, index) {
-				domRequirement = construct.toDom('<p>&nbsp;</p>');
-				indicator = construct.place('<span class = "metricIndicator">&nbsp;</span>', domRequirement);
+      let link = document.createElement('a')
+      link.setAttribute('href', 'viewClassInstance.php?id=' + classInstance['id'])
+      link.innerText = classInstance['title'] 
 
-				txt = construct.place('<div class = "metricText"></div>', domRequirement);
+      let title = document.createElement('h3')
+      title.innerText = 'Class: '
+      title.appendChild(link)
+      dom.appendChild(title);
 
-				txt.appendChild(generate(' <span><a href = "addInstanceCoverage.php?requirementId=' + requirement['requirementId'] + '&instanceId=' + requirement['instanceId'] + '">' + requirement['requirementTitle'] + '</a></span> - '));
+      let list = document.createElement('ul')
 
-				if (requirement['serviceIdentifier'] != null) {
-					query(indicator).addClass(requirement['karma'].toLowerCase());
-					txt.appendChild(generate('<span><a href = "viewService.php?id=' + requirement['service'] + '">' + requirement['serviceIdentifier'] + '</a></span>'));
-				} else {
-					txt.appendChild(generate('<span class = "bad">Not covered</span>'))
-				}
+      classInstance['requirements'].forEach((requirement, index) => {
+        let el = document.createElement('list-item-class-requirement')
+        el.setup()
+        el.setKarma(requirement['karma'])
+        el.setNode(requirement['node'])
+        el.setRequirement(requirement)
 
-				if (requirement['node'] != null) {
-					txt.appendChild(document.createTextNode(' on '));
-					txt.appendChild(generate('<a href = "viewNode.php?identifier=' + requirement['node'] + '">' + requirement['node'] + '</a>'));
-				}
+        list.appendChild(el)
+      })
 
-				txt.appendChild(generate('<div class = "subtle">' + requirement['output'] + '</div>'));
-
-				dom.appendChild(domRequirement)
-			});
+      dom.appendChild(list)
 
 			container.appendChild(dom);
 		});
-	});
 }
 
 function query(r) {
+  if (typeof(r) != "string") {
+    console.error(r)
+    throw "Query with non string: " + r;
+  }
+
   return document.querySelector(r)
 }
 
 function generateElClass(type, cls) {
-  let el = document.create(type);
+  let el = document.createElement(type);
   el.classList += cls
 
   return el
 }
 
+function generateElClassText(type, cls, txt) {
+  let el = generateElClass(type, cls);
+  el.innerText = txt;
+
+  return el;
+}
+
+function remove(el) {
+  if (el != null) {
+    el.remove()
+  }
+}
+
 function renderServiceList(data, owner) {
 		if (typeof(owner) == "string") {
-			owner = query('.widgetRef' + owner)
+			owner = document.querySelector('.widgetRef' + owner)
 		}
-
+  
 		if (!owner.classList.contains('.services')) {
-			owner.querySelector('.loading').remove();
+      remove(owner.querySelector('.loading'))
 
       let domSvc = document.createElement('p');
       domSvc.classList += 'services'
-			owner.append(domSvc)
+			owner.appendChild(domSvc)
 		}
 
-		owner.querySelector('.metricListContainer').remove();
+    remove(owner.querySelector('.metricListContainer'))
 
 		container = generateElClass('div', 'metricListContainer');
-		owner.append(container);
+		owner.appendChild(container);
 
 		container.appendChild(generateElClass('p', 'metricListDescription'));
 
-		list = generateElClass('ul', 'metricList');
-		container.appendChild(list);
+    if (data.length == 0) {
+      let p = document.createElement('span')
+      p.innerText = 'Zero services'
 
-		data.forEach(function(service, index) {
-			indicator = query(generateElClass('span', 'metricIndicator'));
-			indicator.addClass(service.karma.toLowerCase());
+      container.appendChild(p)
+    } else {
+      let list = generateElClass('ul', 'metricList');
+      container.appendChild(list);
 
-			if (service.icon != null) {
-				indicator.append(dojo.toDom('<img src = "resources/images/serviceIcons/' + service.icon + '" /><br />'));
-			}
-			
-			indicator.append(dojo.toDom('<span>' + service.lastChangedRelative + '</span>'));
-			indicator = query(generateElClass('div', 'metricIndicatorContainer')).append(indicator);
+      data.forEach(function(service, index) {
+        let el = document.createElement('list-item-service')
+        el.setup();
+        el.setKarma(service.karma)
+        el.setIcon(service.icon)
+        el.setLastChangedRelative(service.lastChangedRelative)
+        el.setNode(service.node)
+        el.setTitleId(service.alias, service.id)
 
-			metric = generateElClass('li', '');
-			metric.append(indicator);
+        /**
 
-			text = generateElClass('div', 'metricText');
-			text.append('<span class = "metricDetail">' + service.estimatedNextCheckRelative + '</span>');
-			text.append('<a href = "viewService.php?id=' + service.id + '"><span class = "metricTitle">' + service.alias + '</span></a>');
-			text.append(' on ');
-			text.append('<a href = "viewNode.php?identifier=' + service.node + '"><spa>' + service.node + '</span></a>');
-			text.append('<div class = "subtle">' + service.output + '</div>');
-			metric.append(text);
+        text = generateElClass('div', 'metricText');
+        text.appendChild('<span class = "metricDetail">' + service.estimatedNextCheckRelative + '</span>');
+        text.appendChild('<a href = "viewService.php?id=' + service.id + '"><span class = "metricTitle">' + service.alias + '</span></a>');
+        text.appendChild(' on ');
+        text.appendChild('<a href = "viewNode.php?identifier=' + service.node + '"><spa>' + service.node + '</span></a>');
+        text.appendChild('<div class = "subtle">' + service.output + '</div>');
+        metric.append(text);
+        */
 
-			query(list).append(metric);
-		});
-
-		toggleGroups();
+        list.appendChild(el);
+      });
+  }
 }
 
 function renderNewsList(data, ref) {
@@ -657,20 +599,21 @@ function renderNewsList(data, ref) {
 	});
 }
 
-function request(url, queryParams, callback, callbackObject, repeat) {
+function request(urlString, queryParams, callback, callbackObject, repeat) {
+  let url = new URL(urlString, window.location.protocol + "//" + window.location.host)
+  for (let k in queryParams) {
+    url.searchParams.append(k, queryParams[k])
+  }
+
   function doRequest() {
-  fetch(url, { handleAs: "json", query: queryParams }).then(
-    function(data) {
-      try{
-        callback(data, callbackObject);
-      } catch (err) {
-        console.log("err in ajax complete() handle", err)
-      }
-    },
-    function(err) {
-      console.log("err", url, err);
-    }
-  )
+    fetch(url, { handleAs: "json" })
+      .then(data => data.json())
+      .then(json => {
+        callback(json, callbackObject);
+      })
+      .catch(err => {
+        console.error("err in ajax complete() handle", err)
+      })
   }
 
   doRequest()
@@ -721,7 +664,7 @@ function showFullscreenButton() {
 	], function(construct, query) {
 		button = construct.toDom('<button id = "fullscreen" onclick = "requestFullScreen(document.body)">Fullscreen</button>');
 
-		header = query("#header")
+		header = document.querySelector("#header")
 
 		if (header.length > 0) {
 			header[0].appendChild(button);
@@ -762,6 +705,7 @@ function filterGetFieldValues() {
 }
 
 function loadFilterResultsIntoSelect(sel, dat) {
+  console.log("sel", sel)
 	select = document.getElementById(sel);
 	currentValue = select.getAttribute("initialvalue");
 	window.sel = select;
@@ -802,6 +746,18 @@ function filterCommands() {
 	}
 
 	window.filterFunc()
+}
+
+function filterNodes() {
+  window.filterFunc = function() {
+    fields = filterGetFieldValues()
+
+    request('json/getNodes.php', fields, function(dat) {
+      loadFilterResultsIntoSelect('foo', dat)
+    });
+  }
+
+  window.filterFunc()
 }
 
 function filterClassInstance() {

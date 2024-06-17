@@ -11,1833 +11,1854 @@ require_once 'includes/classes/SessionOptions.php';
 $nav = array();
 
 function setNav() {
-	global $nav;
+    global $nav;
 
-	foreach (func_get_args() as $arg) {
-		$nav[] = $arg;
-	}
+    foreach (func_get_args() as $arg) {
+        $nav[] = $arg;
+    }
 }
 
 function getUiLanguage() {
-	return 'en';
+    return 'en';
 }
 
 function addNavBreadcrumb($link, $title = null) {
-	global $nav;
-	
-	if ($title == null) {
-		$nav[] = $link;
-	} else {
-		$nav[] = array($link => $title);
-	}
+    global $nav;
+
+    if ($title == null) {
+        $nav[] = $link;
+    } else {
+        $nav[] = array($link => $title);
+    }
 }
 
 function loggerFields() {
-	return array('userId', 'usergroupId', 'serviceResultId', 'nodeId', 'nodeConfigId', 'serviceDefinitionId', 'commandDefinitionId', 'classId', 'dashboardId', 'serviceGroupId');
+    return array('userId', 'usergroupId', 'serviceResultId', 'nodeId', 'nodeConfigId', 'serviceDefinitionId', 'commandDefinitionId', 'classId', 'dashboardId', 'serviceGroupId');
 }
 
 function logger($message, $keys = array()) {
-	$sql = 'INSERT INTO logs (message, timestamp, userId, usergroupId, serviceResultId, nodeId, nodeConfigId, serviceDefinitionId, commandDefinitionId, classId, dashboardId, serviceGroupId) VALUES (:message, utc_timestamp(), :userId, :usergroupId, :serviceResultId, :nodeId, :nodeConfigId, :serviceDefinitionId, :commandDefinitionId, :classId, :dashboardId, :serviceGroupId)';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':message', $message);
-	
-	foreach (loggerFields() as $arg) {
-		if (isset($keys[$arg])) {
-			$stmt->bindValue($arg, $keys[$arg]);
-		} else {
-			$stmt->bindValue($arg, null);
-		}
-	}
+    $sql = 'INSERT INTO logs (message, timestamp, userId, usergroupId, serviceResultId, nodeId, nodeConfigId, serviceDefinitionId, commandDefinitionId, classId, dashboardId, serviceGroupId) VALUES (:message, utc_timestamp(), :userId, :usergroupId, :serviceResultId, :nodeId, :nodeConfigId, :serviceDefinitionId, :commandDefinitionId, :classId, :dashboardId, :serviceGroupId)';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':message', $message);
 
-	$stmt->execute();
+    foreach (loggerFields() as $arg) {
+        if (isset($keys[$arg])) {
+            $stmt->bindValue($arg, $keys[$arg]);
+        } else {
+            $stmt->bindValue($arg, null);
+        }
+    }
+
+    $stmt->execute();
 }
 
 function isUsingSsl() {
-	if (!isset($_SERVER['HTTPS'])) {
-		$_SERVER['HTTPS'] = 'off';
-	}
+    if (!isset($_SERVER['HTTPS'])) {
+        $_SERVER['HTTPS'] = 'off';
+    }
 
-	return $_SERVER['HTTPS'] == 'on';
+    return $_SERVER['HTTPS'] == 'on';
 }
 
 function explodeOrEmpty($delimiter = null, $serialString = "") {
-	$serialString = trim($serialString);
+    if ($serialString == null) {
+        return array();
+    }
 
-	if (strlen($serialString) == 0) {
-		return array();
-	} else {
-		$ret = array();
+    $serialString = trim($serialString);
 
-		foreach (explode($delimiter, $serialString) as $line) {
-			$ret[] = trim($line);	
-		}
+    if (strlen($serialString) == 0) {
+        return array();
+    } else {
+        $ret = array();
 
-		return $ret;
-	}
+        foreach (explode($delimiter, $serialString) as $line) {
+            $ret[] = trim($line);	
+        }
+
+        return $ret;
+    }
 }
 
 function setSiteSetting($key, $val) {
-        global $settings;
+    global $settings;
 
-        $sql = 'INSERT INTO settings (`key`, `value`) VALUES (:key, :valueInsert) ON DUPLICATE KEY UPDATE value = :valueUpdate';
-        $stmt = DatabaseFactory::getInstance()->prepare($sql);
-        $stmt->bindValue(':key', $key);
-        $stmt->bindValue(':valueInsert', $val);
-        $stmt->bindValue(':valueUpdate', $val);
-        $stmt->execute();
+    $sql = 'INSERT INTO settings (`key`, `value`) VALUES (:key, :valueInsert) ON DUPLICATE KEY UPDATE value = :valueUpdate';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':key', $key);
+    $stmt->bindValue(':valueInsert', $val);
+    $stmt->bindValue(':valueUpdate', $val);
+    $stmt->execute();
 }
 
 
 function getSiteSetting($key, $default = '') {
-        global $settings;
+    global $settings;
 
-		try {
-			if (empty($settings)) {
-					$sql = 'SELECT s.`key`, s.value FROM settings s';
-					$stmt = DatabaseFactory::getInstance()->prepare($sql);
-					$stmt->execute();
+    try {
+        if (empty($settings)) {
+            $sql = 'SELECT s.`key`, s.value FROM settings s';
+            $stmt = DatabaseFactory::getInstance()->prepare($sql);
+            $stmt->execute();
 
-					foreach ($stmt->fetchAll() as $row) {
-							$settings[$row['key']] = $row['value'];
-					}
-			}
+            foreach ($stmt->fetchAll() as $row) {
+                $settings[$row['key']] = $row['value'];
+            }
+        }
 
 
-			if (!isset($settings[$key])) {
-					return $default;
-			} else {
-					return $settings[$key];
-			}
-		} catch (Exception $e) {
-			return $default;
-		}
+        if (!isset($settings[$key]) || $settings[$key] == null) {
+            return $default;
+        } else {
+            return $settings[$key];
+        }
+    } catch (Exception $e) {
+        return $default;
+    }
 }
 
 function connectDatabase() {
-        try {
-                $db = new \libAllure\Database(CFG_DB_DSN, CFG_DB_USER, CFG_DB_PASS);
-                \libAllure\DatabaseFactory::registerInstance($db);
-        } catch (Exception $e) {
-                throw new Exception('Could not connect to database. Check the username, password, host, port and database name.<br />' . $e->getMessage(), null, $e);
+    try {
+        $db = new \libAllure\Database(CFG_DB_DSN, CFG_DB_USER, CFG_DB_PASS);
+        \libAllure\DatabaseFactory::registerInstance($db);
+    } catch (Exception $e) {
+        throw new Exception('Could not connect to database. Check the username, password, host, port and database name.<br />' . $e->getMessage(), 0, $e);
+    }
+
+    $sql = 'SET sql_mode = "NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION" ';
+    $stmt = $db->prepare($sql);
+    $stmt->execute();
+
+    try {
+        $maint = getSiteSetting('maintenanceMode', 'NONE');
+    } catch (Exception $e) {
+        if ($e->getCode() == '42S02') {
+            throw new Exception('Settings table not found. Did you import the table schema?', null, $e);
+        } else {
+            throw new Exception('Unhandled SQL error while getting settings table: ' . $e->getMessage(), null, $e);
         }
+    }
 
-		$sql = 'SET sql_mode = "NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION" ';
-		$stmt = $db->prepare($sql);
-		$stmt->execute();
+    if ($maint === 'NONE') {
+        throw new Exception('Essential setting "maintenanceMode" does not exist in the DB. Did you import the initial data?');
+    }
 
-        try {
-                $maint = getSiteSetting('maintenanceMode', 'NONE');
-        } catch (Exception $e) {
-                if ($e->getCode() == '42S02') {
-                        throw new Exception('Settings table not found. Did you import the table schema?', null, $e);
-                } else {
-                        throw new Exception('Unhandled SQL error while getting settings table: ' . $e->getMessage(), null, $e);
-                }
-        }
-
-        if ($maint === 'NONE') {
-                throw new Exception('Essential setting "maintenanceMode" does not exist in the DB. Did you import the initial data?');
-        }
-
-        return $db;
+    return $db;
 }
 
 function insertId() {
-	return DatabaseFactory::getInstance()->lastInsertId();
+    return DatabaseFactory::getInstance()->lastInsertId();
 }
 
 function stmt($sql) {
-        $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
 
-        return $stmt;
+    return $stmt;
 }
 
 function vde() {
-	var_dump(func_get_args()); exit;
+    var_dump(func_get_args()); exit;
 }
 
 function san() {
-	global $san;;
+    global $san;;
 
-	if (!isset($san)) {
-		$san = new libAllure\Sanitizer();
-	}
+    if (!isset($san)) {
+        $san = new libAllure\Sanitizer();
+    }
 
-	return $san;
+    return $san;
 }
- 
+
 function db() { 
-	return DatabaseFactory::getInstance();
+    return DatabaseFactory::getInstance();
 }
 
 function linksCollection($title = null) {
-	return new HtmlLinksCollection($title);
+    return new HtmlLinksCollection($title);
 }
 
 function redirect($url) {
-	header('Location: ' . $url);
+    header('Location: ' . $url);
 
-	exit;
+    exit;
 }
 
 function plural($num, $short = false, $longForm = null) {
-	$shortForm = substr($longForm, 0, 1);
+    $shortForm = substr($longForm, 0, 1);
 
-	if ($short) {
-		return $shortForm;
-	} else {
-		if ($num != 1) {
-			$longForm .= 's';
-		}
+    if ($short) {
+        return $shortForm;
+    } else {
+        if ($num != 1) {
+            $longForm .= 's';
+        }
 
-		return ' ' . $longForm . ' ago';
-	}
+        return ' ' . $longForm . ' ago';
+    }
 }
-	 
-function getRelativeTime($date, $short = false, $fromDate = null) {
-	if ($fromDate == null) {
-		$fromDate = time();
-	}
 
-	return getRelativeTimeSecondsRectified($fromDate - strtotime($date), $short);
+function getRelativeTime($date, $short = false, $fromDate = null) {
+    if ($date == null) {
+        return '?';
+    }
+
+    if ($fromDate == null) {
+        $fromDate = time();
+    }
+
+    return getRelativeTimeSecondsRectified($fromDate - strtotime($date), $short);
 }
 
 function getRelativeTimeSecondsRectified($diff, $short = false) {
-	$rectified = false;
+    $rectified = false;
 
-	if ($diff < 0) {
-		$diff = abs($diff);
-		$rectified = true;
-	}
+    if ($diff < 0) {
+        $diff = abs($diff);
+        $rectified = true;
+    }
 
-	$res = getRelativeTimeSeconds($diff, $short);
+    $res = getRelativeTimeSeconds($diff, $short);
 
-	if ($rectified) {
-		return '+'.$res;
-	} else {
-		return '-'.$res;
-	}
+    if ($rectified) {
+        return '+'.$res;
+    } else {
+        return '-'.$res;
+    }
 }
 
 function getRelativeTimeSeconds($diff, $short = false) {
-	if ($diff<60) {
-		return $diff . plural($diff, $short, 'second');
-	}
+    if ($diff<60) {
+        return $diff . plural($diff, $short, 'second');
+    }
 
-	$diff = round($diff/60);
+    $diff = round($diff/60);
 
-	if ($diff<60) {
-		return $diff . plural($diff, $short, 'minute');
-	}
+    if ($diff<60) {
+        return $diff . plural($diff, $short, 'minute');
+    }
 
-	$diff = round($diff/60);
-	
-	if ($diff<24) {
-		return $diff . plural($diff, $short, 'hour');
-	}
+    $diff = round($diff/60);
 
-	$diff = round($diff/24);
+    if ($diff<24) {
+        return $diff . plural($diff, $short, 'hour');
+    }
 
-	if ($diff<7) {
-		return $diff . plural($diff, $short, 'day');
-	}
-	
-	$diff = round($diff/7);
+    $diff = round($diff/24);
 
-	if ($diff<4) {
-		return $diff . plural($diff, $short, 'week');
-	}
+    if ($diff<7) {
+        return $diff . plural($diff, $short, 'day');
+    }
 
-	return '???';
+    $diff = round($diff/7);
+
+    if ($diff<4) {
+        return $diff . plural($diff, $short, 'week');
+    }
+
+    return '???';
 }
 
 function getNodes() {
-	$sql = 'SELECT n.id, n.identifier, n.serviceType, n.lastUpdated, count(s.id) AS serviceCount, n.serviceType AS nodeType, n.instanceApplicationVersion FROM nodes n LEFT JOIN services s ON s.node = n.identifier GROUP BY n.id';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->execute();
+    $sql = 'SELECT n.id, n.identifier, n.serviceType, n.lastUpdated, count(s.id) AS serviceCount, n.serviceType AS nodeType, n.instanceApplicationVersion FROM nodes n LEFT JOIN services s ON s.node = n.identifier GROUP BY n.id ORDER BY n.identifier';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->execute();
 
-	$nodes = $stmt->fetchAll();
+    $nodes = $stmt->fetchAll();
 
-	$nodes = addStatusToNodes($nodes);
+    $nodes = addStatusToNodes($nodes);
 
-	return $nodes;
+    return $nodes;
 }
 
 function findLatestNodeVersion($nodes) {
-	$latestTimestamp = 0;
-	$latestValue = '';
+    $latestTimestamp = 0;
+    $latestValue = '';
 
-	if (!isset($nodes[0]['instanceApplicationVersion'])) {
-		return;
-	}
+    if (!isset($nodes[0]['instanceApplicationVersion'])) {
+        return;
+    }
 
-	foreach ($nodes as $node) {
-		$matches = array();
+    foreach ($nodes as $node) {
+        $matches = array();
 
-		preg_match_all('/(?<major>[\d]+)\.(?<minor>[\d]+)\.(?<revision>[\d]+)\-\d+\-(?<timestamp>[\d]+)/i', $node['instanceApplicationVersion'], $matches);
+        preg_match_all('/(?<major>[\d]+)\.(?<minor>[\d]+)\.(?<revision>[\d]+)\-\d+\-(?<timestamp>[\d]+)/i', $node['instanceApplicationVersion'], $matches);
 
-		if (isset($matches['timestamp'])) {
-			$timestamp = intval(current($matches['timestamp']));
+        if (isset($matches['timestamp'])) {
+            $timestamp = intval(current($matches['timestamp']));
 
-			if ($timestamp > $latestTimestamp) {
-				$latestTimestamp = $timestamp;
-				$latestValue = $node['instanceApplicationVersion'];
-			}
-		}
-	}
+            if ($timestamp > $latestTimestamp) {
+                $latestTimestamp = $timestamp;
+                $latestValue = $node['instanceApplicationVersion'];
+            }
+        }
+    }
 
-	return $latestValue;
+    return $latestValue;
 }
 
 function isOld($timestamp) {
-	$diff = usertime() - strtotime($timestamp);
+    $diff = usertime() - strtotime($timestamp);
 
-	return $diff > intval(Session::getUser()->getData('oldServiceThreshold'));
+    return $diff > intval(Session::getUser()->getData('oldServiceThreshold'));
 }
 
 function addStatusToNodes($nodes) {
-	$latestVersion = findLatestNodeVersion($nodes);
+    $latestVersion = findLatestNodeVersion($nodes);
 
-	foreach ($nodes as &$itemNode) {
-		if (isset($itemNode['instanceApplicationVersion'])) {
-			if ($itemNode['instanceApplicationVersion'] == $latestVersion) {
-				$itemNode['versionKarma'] = 'GOOD';
-			} else {
-				$itemNode['versionKarma'] = 'WARNING';
-			}
-		} else {
-			$itemNode['versionKarma'] = 'UNKNOWN';
-		}
-	}
+    foreach ($nodes as &$itemNode) {
+        if (isset($itemNode['instanceApplicationVersion'])) {
+            if ($itemNode['instanceApplicationVersion'] == $latestVersion) {
+                $itemNode['versionKarma'] = 'GOOD';
+            } else {
+                $itemNode['versionKarma'] = 'WARNING';
+            }
+        } else {
+            $itemNode['versionKarma'] = 'UNKNOWN';
+        }
+    }
 
-	return $nodes;
+    return $nodes;
 }
 
 function isJsonSubResultsValid($results) {
-	foreach ($results as $result) {
-		if (!is_array($result)) {
-			return false;
-		}
-	}
+    foreach ($results as $result) {
+        if (!is_array($result)) {
+            return false;
+        }
+    }
 
-	return true;
+    return true;
 }
 
 function parseOutputJson(&$service) {
-	$pat = '#<json>(.+)</json>#ims';
+    $pat = '#<json>(.+)</json>#ims';
 
-	$matches = array();
-	$res = preg_match($pat, $service['output'], $matches);
+    if ($service == null) {
+        return;
+    }
 
+    if ($service['output'] == null) {
+        return;
+    }
 
-	if ($res) {
-		$ret = preg_replace($pat, '', $service['output']);
+    $matches = array();
+    $res = preg_match($pat, $service['output'], $matches);
 
-		//$service['output'] = $service['output']; 
-		$json = json_decode($matches[1], true);
+    if ($res) {
+        $ret = preg_replace($pat, '', $service['output']);
 
-		if (!empty($json['subresults']) && isJsonSubResultsValid($json['subresults'])) {
-			$service['listSubresults'] = $json['subresults'];
-				
-			foreach ($service['listSubresults'] as $key => $result) {
-				if (!isset($result['karma']) || $service['karma'] == 'OLD') {
-					$service['listSubresults'][$key]['karma'] = $service['karma'];
-				}
+        //$service['output'] = $service['output']; 
+        $json = json_decode($matches[1], true);
 
-				$service['listSubresults'][$key]['karma'] = strtolower($service['listSubresults'][$key]['karma']);
+        if (!empty($json['subresults']) && isJsonSubResultsValid($json['subresults'])) {
+            $service['listSubresults'] = $json['subresults'];
 
-				// name
-				if (isset($result['name']) && is_string($result['name'])) {
-					$service['listSubresults'][$key]['name'] = san()->escapeStringForHtml($result['name']);
-					continue;
-				}	
+            foreach ($service['listSubresults'] as $key => $result) {
+                if (!isset($result['karma']) || $service['karma'] == 'OLD') {
+                    $service['listSubresults'][$key]['karma'] = $service['karma'];
+                }
 
-				if (isset($result['subject'])) {
-					$service['listSubresults'][$key]['name'] = san()->escapeStringForHtml($result['subject']);
-					continue;
-				}
+                $service['listSubresults'][$key]['karma'] = strtolower($service['listSubresults'][$key]['karma']);
 
-				if (isset($result['title'])) {
-					$service['listSubresults'][$key]['name'] = san()->escapeStringForHtml($result['title']);
-				}
-			}
-		}
+                // name
+                if (isset($result['name']) && is_string($result['name'])) {
+                    $service['listSubresults'][$key]['name'] = san()->escapeStringForHtml($result['name']);
+                    continue;
+                }	
 
-		if (isset($json['metrics'])) {
-			$service['listMetrics'] = $json['metrics'];
+                if (isset($result['subject'])) {
+                    $service['listSubresults'][$key]['name'] = san()->escapeStringForHtml($result['subject']);
+                    continue;
+                }
 
-			$dates = array();
-			foreach ($service['listMetrics'] as $k => $metric) {
-				if (isset($metric['date'])) {
-					$d = strtotime($metric['date']);
+                if (isset($result['title'])) {
+                    $service['listSubresults'][$key]['name'] = san()->escapeStringForHtml($result['title']);
+                }
+            }
+        }
 
-					$dates[$k] = $d;
-					$service['listMetrics'][$k]['date'] = $d;
-				} else {
-					$dates[$k] = 0;
-				}
-			}
+        // Metrics are now taken from the service_metrics table
 
-			array_multisort($service['listMetrics'], $dates);
-		}
+        if (isset($json['tasks'])) {
+            $service['tasks'] = $json['tasks'];
+        }
 
-		if (isset($json['tasks'])) {
-			$service['tasks'] = $json['tasks'];
-		}
+        if (isset($json['events'])) {
+            $service['events'] = $json['events'];
+        }
 
-		if (isset($json['events'])) {
-			$service['events'] = $json['events'];
-		}
+        if (isset($json['news'])) {
+            $service['news'] = $json['news'];
+        }
 
-		if (isset($json['news'])) {
-			$service['news'] = $json['news'];
-		}
-
-		$service['stabilityProbibility'] = rand(1, 100);
-	}
+        $service['stabilityProbibility'] = rand(1, 100);
+    }
 
 }
 
 function parseMetadata(&$service) {
-	if (empty($service['metaActions'])) {
-		return;
-	}
+    if (empty($service['metaActions'])) {
+        return;
+    }
 
-	foreach (explode("\n", $service['metaActions']) as $line) {
-		$comps = explode("=", $line, 2);
-		
-		if (count($comps) > 0) {
-			$link = new stdClass;
-			$link->url = $comps[1];
-			$link->title = $comps[0];
+    foreach (explode("\n", $service['metaActions']) as $line) {
+        $comps = explode("=", $line, 2);
 
-			$service['listActions'][] = $link;
-		}
-	
-	}
+        if (count($comps) > 0) {
+            $link = new stdClass;
+            $link->url = $comps[1];
+            $link->title = $comps[0];
+
+            $service['listActions'][] = $link;
+        }
+
+    }
 }
 
 $now = time();
 
 function invalidateOldServices(&$service) {
-	global $now;
+    global $now;
 
-        if ($service['lastUpdated'] == null) {
-            $service['lastUpdated'] = '';
-        }
-	
-	$diff = $now - strtotime($service['lastUpdated']);
+    if ($service['lastUpdated'] == null) {
+        $service['lastUpdated'] = '';
+    }
 
-	if ($diff > intval(Session::getUser()->getData('oldServiceThreshold'))) {
-		$service['karma'] = 'OLD';
-	}
+    $diff = $now - strtotime($service['lastUpdated']);
+
+    if ($diff > intval(Session::getUser()->getData('oldServiceThreshold'))) {
+        $service['karma'] = 'OLD';
+    }
 }
 
 function parseAcceptableDowntime(&$service) {
-	if (!empty($service['acceptableDowntime'])) {
-		$downtime = explode("\n", trim($service['acceptableDowntime']));
+    if (!empty($service['acceptableDowntime'])) {
+        $downtime = explode("\n", trim($service['acceptableDowntime']));
 
-		$dt = getFailedDowntimeRule($downtime);
+        $dt = getFailedDowntimeRule($downtime);
 
-		if ($dt != false && $service['karma'] != 'GOOD') {
-			$service['karma'] = 'SKIPPED';
-			$service['output'] = '[DT:' . $dt . '] ' . $service['output'];
-		}
-	}
+        if ($dt != false && $service['karma'] != 'GOOD') {
+            $service['karma'] = 'SKIPPED';
+            $service['output'] = '[DT:' . $dt . '] ' . $service['output'];
+        }
+    }
 }
 
 function getFailedDowntimeRule(array $downtime) {
-	foreach ($downtime as $rule) {
-		$literals = explode(' ', trim($rule));
+    foreach ($downtime as $rule) {
+        $literals = explode(' ', trim($rule));
 
-		if (sizeof($literals) != 3) {
-			continue;
-		} else {
-			$field = $literals[0];
-			$operator = $literals[1];
-			$value = $literals[2];
+        if (sizeof($literals) != 3) {
+            continue;
+        } else {
+            $field = $literals[0];
+            $operator = $literals[1];
+            $value = $literals[2];
 
-			if (is_numeric($value)) {
-				$value = intval($value);
-			}
+            if (is_numeric($value)) {
+                $value = intval($value);
+            }
 
-			switch ($field) {
-				case 'day':
-					$lval = strtolower(date('D'));
-					break;
-				case 'hour':
-					$lval = intval(date('G'));
-					break;
-				case 'week':
-					$lval = intval(date('W'));
-					break;
-                                default:
-                                        $lval = '';
-					break;
-			}
+            switch ($field) {
+            case 'day':
+                $lval = strtolower(date('D'));
+                break;
+            case 'hour':
+                $lval = intval(date('G'));
+                break;
+            case 'week':
+                $lval = intval(date('W'));
+                break;
+            default:
+                $lval = '';
+                break;
+            }
 
-			switch ($operator) {
-				case '>':
-				case '>=':
-				case '<':
-				case '<=':
-				case '==':
-				case '!':
-					$res = null;
+            switch ($operator) {
+            case '>':
+            case '>=':
+            case '<':
+            case '<=':
+            case '==':
+            case '!':
+                $res = null;
 
-					$expr = "\$res = '$lval' $operator '$value';";
-					eval($expr);
+                $expr = "\$res = '$lval' $operator '$value';";
+                eval($expr);
 
-					if ($res) {
-						return $rule . '(' . $lval . ')';
-					}
+                if ($res) {
+                    return $rule . '(' . $lval . ')';
+                }
 
-					break;
-			}
-		}
-	}
+                break;
+            }
+        }
+    }
 
-	return false;
+    return false;
 }
 
 function getFilterCommands() {
-	$filters = new FilterTracker();
-	$filters->addString('identifier');
+    $filters = new FilterTracker();
+    $filters->addString('identifier');
 
-	return $filters;
+    return $filters;
 }
 
 function getFilterServices() {
-	$filters = new FilterTracker();
-	$filters->addBool('problems', 'Problems');
-	$filters->addBool('ungrouped');
-	$filters->addBool('ungrouped');
-	$filters->addBool('ungrouped');
-	$filters->addInt('maintPeriod', 'Maintenance Period');
-	$filters->addString('name');
-	$filters->addSelect('node', getNodes(), 'identifier');
+    $filters = new FilterTracker();
+    $filters->addBool('problems', 'Problems');
+    $filters->addBool('ungrouped');
+    $filters->addBool('ungrouped');
+    $filters->addBool('ungrouped');
+    $filters->addString('name');
+    $filters->addSelect('node', getNodes(), 'identifier');
 
-	return $filters;
+    return $filters;
 }
 
 function getServicesBad() {
-	$filters = getFilterServices();
-	
-	$_REQUEST['problems'] = true;
+    $filters = getFilterServices();
 
-	$problemServices = getServicesWithFilter(null, $filters);
+    $_REQUEST['problems'] = true;
 
-	foreach ($problemServices as $key => $service) {
-		if ($service['karma'] == 'OLD') {
-			unset($problemServices[$key]);
-		}
-	}
+    $problemServices = getServicesWithFilter(null, $filters);
 
-	$problemServices = array_values($problemServices);
+    foreach ($problemServices as $key => $service) {
+        if ($service['karma'] == 'OLD') {
+            unset($problemServices[$key]);
+        }
+    }
 
-	return $problemServices;
+    $problemServices = array_values($problemServices);
+
+    return $problemServices;
 }
 
 function getServicesWithFilter($groupId = null, $filters = null) {
-	if ($filters == null) {
-		$filters = getFilterServices();
-	}
+    if ($filters == null) {
+        $filters = getFilterServices();
+    }
 
-	$qb = new \libAllure\QueryBuilder();
-	$qb->from('services')->fields('id', 'identifier', array('ifnull(s.alias, s.identifier)', 'alias'), 'commandLine executable', 'estimatedNextCheck', 'lastChanged', 'output', 'lastUpdated', 'karma', 'node');
-	$qb->leftJoin('service_metadata', 'm')->on('s.identifier', 'm.service')->fields('m.goodCast', 'm.criticalCast');
+    $qb = new \libAllure\QueryBuilder();
+    $qb->from('services')->fields('id', 'identifier', array('ifnull(s.alias, s.identifier)', 'alias'), 'commandLine executable', 'estimatedNextCheck', 'lastChanged', 'output', 'lastUpdated', 'karma', 'node');
+    $qb->leftJoin('service_metadata', 'm')->on('s.identifier', 'm.service')->fields('m.goodCast', 'm.criticalCast');
 
-	if ($filters->isUsed('problems')) {
-		$qb->whereNotEquals('karma', 'good');
-	}
+    if ($filters->isUsed('problems')) {
+        $qb->whereNotEquals('karma', 'good');
+    }
 
-	if ($filters->isUsed('ungrouped'))  {
-		$qbGroupMemberships = new \libAllure\QueryBuilder();
-		$qbGroupMemberships->from('service_group_memberships', 'g')->fields('service');
+    if ($filters->isUsed('ungrouped'))  {
+        $qbGroupMemberships = new \libAllure\QueryBuilder();
+        $qbGroupMemberships->from('service_group_memberships', 'g')->fields('service');
 
-		$qb->whereSubquery('s.identifier', 'NOT IN', $qbGroupMemberships);
-	} 
+        $qb->whereSubquery('s.identifier', 'NOT IN', $qbGroupMemberships);
+    } 
 
-	if ($filters->isUsed('maintPeriod')) {
-		$id = san()->filterUint('maintPeriod');
+    if ($filters->isUsed('name')) {
+        $qb->where('identifier', 'LIKE', '"%' . $filters->getValue('name') . '%"');
+    }
 
-		$qb->whereEquals('m.acceptableDowntimeSla', $id);
+    if ($filters->isUsed('node')) {
+        $qb->whereEquals('node', 'node');
+    }
 
-		$activeFilters[] = 'Maint Period';
-	}
+    $qb->leftJoin('remote_config_allocated_nodes', 'rn')->on('s.node', 'rn.node');
+    $qb->leftJoin('remote_config_allocated_services', 'ras')->on('ras.config', 'rn.config');
+    $qb->leftJoin('remote_config_services', 'rs')->on('ras.service', 'rs.id')->on('rs.name', 'identifier');
+    $qb->leftJoin('remote_configs', 'rc')->on('rn.config', 'rc.id')->onImpl(null, null, 'not(isnull(rs.id))');
+    $qb->fields(array('rc.id', 'remote_config_id'));
+    $qb->fields(array('rs.id', 'remote_config_service_id'));
+    $qb->fields(array('rs.name', 'remote_config_service_identifier'));
+    $qb->fields(array('rc.name', 'remote_config_name'));
+    $qb->groupBy('s.id');
 
-	if ($filters->isUsed('name')) {
-		$qb->where('identifier', 'LIKE', '"%' . $filters->getValue('name') . '%"');
-	}
+    $stmt = DatabaseFactory::getInstance()->prepare($qb->build());
 
-	if ($filters->isUsed('node')) {
-		$qb->whereEquals('node', 'node');
-	}
+    if ($filters->isUsed('node')) {
+        $stmt->bindValue('node', $filters->getValue('node'));
+    }
 
-	$qb->leftJoin('remote_config_allocated_nodes', 'rn')->on('s.node', 'rn.node');
-	$qb->leftJoin('remote_config_allocated_services', 'ras')->on('ras.config', 'rn.config');
-	$qb->leftJoin('remote_config_services', 'rs')->on('ras.service', 'rs.id')->on('rs.name', 'identifier');
-	$qb->leftJoin('remote_configs', 'rc')->on('rn.config', 'rc.id')->onImpl(null, null, 'not(isnull(rs.id))');
-	$qb->fields(array('rc.id', 'remote_config_id'));
-	$qb->fields(array('rs.id', 'remote_config_service_id'));
-	$qb->fields(array('rs.name', 'remote_config_service_identifier'));
-	$qb->fields(array('rc.name', 'remote_config_name'));
-	$qb->groupBy('s.id');
+    $stmt->execute();
+    $listServices = $stmt->fetchAll();
 
-	$stmt = DatabaseFactory::getInstance()->prepare($qb->build());
-	//$stmt->bindValue('node', $filters->getValue('node'));
-	$stmt->execute();
-	$listServices = $stmt->fetchAll();
+    $listServices = enrichServices($listServices);
 
-	$listServices = enrichServices($listServices);
+    if ($filters->isUsed('problems')) {
+        foreach ($listServices as $k => $v) {
+            if ($v['karma'] == 'GOOD') {
+                unset ($listServices[$k]);	
+            }
+        }
+    }
 
-	if ($filters->isUsed('problems')) {
-		foreach ($listServices as $k => $v) {
-			if ($v['karma'] == 'GOOD') {
-				unset ($listServices[$k]);	
-			}
-		}
-	}
-
-	return $listServices;
+    return $listServices;
 }
 
 function getServices($groupId = null) {
-	if ($groupId == null) {
-		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, s.identifier, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.commandLine, s.output, s.karma, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id ORDER BY s.identifier';
-		$stmt = DatabaseFactory::getInstance()->prepare($sqlSubservices);
-		$stmt->execute();
+    if ($groupId == null) {
+        $sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, s.identifier, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.commandLine, s.output, s.karma, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id ORDER BY s.identifier';
+        $stmt = DatabaseFactory::getInstance()->prepare($sqlSubservices);
+        $stmt->execute();
 
-	} else {
-		$sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, s.identifier, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.commandLine, s.output, s.karma, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id WHERE g.id = :groupId ORDER BY s.identifier';
-		$stmt = DatabaseFactory::getInstance()->prepare($sqlSubservices);
-		$stmt->bindValue(':groupId', $groupId);
-		$stmt->execute();
+    } else {
+        $sqlSubservices = 'SELECT DISTINCT m.id membershipId, md.actions AS metaActions, IF(md.icon IS null, cmd.icon, md.icon) AS icon, s.identifier, IF(md.alias IS null, s.identifier, md.alias) AS alias, IF(md.acceptableDowntimeSla IS NULL, md.acceptableDowntime, sla.content) AS acceptableDowntime, s.id, s.lastUpdated, s.lastChanged, s.commandLine, s.output, s.karma, s.executable, s.consecutiveCount, s.node, s.estimatedNextCheck FROM service_group_memberships m RIGHT JOIN services s ON m.service = s.identifier LEFT JOIN service_groups g ON m.`group` = g.title LEFT JOIN command_metadata cmd ON s.commandIdentifier = cmd.commandIdentifier LEFT JOIN service_metadata md ON md.service = s.identifier LEFT JOIN acceptable_downtime_sla sla ON md.acceptableDowntimeSla = sla.id WHERE g.id = :groupId ORDER BY s.identifier';
+        $stmt = DatabaseFactory::getInstance()->prepare($sqlSubservices);
+        $stmt->bindValue(':groupId', $groupId);
+        $stmt->execute();
 
-	}
+    }
 
-	$listServices = $stmt->fetchAll();
-	$listServices = enrichServices($listServices);
+    $listServices = $stmt->fetchAll();
+    $listServices = enrichServices($listServices);
 
-	return $listServices;
+    return $listServices;
 }
 
 function castService(&$service) {
-	if ($service['karma'] != 'GOOD' && !empty($service['criticalCast'])) {
-		$service['karma'] = $service['criticalCast'];
-	}
+    if ($service['karma'] != 'GOOD' && !empty($service['criticalCast'])) {
+        $service['karma'] = $service['criticalCast'];
+    }
 }
 
 function enrichService($service, $parseOutput = true, $parseMetadata = true, $invalidateOldServices = true, $parseAcceptableDowntime = true, $castServices = false) {
-	$services = enrichServices(array($service), $parseOutput, $parseMetadata, $invalidateOldServices, $parseAcceptableDowntime, $castServices);
+    $services = enrichServices(array($service), $parseOutput, $parseMetadata, $invalidateOldServices, $parseAcceptableDowntime, $castServices);
 
-	return $services[0];
+    return $services[0];
 }
 
 function enrichServices($listServices, $parseOutput = true, $parseMetadata = true, $invalidateOldServices = true, $parseAcceptableDowntime = true, $castServices = true) {
-                
-        foreach ($listServices as $k => $itemService) {
-                if ($listServices[$k]['executable'] == null) {
-                    $listServices[$k]['executable'] = '';
-                }
 
-                if ($itemService['estimatedNextCheck'] == null) {
-                    $itemService['estimatedNextCheck'] = '';
-                }
+    foreach ($listServices as $k => $itemService) {
+        if ($listServices[$k]['executable'] == null) {
+            $listServices[$k]['executable'] = '';
+        }
 
-		$listServices[$k]['stabilityProbibility'] = 0;
-		$listServices[$k]['executableShort'] = str_replace(array('.pl', '.py', 'check_'), '', basename($listServices[$k]['executable']));
-		$listServices[$k]['isOverdue'] = (time() - strtotime($itemService['estimatedNextCheck'])) > 0;
-		$listServices[$k]['estimatedNextCheckRelative'] = getRelativeTime($itemService['estimatedNextCheck'], true);
-		$listServices[$k]['lastChangedRelative'] = getRelativeTime($itemService['lastChanged'], true);
-		$listServices[$k]['listSubresults'] = array();
-		$listServices[$k]['listActions'] = array();
+        if ($itemService['estimatedNextCheck'] == null) {
+            $itemService['estimatedNextCheck'] = '';
+        }
 
-		$parseAcceptableDowntime && parseAcceptableDowntime($listServices[$k]);
-		$invalidateOldServices && invalidateOldServices($listServices[$k]);
-		$parseOutput && parseOutputJson($listServices[$k]);
-		$parseMetadata && parseMetadata($listServices[$k]);
-		$castServices && castService($listServices[$k]);
+        $listServices[$k]['stabilityProbibility'] = 0;
+        $listServices[$k]['executableShort'] = str_replace(array('.pl', '.py', 'check_'), '', basename($listServices[$k]['executable']));
+        $listServices[$k]['isOverdue'] = (time() - strtotime($itemService['estimatedNextCheck'])) > 0;
+        $listServices[$k]['estimatedNextCheckRelative'] = getRelativeTime($itemService['estimatedNextCheck'], true);
+        $listServices[$k]['lastChangedRelative'] = getRelativeTime($itemService['lastChanged'], true);
+        $listServices[$k]['listSubresults'] = array();
+        $listServices[$k]['listActions'] = array();
 
-		$listServices[$k]['output'] = htmlspecialchars($listServices[$k]['output']);
-	}
+        $parseAcceptableDowntime && parseAcceptableDowntime($listServices[$k]);
+        $invalidateOldServices && invalidateOldServices($listServices[$k]);
+        $parseOutput && parseOutputJson($listServices[$k]);
+        $parseOutput && addMetricsToService($listServices[$k]);
+        $parseMetadata && parseMetadata($listServices[$k]);
+        $castServices && castService($listServices[$k]);
 
-	return $listServices;
+        if ($listServices[$k]['output'] != null) {
+            $listServices[$k]['output'] = trim(htmlspecialchars($listServices[$k]['output']));
+        }
+    }
+
+    return $listServices;
+}
+
+function addMetricsToService(&$service) {
+    $sql = 'SELECT * FROM service_metrics WHERE serviceIdentifier = :identifier';
+    $stmt = stmt($sql);
+    $stmt->bindValue('identifier', $service['identifier']);
+    $stmt->execute();
+
+    $service['listMetrics'] = array();
+
+    foreach ($stmt->fetchAll() as $metric) {
+        $service['listMetrics'][] = $metric;
+    }
 }
 
 function array2dFetchKey($array, $key) {
-	$ret = array();
-	foreach ($array as $item) {
-		if (is_array($item) && isset($item[$key])) {
-			$ret[] = $item[$key];
-		}
-	}
+    $ret = array();
+    foreach ($array as $item) {
+        if (is_array($item) && isset($item[$key])) {
+            $ret[] = $item[$key];
+        }
+    }
 
-	return $ret;
+    return $ret;
 }
 
 function enrichGroupListingsWithServiceMemberships($listGroups, $subGroupDepth = 1) {
-	foreach ($listGroups as &$itemGroup) {
-		$itemGroup['listServices'] = getServices($itemGroup['id']);
+    foreach ($listGroups as &$itemGroup) {
+        $itemGroup['listServices'] = getServices($itemGroup['id']);
 
-		if ($subGroupDepth > 0) {
-				$sql = 'SELECT g.* FROM service_groups g WHERE g.parent = :name';
-				$stmt = DatabaseFactory::getInstance()->prepare($sql);
-				$stmt->bindValue(':name', $itemGroup['name']);
-				$stmt->execute();
+        if ($subGroupDepth > 0) {
+            $sql = 'SELECT g.* FROM service_groups g WHERE g.parent = :name';
+            $stmt = DatabaseFactory::getInstance()->prepare($sql);
+            $stmt->bindValue(':name', $itemGroup['name']);
+            $stmt->execute();
 
-				$itemGroup['listSubgroups'] = array();
+            $itemGroup['listSubgroups'] = array();
 
-				foreach ($stmt->fetchAll() as $itemSubgroup) {
-					$itemSubgroup['listServices'] = getServices($itemSubgroup['id']);
+            foreach ($stmt->fetchAll() as $itemSubgroup) {
+                $itemSubgroup['listServices'] = getServices($itemSubgroup['id']);
 
-					$itemGroup['listSubgroups'][] = $itemSubgroup;
-				}
-		}
-	}
+                $itemGroup['listSubgroups'][] = $itemSubgroup;
+            }
+        }
+    }
 
-	return $listGroups;
+    return $listGroups;
 }
 
 function getClassInstances() {
-	$filters = classInstanceFilter();
+    $filters = classInstanceFilter();
 
-	$qb = new \libAllure\QueryBuilder();
-	$qb->from('class_instances')->fields('id', 'title identifier');
+    $qb = new \libAllure\QueryBuilder();
+    $qb->from('class_instances')->fields('id', 'title identifier');
 
-	if ($filters->isUsed('identifier')) {
-		$qb->whereLikeValue('title', $filters->getValue('identifier'));
-	}
+    if ($filters->isUsed('identifier')) {
+        $qb->whereLikeValue('title', $filters->getValue('identifier'));
+    }
 
-	$qb->orderBy('title');
+    $qb->orderBy('title');
 
-	$stmt = stmt($qb->build());
-	$stmt->execute();
+    $stmt = stmt($qb->build());
+    $stmt->execute();
 
 
-	$ret = $stmt->fetchAll();
+    $ret = $stmt->fetchAll();
 
-	return $ret;
+    return $ret;
 }
 
 function getClassInstancesInGroup($gid) {
-	$sql = 'SELECT ci.id, ci.title FROM class_instance_group_memberships gm LEFT JOIN class_instances ci ON gm.class_instance = ci.id WHERE gm.gid = :gid';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':gid', $gid);
-	$stmt->execute();
+    $sql = 'SELECT ci.id, ci.title FROM class_instance_group_memberships gm LEFT JOIN class_instances ci ON gm.class_instance = ci.id WHERE gm.gid = :gid';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':gid', $gid);
+    $stmt->execute();
 
-	$ret = $stmt->fetchAll();
+    $ret = $stmt->fetchAll();
 
-	foreach ($ret as &$ci) {
-		$ci['requirements'] = getInstanceRequirements($ci['id']);
-	}
+    foreach ($ret as &$ci) {
+        $ci['requirements'] = getInstanceRequirements($ci['id']);
+    }
 
-	return $ret;
+    return $ret;
+}
+
+function getClassInstancesNotInGroup($gid) {
+    $sql = 'SELECT ci.id, ci.title FROM class_instance_group_memberships gm RIGHT OUTER JOIN class_instances ci ON gm.class_instance = ci.id WHERE gm.gid = :gid';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':gid', $gid);
+    $stmt->execute();
+
+    $ret = $stmt->fetchAll();
+
+    return $ret;
 }
 
 function enrichGroupListingsWithClassInstanceMemberships($listGroups, $subGroupDepth = 1) {
-	foreach ($listGroups as &$itemGroup) {
-		$itemGroup['listClassInstances'] = getClassInstancesInGroup($itemGroup['id']);
-	}
+    foreach ($listGroups as &$itemGroup) {
+        $itemGroup['listClassInstances'] = getClassInstancesInGroup($itemGroup['id']);
+    }
 
-	return $listGroups;
+    return $listGroups;
 }
 
 
 function enrichGroupListingsWithNodeMemberships($listGroups) {
-	foreach ($listGroups as &$itemGroup) {
-		$itemGroup['listNodes'] = array();
-	}
+    foreach ($listGroups as &$itemGroup) {
+        $itemGroup['listNodes'] = array();
+    }
 
-	return $listGroups;
+    return $listGroups;
 }
 
 function getGroups($includeServices = true, $includeNodes = true, $includeClassInstances = true) {
-	$sql = 'SELECT g.id, g.title AS name, g.description, p.id AS parentId, p.title AS parentName, count(m.id) AS serviceCount, count(n.id) AS nodeCount FROM service_groups g LEFT JOIN service_group_memberships m ON g.title = m.group LEFT JOIN service_groups p ON g.parent = p.title LEFT JOIN node_group_memberships mn ON g.id = mn.gid LEFT JOIN nodes n ON mn.node = n.id GROUP BY g.id ORDER BY g.title ASC';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->execute();
+    $sql = 'SELECT g.id, g.title AS name, g.description, p.id AS parentId, p.title AS parentName, count(m.id) AS serviceCount, count(n.id) AS nodeCount FROM service_groups g LEFT JOIN service_group_memberships m ON g.title = m.group LEFT JOIN service_groups p ON g.parent = p.title LEFT JOIN node_group_memberships mn ON g.id = mn.gid LEFT JOIN nodes n ON mn.node = n.id GROUP BY g.id ORDER BY g.title ASC';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->execute();
 
-	$listGroups = $stmt->fetchAll();
-	
-	if ($includeServices) {
-		$listGroups = enrichGroupListingsWithServiceMemberships($listGroups);
-	}
+    $listGroups = $stmt->fetchAll();
 
-	if ($includeNodes) {
-		$listGroups = enrichGroupListingsWithNodeMemberships($listGroups);
-	}
+    if ($includeServices) {
+        $listGroups = enrichGroupListingsWithServiceMemberships($listGroups);
+    }
 
-	if ($includeClassInstances) {
-		$listGroups = enrichGroupListingsWithClassInstanceMemberships($listGroups);
-	}
+    if ($includeNodes) {
+        $listGroups = enrichGroupListingsWithNodeMemberships($listGroups);
+    }
 
-	return $listGroups;
+    if ($includeClassInstances) {
+        $listGroups = enrichGroupListingsWithClassInstanceMemberships($listGroups);
+    }
+
+    return $listGroups;
 }
 
 function getGroup($id) {
-	$sql = 'SELECT g.* FROM service_groups g WHERE g.id = :id LIMIT 1';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'SELECT g.* FROM service_groups g WHERE g.id = :id LIMIT 1';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	$itemGroup = enrichGroupListingsWithServiceMemberships(array($stmt->fetchRowNotNull()));
-	$itemGroup = enrichGroupListingsWithNodeMemberships(array($itemGroup[0]));
-	$itemGroup = enrichGroupListingsWithClassInstanceMemberships(array($itemGroup[0]));
+    $itemGroup = enrichGroupListingsWithServiceMemberships(array($stmt->fetchRowNotNull()));
+    $itemGroup = enrichGroupListingsWithNodeMemberships(array($itemGroup[0]));
+    $itemGroup = enrichGroupListingsWithClassInstanceMemberships(array($itemGroup[0]));
 
-	return $itemGroup[0];
+    return $itemGroup[0];
 }
 
 function handleApiLogin($redirect = true) {
-	if (isset($_REQUEST['login'])) {
-		$sql = 'SELECT u.id, u.username, a.* FROM apiClients a LEFT JOIN users u ON a.user = u.id WHERE a.identifier = :identifier LIMIT 1';
-		$stmt = DatabaseFactory::getInstance()->prepare($sql);
-		$stmt->bindValue(':identifier', $_REQUEST['login']);
-		$stmt->execute();
+    if (isset($_REQUEST['login'])) {
+        $sql = 'SELECT u.id, u.username, a.* FROM apiClients a LEFT JOIN users u ON a.user = u.id WHERE a.identifier = :identifier LIMIT 1';
+        $stmt = DatabaseFactory::getInstance()->prepare($sql);
+        $stmt->bindValue(':identifier', $_REQUEST['login']);
+        $stmt->execute();
 
 
-		if ($stmt->numRows() > 0) {
-			$apiClient = $stmt->fetchRow();
-			$username = $apiClient['username'];
+        if ($stmt->numRows() > 0) {
+            $apiClient = $stmt->fetchRow();
+            $username = $apiClient['username'];
 
-			$user = \libAllure\User::getUser($username);
-			$_SESSION['user'] = $user;
-			$_SESSION['username'] = $username;
+            $user = \libAllure\User::getUser($username);
+            $_SESSION['user'] = $user;
+            $_SESSION['username'] = $username;
 
-			sessionOptions()->drawHeaders = $apiClient['drawHeader'];
-			sessionOptions()->drawNavigation = $apiClient['drawNavigation'];
-			sessionOptions()->drawBigClock = $apiClient['drawBigClock'];
+            sessionOptions()->drawHeaders = $apiClient['drawHeader'];
+            sessionOptions()->drawNavigation = $apiClient['drawNavigation'];
+            sessionOptions()->drawBigClock = $apiClient['drawBigClock'];
 
-			$_SESSION['apiClient'] = $apiClient['identifier'];
-			$_SESSION['apiClientRedirect'] = $apiClient['redirect'];
+            $_SESSION['apiClient'] = $apiClient['identifier'];
+            $_SESSION['apiClientRedirect'] = $apiClient['redirect'];
 
-			if ($redirect) {
-				redirectApiClients();
-			}
-		}
-	}  
+            if ($redirect) {
+                redirectApiClients();
+            }
+        }
+    }  
 }
 
 function redirectApiClients() {
-	if (isset($_SESSION['apiClientRedirect'])) {
-			if (stripos($_SESSION['apiClientRedirect'], 'dashboard') !== false) {
-				$dashboard = explode(':', $_SESSION['apiClientRedirect']);
-	
-				$url = 'viewDashboard.php?id=' . $dashboard[1];
-				redirect($url, 'API Login complete. Redirecting to Dashboard.');
-			}
+    if (isset($_SESSION['apiClientRedirect'])) {
+        if (stripos($_SESSION['apiClientRedirect'], 'dashboard') !== false) {
+            $dashboard = explode(':', $_SESSION['apiClientRedirect']);
 
-			switch ($_SESSION['apiClientRedirect']) {
-				case 'mobile':
-					redirect('viewMobileStats.php', 'View Mobile Stats');
-				case 'hud':
-					redirect('viewServiceDashboard.php', 'API Login complete. Redirecting to Service HUD.');
-				default:
-					redirect($_SERVER['REQUEST_URI'], 'API login complete.');
-			}
-	}
+            $url = 'viewDashboard.php?id=' . $dashboard[1];
+            redirect($url, 'API Login complete. Redirecting to Dashboard.');
+        }
+
+        switch ($_SESSION['apiClientRedirect']) {
+        case 'mobile':
+            redirect('viewMobileStats.php', 'View Mobile Stats');
+        case 'hud':
+            redirect('viewServiceDashboard.php', 'API Login complete. Redirecting to Service HUD.');
+        default:
+            redirect($_SERVER['REQUEST_URI'], 'API login complete.');
+        }
+    }
 }
 
 function getServiceByIdentifier($identifier) {
-	$sql = 'SELECT s.id FROM services s WHERE s.identifier = :identifier';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':identifier', $identifier);
-	$stmt->execute();
+    $sql = 'SELECT s.id FROM services s WHERE s.identifier = :identifier';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':identifier', $identifier);
+    $stmt->execute();
 
-	$result = $stmt->fetchRowNotNull();
+    $result = $stmt->fetchRowNotNull();
 
-	return getServiceById($result['id']);
+    return getServiceById($result['id']);
 }
 
 function getServiceById($id, $parseOutput = false) {
-		$sql = 'SELECT s.id, s.alias, s.identifier, s.executable, s.commandLine, s.karma, s.node, s.output, s.lastChanged, s.lastUpdated, s.estimatedNextCheck, s.consecutiveCount, s.commandIdentifier FROM services s WHERE s.id = :serviceId';
-		$stmt = DatabaseFactory::getInstance()->prepare($sql);
-		$stmt->bindValue(':serviceId', $id);
-		$stmt->execute();
+    $sql = 'SELECT s.id, s.alias, s.identifier, s.executable, s.commandLine, s.karma, s.node, s.output, s.lastChanged, s.lastUpdated, s.estimatedNextCheck, s.consecutiveCount, s.commandIdentifier FROM services s WHERE s.id = :serviceId';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':serviceId', $id);
+    $stmt->execute();
 
-		if ($stmt->numRows() == 0) {
-			throw new Exception("Service not found");
-		}
+    if ($stmt->numRows() == 0) {
+        throw new Exception("Service not found");
+    }
 
-		$service = $stmt->fetchRowNotNull();
-		$service = enrichService($service);
+    $service = $stmt->fetchRowNotNull();
+    $service = enrichService($service);
 
-		$parseOutput && parseOutputJson($service);
+    $parseOutput && parseOutputJson($service);
 
-		$service['commandLine'] = $service['executable'];
+    $service['commandLine'] = $service['executable'];
 
-		return $service;
+    return $service;
 }
 
 function getEvents() {
-	$sql = 'SELECT s.id, s.identifier, s.output FROM services s JOIN service_metadata m ON m.service = s.identifier AND m.hasEvents = 1';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->execute();
+    $sql = 'SELECT s.id, s.identifier, s.output FROM services s JOIN service_metadata m ON m.service = s.identifier AND m.hasEvents = 1';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->execute();
 
-	$events = array();
-	$listEvents = $stmt->fetchAll();
+    $events = array();
+    $listEvents = $stmt->fetchAll();
 
-	foreach ($listEvents as $itemServiceWithEvents) {
-		parseOutputJson($itemServiceWithEvents);
+    foreach ($listEvents as $itemServiceWithEvents) {
+        parseOutputJson($itemServiceWithEvents);
 
-		if (!empty($itemServiceWithEvents['events'])) {
-			$events = array_merge_recursive($events, $itemServiceWithEvents['events']);
-		}
-	}
+        if (!empty($itemServiceWithEvents['events'])) {
+            $events = array_merge_recursive($events, $itemServiceWithEvents['events']);
+        }
+    }
 
-	return $events;
+    return $events;
 }
 
 function getTasks() {
-	$sql = 'SELECT s.id, s.identifier, s.output FROM services s JOIN service_metadata m ON m.service = s.identifier AND m.hasTasks = 1 ';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->execute();
+    $sql = 'SELECT s.id, s.identifier, s.output FROM services s JOIN service_metadata m ON m.service = s.identifier AND m.hasTasks = 1 ';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->execute();
 
-	$listServices = $stmt->fetchAll();
+    $listServices = $stmt->fetchAll();
 
-	$tasks = array(
-		'hihu' => array(),
-		'hilu' => array(),
-		'lihu' => array(),
-		'lilu' => array()
-	);
+    $tasks = array(
+        'hihu' => array(),
+        'hilu' => array(),
+        'lihu' => array(),
+        'lilu' => array()
+    );
 
-	foreach ($listServices as $itemService) {
-		parseOutputJson($itemService);
+    foreach ($listServices as $itemService) {
+        parseOutputJson($itemService);
 
-		if (isset($itemService['tasks'])) {
-			$tasks = array_merge_recursive($tasks, $itemService['tasks']);
-		}
-	}
+        if (isset($itemService['tasks'])) {
+            $tasks = array_merge_recursive($tasks, $itemService['tasks']);
+        }
+    }
 
-	return $tasks;
+    return $tasks;
 }
 
 function array_utf8_encode_recursive($dat) { 
-	if (is_string($dat)) { 
-        	return utf8_encode($dat); 
-        } 
-        
-	if (is_object($dat)) { 
-            $ovs= get_object_vars($dat); 
-            $new=$dat; 
-            foreach ($ovs as $k =>$v)    { 
-                $new->$k=array_utf8_encode_recursive($new->$k); 
-            } 
-            return $new; 
-        } 
-          
-        if (!is_array($dat)) return $dat; 
+    if (is_string($dat)) { 
+        return utf8_encode($dat); 
+    } 
 
-          $ret = array(); 
-          foreach($dat as $i=>$d) $ret[$i] = array_utf8_encode_recursive($d); 
-          return $ret; 
+    if (is_object($dat)) { 
+        $ovs= get_object_vars($dat); 
+        $new=$dat; 
+        foreach ($ovs as $k =>$v)    { 
+            $new->$k=array_utf8_encode_recursive($new->$k); 
+        } 
+        return $new; 
+    } 
+
+    if (!is_array($dat)) return $dat; 
+
+    $ret = array(); 
+    foreach($dat as $i=>$d) $ret[$i] = array_utf8_encode_recursive($d); 
+    return $ret; 
 } 
-																										
+
 function outputJson($content) {
-	header('Content-Type: application/json');
-	$content = array_utf8_encode_recursive($content);
-	$encoded = json_encode($content, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    header('Content-Type: application/json');
+    $content = array_utf8_encode_recursive($content);
+    $encoded = json_encode($content, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-	if ($encoded) {
-		echo $encoded;
-	} else {
-		if (function_exists('json_last_error_msg')) {
-			$msg = json_last_error_msg();
-		} else {
-			$msg = json_last_error();
-		}
+    if ($encoded) {
+        echo $encoded;
+    } else {
+        if (function_exists('json_last_error_msg')) {
+            $msg = json_last_error_msg();
+        } else {
+            $msg = json_last_error();
+        }
 
-		throw new Exception('JSON Encode error:' . $msg);
-	}
+        throw new Exception('JSON Encode error:' . $msg);
+    }
 
-	exit;
+    exit;
 }
 
 function isApiPage() {
-	return strpos($_SERVER['PHP_SELF'], 'json');
+    return strpos($_SERVER['PHP_SELF'], 'json');
 }
 
 function denyApiAccess($message = 'API Access Forbidden. Did you authenticate?') {
-	header('HTTP/1.0 403 Forbidden');
-	header('Content-Type: application/json');
+    header('HTTP/1.0 403 Forbidden');
+    header('Content-Type: application/json');
 
-	outputJson($message);
+    outputJson($message);
 }
 
 function validateAcceptableDowntime($el) {
-	$content = $el->getValue();
-	$content = trim($content);
+    $content = $el->getValue();
+    $content = trim($content);
 
-	if (empty($content)) {
-		return;
-	}
+    if (empty($content)) {
+        return;
+    }
 
-	$line = 0;
-	foreach (explode("\n", $content) as $rule) {
-		$line++;
+    $line = 0;
+    foreach (explode("\n", $content) as $rule) {
+        $line++;
 
-		$literals = explode(' ', trim($rule));
+        $literals = explode(' ', trim($rule));
 
-		if (count($literals) != 3) {
-			$el->setValidationError('Line ' . $line . ': 3 literals expected (field, operator, value). Found: ' . count($literals));
-			return;
-		}
+        if (count($literals) != 3) {
+            $el->setValidationError('Line ' . $line . ': 3 literals expected (field, operator, value). Found: ' . count($literals));
+            return;
+        }
 
-		$field = $literals[0];
-		$operator = $literals[1];
-		$value = $literals[2];
+        $field = $literals[0];
+        $operator = $literals[1];
+        $value = $literals[2];
 
-		switch ($operator) {
-			case '==':
-			case '!':
-			case '>':
-			case '<':
-			case '>=':
-			case '<=':
-				break;
-			default:
-				$el->setValidationError('Line ' . $line . ': Unknown operator: ' . $operator);
-				return;
-		}
+        switch ($operator) {
+        case '==':
+        case '!':
+        case '>':
+        case '<':
+        case '>=':
+        case '<=':
+            break;
+        default:
+            $el->setValidationError('Line ' . $line . ': Unknown operator: ' . $operator);
+            return;
+        }
 
 
-		switch ($field) {
-			case 'hour':
-			case 'day':
-			case 'week':
-				break;
-			default:
-				$el->setValidationError('Line ' . $line . ': Unknown operator: ' . $field);
-				return;
-		}
-	}
+        switch ($field) {
+        case 'hour':
+        case 'day':
+        case 'week':
+            break;
+        default:
+            $el->setValidationError('Line ' . $line . ': Unknown operator: ' . $field);
+            return;
+        }
+    }
 }
 
 function deleteServiceByIdentifier($identifier) {
-	$service = getServiceByIdentifier($identifier);
+    $service = getServiceByIdentifier($identifier);
 
-	$sql = 'DELETE FROM services WHERE identifier = :identifier';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':identifier', $identifier);
-	$stmt->execute();
+    $sql = 'DELETE FROM services WHERE identifier = :identifier';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':identifier', $identifier);
+    $stmt->execute();
 
-	$sql = 'DELETE FROM service_group_memberships WHERE service = :serviceIdentifier';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':serviceIdentifier', $identifier);
-	$stmt->execute();
+    $sql = 'DELETE FROM service_group_memberships WHERE service = :serviceIdentifier';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':serviceIdentifier', $identifier);
+    $stmt->execute();
 
-	$sql = 'DELETE FROM service_check_results WHERE service = :serviceIdentifier';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':serviceIdentifier', $identifier);
-	$stmt->execute();
+    $sql = 'DELETE FROM service_check_results WHERE service = :serviceIdentifier';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':serviceIdentifier', $identifier);
+    $stmt->execute();
 
-	return $service;
+    return $service;
 }
 
 
 function getWidgetInstance($id) {
-	$sql = 'SELECT wi.dashboard FROM widget_instances wi WHERE wi.id = :id';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'SELECT wi.dashboard FROM widget_instances wi WHERE wi.id = :id';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	return $stmt->fetchRowNotNull();
+    return $stmt->fetchRowNotNull();
 }
 
 function deleteWidgetInstance($id) {
-	$widgetInstance = getWidgetInstance($id);
+    $widgetInstance = getWidgetInstance($id);
 
-	$sql = 'DELETE FROM widget_instance_arguments WHERE instance = :widget';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':widget', $id);
-	$stmt->execute();
+    $sql = 'DELETE FROM widget_instance_arguments WHERE instance = :widget';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':widget', $id);
+    $stmt->execute();
 
-	$sql = 'DELETE FROM widget_instances WHERE id = :id';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'DELETE FROM widget_instances WHERE id = :id';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	return $widgetInstance;
+    return $widgetInstance;
 }
 
 function deleteGroupByName($name) {
-	$sql = 'DELETE FROM service_group_memberships WHERE `group` = :groupTitle';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':groupTitle', $name);
-	$stmt->execute();
+    $sql = 'DELETE FROM service_group_memberships WHERE `group` = :groupTitle';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':groupTitle', $name);
+    $stmt->execute();
 
-	$sql = 'DELETE FROM service_groups WHERE title = :groupTitle';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':groupTitle', $name);
-	$stmt->execute();
+    $sql = 'DELETE FROM service_groups WHERE title = :groupTitle';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':groupTitle', $name);
+    $stmt->execute();
 }
 
 function deleteDashboardById($id) {
-	$sql = 'DELETE FROM widget_instances WHERE dashboard = :id ';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'DELETE FROM widget_instances WHERE dashboard = :id ';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	$sql = 'DELETE FROM dashboard WHERE id = :id';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'DELETE FROM dashboard WHERE id = :id';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 }
 
 function getUsergroups() {
-	$sql = 'SELECT g.id, g.title FROM groups g ORDER BY g.title ASC';
-	$stmt = stmt($sql);
-	$stmt->execute();
+    $sql = 'SELECT g.id, g.title FROM groups g ORDER BY g.title ASC';
+    $stmt = stmt($sql);
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function getUserGroupById($id) {
-	$sql = 'SELECT g.id, g.title FROM groups g WHERE g.id = :id LIMIT 1';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'SELECT g.id, g.title FROM groups g WHERE g.id = :id LIMIT 1';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	return $stmt->fetchRowNotNull();
+    return $stmt->fetchRowNotNull();
 }
 
 function addUserToGroup($userId, $groupId) {
-	$sql = 'INSERT INTO group_memberships (`user`, `group`) VALUES (:user, :group)';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':user', $userId);
-	$stmt->bindValue(':group', $groupId);
-	$stmt->execute();
+    $sql = 'INSERT INTO group_memberships (`user`, `group`) VALUES (:user, :group)';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':user', $userId);
+    $stmt->bindValue(':group', $groupId);
+    $stmt->execute();
 }
 
 function getUsersInGroupById($groupId) {
-	$sql = 'SELECT u.id AS userId, u.username FROM users u LEFT JOIN group_memberships m ON m.user = u.id WHERE m.`group` = :id ';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $groupId);
-	$stmt->execute();
+    $sql = 'SELECT u.id AS userId, u.username FROM users u LEFT JOIN group_memberships m ON m.user = u.id WHERE m.`group` = :id ';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $groupId);
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function deleteUserGroupMembership($user, $group) {
-	$sql = 'DELETE FROM group_memberships WHERE user = :user AND `group` = :group LIMIT 1';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':user', $user);
-	$stmt->bindValue(':group', $group);
-	$stmt->execute();
+    $sql = 'DELETE FROM group_memberships WHERE user = :user AND `group` = :group LIMIT 1';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':user', $user);
+    $stmt->bindValue(':group', $group);
+    $stmt->execute();
 }
 
 function createUsergroup($title) {
-	$sql = 'INSERT INTO groups (`title`) VALUES (:title)';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':title', $title);
-	$stmt->execute();
+    $sql = 'INSERT INTO groups (`title`) VALUES (:title)';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':title', $title);
+    $stmt->execute();
 
-	return insertId();
+    return insertId();
 }
 
 function deleteUsergroupById($id) {
-	$sql = 'DELETE FROM groups WHERE id = :id LIMIT 1';	
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'DELETE FROM groups WHERE id = :id LIMIT 1';	
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 }
 
 function createGroup($title) {
-	$sql = 'INSERT INTO service_groups (title) VALUES (:title)';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue('title', $title);
-	$stmt->execute();
+    $sql = 'INSERT INTO service_groups (title) VALUES (:title)';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue('title', $title);
+    $stmt->execute();
 
-	return insertId();
+    return insertId();
 }
 
 function getRooms() {
-	$sql = 'SELECT r.id, r.filename, r.title FROM rooms r';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':id', Sanitizer::getInstance()->filterUint('id'));
-	$stmt->execute();
+    $sql = 'SELECT r.id, r.filename, r.title FROM rooms r';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':id', Sanitizer::getInstance()->filterUint('id'));
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function getMaintPeriodById($id) {
-	$sql = 'SELECT s.content, s.title FROM acceptable_downtime_sla s WHERE s.id = :id';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
-	$sla = $stmt->fetchRowNotNull();
+    $sql = 'SELECT s.content, s.title FROM acceptable_downtime_sla s WHERE s.id = :id';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
+    $sla = $stmt->fetchRowNotNull();
 
-	return $sla;
+    return $sla;
 }
 
 function deleteMaintPeriodById($id) {
-	$sql = 'DELETE FROM acceptable_downtime_sla WHERE id = :id';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'DELETE FROM acceptable_downtime_sla WHERE id = :id';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	$sql = 'UPDATE service_metadata SET acceptableDowntimeSla = NULL WHERE acceptableDowntimeSla = :id';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'UPDATE service_metadata SET acceptableDowntimeSla = NULL WHERE acceptableDowntimeSla = :id';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 }
 
 function setMaintPeriodContent($id, $content, $title) {
-	$sql = 'UPDATE acceptable_downtime_sla SET content = :content, title = :title WHERE id = :id';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':content', $content);
-	$stmt->bindValue(':title', $title);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'UPDATE acceptable_downtime_sla SET content = :content, title = :title WHERE id = :id';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':content', $content);
+    $stmt->bindValue(':title', $title);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 }
 
 function getServicesUngrouped() {
-	$sql = 'SELECT s.estimatedNextCheck, s.alias, s.id FROM services s WHERE s.id NOT IN (SELECT s2.id FROM service_group_memberships m INNER JOIN services s2 ON m.service = s2.identifier)';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->execute();
+    $sql = 'SELECT s.estimatedNextCheck, s.identifier, s.alias, s.id FROM services s WHERE s.id NOT IN (SELECT s2.id FROM service_group_memberships m INNER JOIN services s2 ON m.service = s2.identifier)';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->execute();
 
-	$listServices = $stmt->fetchAll();
+    $listServices = $stmt->fetchAll();
 
-	return $listServices;
+    return $listServices;
 }
 
 function getMembershipsFromServiceIdentifier($identifier) {
-	$sql = 'SELECT m.id, m.`group`, g.id AS groupId, g.title AS groupName FROM service_group_memberships m INNER JOIN service_groups g ON m.group = g.title WHERE m.service = :service';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':service', $identifier);
-	$stmt->execute();
+    $sql = 'SELECT m.id, m.`group`, g.id AS groupId, g.title AS groupName FROM service_group_memberships m INNER JOIN service_groups g ON m.group = g.title WHERE m.service = :service';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':service', $identifier);
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function deleteServiceGroupMembershipById($id) {
-	$sql = 'DELETE FROM service_group_memberships WHERE id = :id';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'DELETE FROM service_group_memberships WHERE id = :id';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 }
 
 function getServiceGroupMembershipById($id) {
-	$sql = 'SELECT m.*, s.id AS service FROM service_group_memberships m INNER JOIN services s ON m.service = s.identifier WHERE m.id = :id';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'SELECT m.*, s.id AS service FROM service_group_memberships m INNER JOIN services s ON m.service = s.identifier WHERE m.id = :id';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	return $stmt->fetchRowNotNull();
+    return $stmt->fetchRowNotNull();
 }
 
 function setGroupPermissions($id, array $perms) {
-	$sql = 'DELETE FROM privileges_g WHERE `group` = :id';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'DELETE FROM privileges_g WHERE `group` = :id';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	foreach ($perms as $perm) {
-		$sql = 'SELECT p.id FROM permissions p WHERE p.`key` = :key LIMIT 1';
-		$stmt = stmt($sql);
-		$stmt->bindValue(':key', trim($perm));
-		$stmt->execute();
+    foreach ($perms as $perm) {
+        $sql = 'SELECT p.id FROM permissions p WHERE p.`key` = :key LIMIT 1';
+        $stmt = stmt($sql);
+        $stmt->bindValue(':key', trim($perm));
+        $stmt->execute();
 
-		$permDb = $stmt->fetchRowNotNull();
-	
-		$sql = 'INSERT INTO privileges_g (`permission`, `group`) VALUES (:key, :group)';
-		$stmt = stmt($sql);
-		$stmt->bindValue(':key', $permDb['id']);
-		$stmt->bindValue(':group', $id);
-		$stmt->execute();
+        $permDb = $stmt->fetchRowNotNull();
 
-	}
+        $sql = 'INSERT INTO privileges_g (`permission`, `group`) VALUES (:key, :group)';
+        $stmt = stmt($sql);
+        $stmt->bindValue(':key', $permDb['id']);
+        $stmt->bindValue(':group', $id);
+        $stmt->execute();
+
+    }
 }
 
 function karmaToInt($karma) {
-	switch ($karma) {
-		case 'BAD': return -1;
-		case 'STALLED': return 0;
-		case 'GOOD': return 1;
-		case 'WARNING': return -.5;
-		case 'UNKNOWN': return 0;
-	}
+    switch ($karma) {
+    case 'BAD': return -1;
+    case 'STALLED': return 0;
+    case 'GOOD': return 1;
+    case 'WARNING': return -.5;
+    case 'UNKNOWN': return 0;
+    }
 }
 
 function getSingleServiceMetric($service, $field) {
-	$pat = '#<json>(.+)</json>#ims';
+    $pat = '#<json>(.+)</json>#ims';
 
-	if ($field == 'karma') {
-		$metric = new stdClass;
-		$metric->date = $service['checked'];
-		$metric->karma = $service['karma'];
-		$metric->value = karmaToInt($service['karma']);
+    if ($field == 'karma') {
+        $metric = new stdClass;
+        $metric->date = $service['checked'];
+        $metric->karma = $service['karma'];
+        $metric->value = karmaToInt($service['karma']);
 
-		return $metric;
-	}
+        return $metric;
+    }
 
-		$res = preg_match($pat, $service['output'], $matches);
+    $res = preg_match($pat, $service['output'], $matches);
 
-		if ($res) {
-			$ret = preg_replace($pat, null, $service['output']);
+    if ($res) {
+        $ret = preg_replace($pat, null, $service['output']);
 
-			$json = json_decode($matches[1]);
+        $json = json_decode($matches[1]);
 
-			if ($field == 'count') {
-				$metric = new stdClass;
-				$metric->date = $service['date'];
-				$metric->karma = $service['karma'];
-				$metric->value = count($json);
+        if ($field == 'count') {
+            $metric = new stdClass;
+            $metric->date = $service['date'];
+            $metric->karma = $service['karma'];
+            $metric->value = count($json);
 
-				return $metric;
-			}
+            return $metric;
+        }
 
-			if (!empty($json->metrics)) {
-				foreach ($json->metrics as $metric) {
-					if ($metric->name != $field) {
-						continue;
-					}
-		
-					$metric->date = $service['checked'];
-					$metric->karma = $service['karma'];
+        if (!empty($json->metrics)) {
+            foreach ($json->metrics as $metric) {
+                if ($metric->name != $field) {
+                    continue;
+                }
 
-					return $metric;
-				}
-			}
-		} else {
-			$metric = extractNagiosMetric($service, $field);
+                $metric->date = $service['checked'];
+                $metric->karma = $service['karma'];
+
+                return $metric;
+            }
+        }
+    } else {
+        $metric = extractNagiosMetric($service, $field);
 /*
-			$metric = new stdClass;
-			$metric->date = $service['date'];
-			$metric->karma = $service['karma'];
-			$metric->value = '[NO OUTPUT]';
-*/
-			return $metric;
-		}
+                        $metric = new stdClass;
+                        $metric->date = $service['date'];
+                        $metric->karma = $service['karma'];
+                        $metric->value = '[NO OUTPUT]';
+ */
+        return $metric;
+    }
 
 }
 
 function getServiceMetrics($results, $field) {
-	$matches = array();
-	$metrics = array();
+    $matches = array();
+    $metrics = array();
 
-	foreach ($results as $service) {
-		$metric = getSingleServiceMetric($service, $field);
+    foreach ($results as $service) {
+        $metric = getSingleServiceMetric($service, $field);
 
-		if (!empty($metric)) {
-			$metrics[] = $metric;
-		}
-	}
+        if (!empty($metric)) {
+            $metrics[] = $metric;
+        }
+    }
 
-	foreach ($metrics as &$metric) {
-		$metric->date = strtotime($metric->date);
-	}
+    foreach ($metrics as &$metric) {
+        $metric->date = strtotime($metric->date);
+    }
 
-	return $metrics;
+    return $metrics;
 }
 
 function getClassInstance($id) {
-	$sql = <<<SQL
+    $sql = <<<SQL
 SELECT
-	i.id,
-	i.title,
-	p.icon
+        i.id,
+        i.title,
+        p.icon
 FROM 
-	class_instances i 
+        class_instances i 
 LEFT JOIN class_instance_parents ip ON ip.instance = i.id
 LEFT JOIN classes p ON ip.parent = p.id
 WHERE 
-	i.id = :instanceId
+        i.id = :instanceId
 LIMIT 1
 SQL;
 
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':instanceId', $id);
-	$stmt->execute();
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':instanceId', $id);
+    $stmt->execute();
 
-	return $stmt->fetchRowNotNull();
+    return $stmt->fetchRowNotNull();
 }
 
 function getInstanceRequirements($id) {
-// TODO: It might be possible to have multiple checks assigned to a requirement
-// if DISTINCT is removed and the query is slightly adjusted. 
-$sql = <<<SQL
+    // TODO: It might be possible to have multiple checks assigned to a requirement
+    // if DISTINCT is removed and the query is slightly adjusted. 
+    $sql = <<<SQL
 SELECT DISTINCT
-	i.id AS instanceId,
-	p.title AS owningClassTitle, 
-	p.id AS owningClassId,
-	r.title AS requirementTitle,
-	r.command AS requirementRecommendedCommand,
-	r.id AS requirementId,
-	a.service,
-	s.identifier,
-	s.karma,
-	s.node,
-	LEFT(s.output, 50) AS output,
-	s.identifier AS serviceIdentifier,
-	s.lastUpdated AS serviceLastUpdated,
-	m.icon
+        i.id AS instanceId,
+        p.title AS owningClassTitle, 
+        p.id AS owningClassId,
+        r.title AS requirementTitle,
+        r.command AS requirementRecommendedCommand,
+        r.id AS requirementId,
+        a.service,
+        s.identifier,
+        s.karma,
+        s.node,
+        LEFT(s.output, 50) AS output,
+        s.identifier AS serviceIdentifier,
+        s.lastUpdated AS serviceLastUpdated,
+        m.icon
 FROM 
-	class_instances i
+        class_instances i
 LEFT JOIN class_instance_parents ip ON
-	ip.instance = i.id
+        ip.instance = i.id
 LEFT JOIN classes p ON 
-	ip.parent = p.id
+        ip.parent = p.id
 RIGHT JOIN class_service_requirements r ON
-	r.class = p.id
+        r.class = p.id
 LEFT JOIN class_service_assignments a ON
-	a.instance = ip.instance
-	AND a.requirement = r.id
+        a.instance = ip.instance
+        AND a.requirement = r.id
 LEFT JOIN services s ON
-	a.service = s.id
+        a.service = s.id
 LEFT JOIN service_metadata m ON
-	m.service = s.identifier
+        m.service = s.identifier
 WHERE 
-	ip.instance = :instanceId
+        ip.instance = :instanceId
 SQL;
 
-	$stmt = stmt($sql);
-	$stmt->bindValue(':instanceId', $id);
-	$stmt->execute();
+    $stmt = stmt($sql);
+    $stmt->bindValue(':instanceId', $id);
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function getImmediateClassInstances($id) {
-	$sql = <<<SQL
+    $sql = <<<SQL
 SELECT DISTINCT 
-	ci.id AS id,
-	ci.title, 
-	r.title AS requirementTitle,
-	r.id AS requirementId,
-	count(s.id) AS goodCount,
-	count(a.id) AS assignedCount,
-	count(r.id) AS totalCount
+        ci.id AS id,
+        ci.title, 
+        r.title AS requirementTitle,
+        r.id AS requirementId,
+        count(s.id) AS goodCount,
+        count(a.id) AS assignedCount,
+        count(r.id) AS totalCount
 FROM 
-	class_instances ci
+        class_instances ci
 LEFT JOIN class_instance_parents ip ON 
-	ip.instance = ci.id
+        ip.instance = ci.id
 LEFT JOIN classes c ON
-	ip.parent = c.id
+        ip.parent = c.id
 LEFT JOIN class_service_requirements r ON
-	r.class = c.id
+        r.class = c.id
 LEFT JOIN class_service_assignments a ON
-	a.instance = ci.id
-	AND a.requirement = r.id
+        a.instance = ci.id
+        AND a.requirement = r.id
 LEFT JOIN services s ON
-	a.service = s.id
-	AND s.karma = "GOOD"
+        a.service = s.id
+        AND s.karma = "GOOD"
 WHERE ip.parent = :id
 GROUP BY
-	ci.id
+        ci.id
 SQL;
 
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	$listInstances = $stmt->fetchAll();
+    $listInstances = $stmt->fetchAll();
 
-	foreach ($listInstances as $index => $instance) {
-			$row = &$listInstances[$index];
-			$row['assignedKarma'] = 'unknown';
+    foreach ($listInstances as $index => $instance) {
+        $row = &$listInstances[$index];
+        $row['assignedKarma'] = 'unknown';
 
-			if ($row['assignedCount'] == $row['totalCount']) {
-				$row['overallKarma'] = 'good';
-			} else {
-				$row['overallKarma'] = 'bad';
-			}
+        if ($row['assignedCount'] == $row['totalCount']) {
+            $row['overallKarma'] = 'good';
+        } else {
+            $row['overallKarma'] = 'bad';
+        }
 
-			if ($row['goodCount'] == $row['assignedCount']) {
-				$row['assignedKarma'] = 'good';
-			} else {
-				$row['assignedKarma'] = 'bad';
-			}
-	}
+        if ($row['goodCount'] == $row['assignedCount']) {
+            $row['assignedKarma'] = 'good';
+        } else {
+            $row['assignedKarma'] = 'bad';
+        }
+    }
 
-	return $listInstances;
+    return $listInstances;
 }
 
 function getImmediateChildrenClasses($id) {
-	$sqlImmediateChildren = <<<SQL
+    $sqlImmediateChildren = <<<SQL
 SELECT 
-	n.id AS id,
-	n.title,
-	n.icon, 
-	children.count AS childrenCount,
-	(count(parent.title) - (children.depth + 1)) AS depth
+        n.id AS id,
+        n.title,
+        n.icon, 
+        children.count AS childrenCount,
+        (count(parent.title) - (children.depth + 1)) AS depth
 FROM 
-	classes AS n,
-	classes AS parent,
-	classes AS sub_parent, 
-	(
-		SELECT 
-			n.title,
-			(count(parent.title) - 1) AS depth,
-			count(parent.title) AS count
-		FROM
-			classes AS n,
-			classes AS parent
-		WHERE
-			n.l BETWEEN parent.l AND parent.r 
-			AND n.id = :nodeId
-		GROUP BY 
-			n.title, 
-			n.l
-	) AS children
+        classes AS n,
+        classes AS parent,
+        classes AS sub_parent, 
+        (
+                SELECT 
+                        n.title,
+                        (count(parent.title) - 1) AS depth,
+                        count(parent.title) AS count
+                FROM
+                        classes AS n,
+                        classes AS parent
+                WHERE
+                        n.l BETWEEN parent.l AND parent.r 
+                        AND n.id = :nodeId
+                GROUP BY 
+                        n.title, 
+                        n.l
+        ) AS children
 WHERE 
-	n.l BETWEEN parent.l AND parent.r
-	AND n.l BETWEEN sub_parent.l AND sub_parent.r
-	AND parent.title = children.title
-	AND n.id != :nodeIdOrig
+        n.l BETWEEN parent.l AND parent.r
+        AND n.l BETWEEN sub_parent.l AND sub_parent.r
+        AND parent.title = children.title
+        AND n.id != :nodeIdOrig
 GROUP BY n.title
 HAVING depth <= 1
 ORDER BY n.l
-	
+
 SQL;
 
-	$sql = $sqlImmediateChildren;
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':nodeId', $id);
-	$stmt->bindValue(':nodeIdOrig', $id);
-	$stmt->execute();
+    $sql = $sqlImmediateChildren;
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':nodeId', $id);
+    $stmt->bindValue(':nodeIdOrig', $id);
+    $stmt->execute();
 
-	return $stmt->fetchall();
+    return $stmt->fetchall();
 }
 
 function getClasses() {
-	$sql = 'SELECT c.* FROM classes c';
-	$stmt = stmt($sql);
-	$stmt->execute();
+    $sql = 'SELECT c.* FROM classes c';
+    $stmt = stmt($sql);
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function getClass($id) {
-	$sql = 'SELECT c.* FROM classes c WHERE c.id = :id';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'SELECT c.* FROM classes c WHERE c.id = :id';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	$class = $stmt->fetchRowNotNull();
+    $class = $stmt->fetchRowNotNull();
 
-	return $class;
+    return $class;
 }
 
 function getClassInstancesUsingService($serviceId) {
-	$sql = 'SELECT i.instance AS id FROM class_service_assignments i WHERE i.service = :id ';
+    $sql = 'SELECT i.instance AS id FROM class_service_assignments i WHERE i.service = :id ';
 
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':id', $serviceId);
-	$stmt->execute();
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':id', $serviceId);
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function getClassRequirements($id) {
-	$sql = 'SELECT r.id, r.title FROM class_service_requirements r WHERE r.class = :id ';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'SELECT r.id, r.title FROM class_service_requirements r WHERE r.class = :id ';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function getElementServiceIcon($default) {
-	$el = new \libAllure\ElementSelect('icon', 'Icon', null, '<span id = "serviceIconPreview"><em>No icon selected.</em></span>');
-	$el->addOption('', '');
+    $el = new \libAllure\ElementSelect('icon', 'Icon', null, '<span id = "serviceIconPreview"><em>No icon selected.</em></span>');
+    $el->addOption('', '');
 
-	$listIcons = scandir('resources/images/serviceIcons/');
+    $listIcons = scandir('resources/images/serviceIcons/');
 
-	foreach ($listIcons as $k => $itemIcon) {
-		if ($itemIcon[0] == '.') {
-			continue;
-		}
+    foreach ($listIcons as $k => $itemIcon) {
+        if ($itemIcon[0] == '.') {
+            continue;
+        }
 
-		if (stripos($itemIcon, '.png') == false) {
-			continue;
-		}
+        if (stripos($itemIcon, '.png') == false) {
+            continue;
+        }
 
-		$el->addOption($itemIcon, $itemIcon);
-	}
+        $el->addOption($itemIcon, $itemIcon);
+    }
 
-	$el->setValue($default);
-	$el->setOnChange('serviceIconChanged');
-	
-	return $el;
+    $el->setValue($default);
+    $el->setOnChange('serviceIconChanged');
+
+    return $el;
 }
 
 function getClassParents($class) {
-	$sql = 'SELECT c.id, c.title FROM classes c WHERE c.l < :left AND c.r > :right ORDER BY c.l';
-	$stmt = db()->prepare($sql);
-	$stmt->bindValue(':left', $class['l']);
-	$stmt->bindValue(':right', $class['r']);
-	$stmt->execute();
+    $sql = 'SELECT c.id, c.title FROM classes c WHERE c.l < :left AND c.r > :right ORDER BY c.l';
+    $stmt = db()->prepare($sql);
+    $stmt->bindValue(':left', $class['l']);
+    $stmt->bindValue(':right', $class['r']);
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function getDashboards() {
-	$sql = 'SELECT d.title, d.id, count(w.id) AS widgetCount FROM dashboard d LEFT JOIN widget_instances w ON w.dashboard = d.id GROUP BY d.id';
-	$stmt = stmt($sql);
-	$stmt->execute();
+    $sql = 'SELECT d.title, d.id, count(w.id) AS widgetCount FROM dashboard d LEFT JOIN widget_instances w ON w.dashboard = d.id GROUP BY d.id';
+    $stmt = stmt($sql);
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function getCommands() {
-	$filters = getFilterCommands();
+    $filters = getFilterCommands();
 
-	$qb = new \libAllure\QueryBuilder();
-	$qb->from('remote_config_commands', 'c')->fields('identifier', array('identifier', 'commandIdentifier'), 'id', 'm.icon', array('id', 'serviceCount'), array('count(c.id)', 'remoteConfigCommandCount'));
-	$qb->leftJoin('command_metadata', 'm')->on('c.metadata', 'm.id');
+    $qb = new \libAllure\QueryBuilder();
+    $qb->from('remote_config_commands', 'c')->fields('identifier', array('identifier', 'commandIdentifier'), 'id', 'm.icon', array('id', 'serviceCount'), array('count(c.id)', 'remoteConfigCommandCount'));
+    $qb->leftJoin('command_metadata', 'm')->on('c.metadata', 'm.id');
 
-	if ($filters->isUsed('identifier')) {
-		$qb->whereLikeValue('commandIdentifier', $filters->getValue('identifier'));
-	}
+    if ($filters->isUsed('identifier')) {
+        $qb->whereLikeValue('commandIdentifier', $filters->getValue('identifier'));
+    }
 
-//	$qb->leftJoin('services')->on('c.Identifier', 's.identifier');
-	$qb->groupBy('c.id');
+    //	$qb->leftJoin('services')->on('c.Identifier', 's.identifier');
+    $qb->groupBy('c.id');
 
 
-//	$sql = 'SELECT c.id, c.commandIdentifier, c.commandIdentifier AS identifier, c.icon, count(s.id) AS serviceCount, count(ac.id) AS remoteConfigCommandCount FROM command_metadata c LEFT JOIN services s ON s.commandIdentifier = c.commandIdentifier LEFT JOIN remote_config_commands ac ON ac.metadata = c.id GROUP BY c.id';
-//          SELECT c.commandIdentifier, c.id, c.icon, count(s.id) AS serviceCount FROM command_metadata c LEFT JOIN services s ON c.commandIdentifier = s.identifier LEFT JOIN remote_config_commands ac ON ac.metadata = c.id GROUP BY c.id ORDER BY c.commandIdentifier
-	$stmt = stmt($qb->build());
-	$stmt->execute();
+    //	$sql = 'SELECT c.id, c.commandIdentifier, c.commandIdentifier AS identifier, c.icon, count(s.id) AS serviceCount, count(ac.id) AS remoteConfigCommandCount FROM command_metadata c LEFT JOIN services s ON s.commandIdentifier = c.commandIdentifier LEFT JOIN remote_config_commands ac ON ac.metadata = c.id GROUP BY c.id';
+    //          SELECT c.commandIdentifier, c.id, c.icon, count(s.id) AS serviceCount FROM command_metadata c LEFT JOIN services s ON c.commandIdentifier = s.identifier LEFT JOIN remote_config_commands ac ON ac.metadata = c.id GROUP BY c.id ORDER BY c.commandIdentifier
+    $stmt = stmt($qb->build());
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function getUsers() {
-	$sql = 'SELECT u.id, u.username FROM users u';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->execute();
+    $sql = 'SELECT u.id, u.username FROM users u';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function getVersion() {
-	$version = '???';
+    $version = '???';
 
-	try {
-		$buildId = getBuildId();
-		$version = $buildId['tag'];
-	} catch (Exception $e) {}
+    try {
+        $buildId = getBuildId();
+        $version = $buildId['tag'];
+    } catch (Exception $e) {}
 
-	return $version;
+        return $version;
 }
 
 function getBuildId() {
-	$buildIdFile = __DIR__ . '/../.buildid';
+    $buildIdFile = __DIR__ . '/../.buildid';
 
-	if (file_exists($buildIdFile)) {
-		$buildId = parse_ini_file($buildIdFile, false, INI_SCANNER_RAW);
+    if (file_exists($buildIdFile)) {
+        $buildId = parse_ini_file($buildIdFile, false, INI_SCANNER_RAW);
 
-		if (!$buildId) {
-			throw new Exception('buildid found, but could not be parsed');
-		}
+        if (!$buildId) {
+            throw new Exception('buildid found, but could not be parsed');
+        }
 
-		return $buildId;
-	} else {
-		throw new Exception('buildid does not exist.');
-	}
+        return $buildId;
+    } else {
+        throw new Exception('buildid does not exist.');
+    }
 }
 
 function listMaintPeriods() {
-	$sql = 'SELECT s.id, s.title, s.content, COUNT(m.id) AS countServices FROM acceptable_downtime_sla s LEFT JOIN service_metadata m ON m.acceptableDowntimeSla = s.id GROUP BY s.id';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->execute();
-	$listMaintPeriods = $stmt->fetchAll();
+    $sql = 'SELECT s.id, s.title, s.content, COUNT(m.id) AS countServices FROM acceptable_downtime_sla s LEFT JOIN service_metadata m ON m.acceptableDowntimeSla = s.id GROUP BY s.id';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->execute();
+    $listMaintPeriods = $stmt->fetchAll();
 
-	return $listMaintPeriods;
+    return $listMaintPeriods;
 }
 
 if (!function_exists('array_column')) {
-	function array_column(array $arr, $valCol, $keyCol = null) {
-		$ret = array();
+    function array_column(array $arr, $valCol, $keyCol = null) {
+        $ret = array();
 
-		foreach ($arr as $val) {
-			if ($keyCol == null) {
-				$ret [] = $val[$valCol];
-			} else {
-				$ret[$val[$keyCol]] = $val[$valCol];
-			}
-		}
+        foreach ($arr as $val) {
+            if ($keyCol == null) {
+                $ret [] = $val[$valCol];
+            } else {
+                $ret[$val[$keyCol]] = $val[$valCol];
+            }
+        }
 
-		return $ret;
-	}
+        return $ret;
+    }
 }
 
 function getAllCommands() {
-	$sql = 'SELECT c.id, c.command_Line, c.identifier, c.command_line, count(s.id) AS instanceCount, c.metadata AS metadataId, m.commandIdentifier AS metadataIdentifier, m.icon FROM remote_config_commands c LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_services s ON s.command = c.id GROUP BY c.id ORDER BY c.identifier';
-        $stmt = stmt($sql);
-        $stmt->execute();
+    $sql = 'SELECT c.id, c.command_Line, c.identifier, c.command_line, count(s.id) AS instanceCount, c.metadata AS metadataId, m.commandIdentifier AS metadataIdentifier, m.icon FROM remote_config_commands c LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_services s ON s.command = c.id GROUP BY c.id ORDER BY c.identifier';
+    $stmt = stmt($sql);
+    $stmt->execute();
 
-	$commands = $stmt->fetchAll();
+    $commands = $stmt->fetchAll();
 
-	return $commands;
+    return $commands;
 }
 
 function getAllRemoteConfigServices() {
-	$sql = 'SELECT s.id, s.name, s.parent, c.id AS commandId, c.identifier AS commandIdentifier, count(a.id) AS instanceCount, m.icon FROM remote_config_services s LEFT JOIN remote_config_commands c ON s.command = c.id LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_allocated_services a ON a.service = s.id GROUP BY s.id ORDER BY s.name';
-	$stmt = stmt($sql)->execute();
+    $sql = 'SELECT s.id, s.name, s.parent, c.id AS commandId, c.identifier AS commandIdentifier, count(a.id) AS instanceCount, m.icon FROM remote_config_services s LEFT JOIN remote_config_commands c ON s.command = c.id LEFT JOIN command_metadata m ON c.metadata = m.id LEFT JOIN remote_config_allocated_services a ON a.service = s.id GROUP BY s.id ORDER BY s.name';
+    $stmt = stmt($sql)->execute();
 
-	$services = $stmt->fetchAll();
+    $services = $stmt->fetchAll();
 
-	return $services;
+    return $services;
 }
 
 function deleteConfigServiceInstance($id) {
-	$sql = 'SELECT s.id, s.config FROM remote_config_allocated_services s WHERE s.id = :service LIMIT 1';
-	$stmt = db()->prepare($sql);
-	$stmt->bindValue(':service', $id);
-	$stmt->execute();
+    $sql = 'SELECT s.id, s.config FROM remote_config_allocated_services s WHERE s.id = :service LIMIT 1';
+    $stmt = db()->prepare($sql);
+    $stmt->bindValue(':service', $id);
+    $stmt->execute();
 
-	$service = $stmt->fetchRowNotNull();
-	$config = $service['config'];
+    $service = $stmt->fetchRowNotNull();
+    $config = $service['config'];
 
-	$sql = 'DELETE FROM remote_config_allocated_services WHERE id = :service LIMIT 1';
-	$stmt = db()->prepare($sql);
-	$stmt->bindValue(':service', $id);
-	$stmt->execute();
+    $sql = 'DELETE FROM remote_config_allocated_services WHERE id = :service LIMIT 1';
+    $stmt = db()->prepare($sql);
+    $stmt->bindValue(':service', $id);
+    $stmt->execute();
 
-	return $config;
+    return $config;
 }
 
 function getServiceArgumentValues($serviceId) {
-	$sql = 'SELECT a.name, v.value FROM remote_config_service_arg_values v LEFT JOIN remote_config_command_arguments a ON v.argument = a.id WHERE v.service = :serviceId';
-	$stmt = db()->prepare($sql);
-	$stmt->bindValue(':serviceId', $serviceId);
-	$stmt->execute();
+    $sql = 'SELECT a.name, v.value FROM remote_config_service_arg_values v LEFT JOIN remote_config_command_arguments a ON v.argument = a.id WHERE v.service = :serviceId';
+    $stmt = db()->prepare($sql);
+    $stmt->bindValue(':serviceId', $serviceId);
+    $stmt->execute();
 
-	$args = array();
+    $args = array();
 
-	foreach ($stmt->fetchAll() as $arg) {
-		$args[$arg['name']] = $arg['value'];
-	}
+    foreach ($stmt->fetchAll() as $arg) {
+        $args[$arg['name']] = $arg['value'];
+    }
 
-	return $args;
+    return $args;
 }
 
 function getServiceResultsMostRecent($serviceIdentifier, $nodeIdentifier) {
-	return getServiceResults($serviceIdentifier, $nodeIdentifier, 1, 1);
+    return getServiceResults($serviceIdentifier, $nodeIdentifier, 1, 1);
 }
 
 function getServiceResults($serviceIdentifier, $nodeIdentifier, $interval = 7, $resolution = null) {
-	$interval = intval($interval);
+    $interval = intval($interval);
 
-	if ($resolution == null) {
-		$resolution = $interval * 50;
-	}
+    if ($resolution == null) {
+        $resolution = $interval * 50;
+    }
 
-	stmt('SET @row := -1')->execute();
-	$sql = 'SELECT r.id, r.output, r.checked, r.karma, r.checked AS lastUpdated FROM service_check_results r INNER JOIN (SELECT ID from (SELECT @row := @row + 1 AS rowNum, id FROM (SELECT id FROM service_check_results WHERE checked > date_sub(now(), INTERVAL ' . $interval . ' DAY) AND service = :serviceIdentifier AND node = :nodeIdentifier) AS sorted) AS ranked where rowNum % :resolution = 0) AS subset on subset.id = r.id ORDER BY r.checked DESC ';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':serviceIdentifier', $serviceIdentifier);
-	$stmt->bindValue(':nodeIdentifier', $nodeIdentifier);
-	$stmt->bindValue(':resolution', $resolution);
-	$stmt->execute();
+    stmt('SET @row := -1')->execute();
+    $sql = 'SELECT r.id, r.output, r.checked, r.karma, r.checked AS lastUpdated FROM service_check_results r INNER JOIN (SELECT ID from (SELECT @row := @row + 1 AS rowNum, id FROM (SELECT id FROM service_check_results WHERE checked > date_sub(now(), INTERVAL ' . $interval . ' DAY) AND service = :serviceIdentifier AND node = :nodeIdentifier) AS sorted) AS ranked where rowNum % :resolution = 0) AS subset on subset.id = r.id ORDER BY r.checked DESC ';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':serviceIdentifier', $serviceIdentifier);
+    $stmt->bindValue(':nodeIdentifier', $nodeIdentifier);
+    $stmt->bindValue(':resolution', $resolution);
+    $stmt->execute();
 
-	$listResults = $stmt->fetchAll();
+    $listResults = $stmt->fetchAll();
 
-	if (!empty($listResults)) {
-		$k = sizeof($listResults) - 1;
-		$lastDate = strtotime($listResults[$k]['checked']);
+    if (!empty($listResults)) {
+        $k = sizeof($listResults) - 1;
+        $lastDate = strtotime($listResults[$k]['checked']);
 
-		for($i = 0; $i < sizeof($listResults); $i++) {
-			$currentDate = strtotime($listResults[$k]['checked']);
-			$listResults[$k--]['relative'] = getRelativeTimeSeconds($currentDate - $lastDate, true);
-			$lastDate = $currentDate;
-		}
-	}
+        for($i = 0; $i < sizeof($listResults); $i++) {
+            $currentDate = strtotime($listResults[$k]['checked']);
+            $listResults[$k--]['relative'] = getRelativeTimeSeconds($currentDate - $lastDate, true);
+            $lastDate = $currentDate;
+        }
+    }
 
-	foreach ($listResults as $result) {
-		invalidateOldServices($result);
-	}
+    foreach ($listResults as $result) {
+        invalidateOldServices($result);
+    }
 
-	return $listResults;
+    return $listResults;
 }
 
 function allocateNodeToConfig($node, $config) {
-	$sql = 'INSERT INTO remote_config_allocated_nodes (node, config) VALUES (:node, :config)';
-	$stmt = db()->prepare($sql);
-	$stmt->bindValue(':node', $node);
-	$stmt->bindValue(':config', $config);
-	$stmt->execute();	
+    $sql = 'INSERT INTO remote_config_allocated_nodes (node, config) VALUES (:node, :config)';
+    $stmt = db()->prepare($sql);
+    $stmt->bindValue(':node', $node);
+    $stmt->bindValue(':config', $config);
+    $stmt->execute();	
 }
 
 function isUpgradeNeeded() {
-	require_once 'includes/classes/Upgrader.php';
+    require_once 'includes/classes/Upgrader.php';
 
-	$upgrader = new Upgrader();
+    $upgrader = new Upgrader();
 
-	return $upgrader->isUpgradeNeeded();
+    return $upgrader->isUpgradeNeeded();
 }
 
 function associateRemoteAndReportedConfigs($configString, $remoteConfigs) {
-	$reportedConfigs = parseReportedConfigs($configString);
+    $reportedConfigs = parseReportedConfigs($configString);
 
-	foreach ($remoteConfigs as $index => $remoteConfig) {
-		$remoteConfigs[$index]['reported'] = null;
+    foreach ($remoteConfigs as $index => $remoteConfig) {
+        $remoteConfigs[$index]['reported'] = null;
 
-		foreach ($reportedConfigs as $reportedConfig) {
-			if ($remoteConfig['id'] == $reportedConfig['remoteId']) {
-				$remoteConfigs[$index]['reported'] = $reportedConfig;
-				break;
-			}
+        foreach ($reportedConfigs as $reportedConfig) {
+            if ($remoteConfig['id'] == $reportedConfig['remoteId']) {
+                $remoteConfigs[$index]['reported'] = $reportedConfig;
+                break;
+            }
 
-		}
-	}
+        }
+    }
 
-	return $remoteConfigs;
+    return $remoteConfigs;
 }
 
 function parseReportedConfigs($configString) {
     $configs = array();
 
     if ($configString != null) {
-	$configString = str_replace(array('[', ']', ','), '', $configString);
+        $configString = str_replace(array('[', ']', ','), '', $configString);
 
-	$configLines = explode(" ", $configString);
+        $configLines = explode(" ", $configString);
 
-	foreach ($configLines as $line) {
-		$lineElements = explode(":", $line);
+        foreach ($configLines as $line) {
+            $lineElements = explode(":", $line);
 
-		if (count($lineElements) == 4) {
-			$configs[$lineElements[1]] = array(
-				'sourceTag' => $lineElements[0],
-				'remoteId' => $lineElements[1],
-				'updated' => $lineElements[2],
-				'errors' => $lineElements[3] == "true",
-				'karma' => 'GOOD',
-				'status' => '???',
-			);
-		}
-	}
+            if (count($lineElements) == 4) {
+                $configs[$lineElements[1]] = array(
+                    'sourceTag' => $lineElements[0],
+                    'remoteId' => $lineElements[1],
+                    'updated' => $lineElements[2],
+                    'errors' => $lineElements[3] == "true",
+                    'karma' => 'GOOD',
+                    'status' => '???',
+                );
+            }
+        }
     }
 
     return $configs;
 }
 
 function deleteNodeById($id) {
-	$sql = 'DELETE FROM nodes WHERE id = :id ';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'DELETE FROM nodes WHERE id = :id ';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	$sql = 'DELETE FROM';
+    $sql = 'DELETE FROM';
 }
 
 function sessionOptions() {
-	if (!isset($_SESSION['options'])) {
-		$_SESSION['options'] = new SessionOptions();
-	} 
+    if (!isset($_SESSION['options'])) {
+        $_SESSION['options'] = new SessionOptions();
+    } 
 
-	global $tpl;
-	$tpl->assign('sessionOptions', $_SESSION['options']);
+    global $tpl;
+    $tpl->assign('sessionOptions', $_SESSION['options']);
 
-	return $_SESSION['options'];
+    return $_SESSION['options'];
 }
 
 function definedOrException($key) {
-	if (!defined($key)) {
-		throw new Exception("Constant not defined: $key");
-	}
+    if (!defined($key)) {
+        throw new Exception("Constant not defined: $key");
+    }
 }
 
 function defineFromEnv($name) {
@@ -1863,148 +1884,148 @@ function configAutodiscover() {
 
 
 function isEssentialConfigurationProvided() {
-	configAutodiscover();
+    configAutodiscover();
 
-	try {
-		definedOrException('CFG_DB_DSN');
-		definedOrException('CFG_DB_USER');
-		definedOrException('CFG_DB_PASS');
-		definedOrException('CFG_PASSWORD_SALT');
-	} catch (Exception $e) {
-		return false;
-	}
+    try {
+        definedOrException('CFG_DB_DSN');
+        definedOrException('CFG_DB_USER');
+        definedOrException('CFG_DB_PASS');
+        definedOrException('CFG_PASSWORD_SALT');
+    } catch (Exception $e) {
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 function getRelatedLogs($criteria, $limit = 5) {
-	$qb = new \libAllure\QueryBuilder();
-	$qb->from('logs')->fields('*');
+    $qb = new \libAllure\QueryBuilder();
+    $qb->from('logs')->fields('*');
 
-	foreach ($criteria as $field => $value) {
-		$qb->whereEqualsValue($field, $value);
-	}
+    foreach ($criteria as $field => $value) {
+        $qb->whereEqualsValue($field, $value);
+    }
 
-	$qb->orderBy('timestamp DESC', 'id DESC');
+    $qb->orderBy('timestamp DESC', 'id DESC');
 
-	$stmt = stmt($qb->build() . ' LIMIT ' . $limit);
-	$stmt->execute();
+    $stmt = stmt($qb->build() . ' LIMIT ' . $limit);
+    $stmt->execute();
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 function processLogs($logs) {
-	foreach ($logs as $key => $log) {
-		$message = $logs[$key]['message'];
+    foreach ($logs as $key => $log) {
+        $message = $logs[$key]['message'];
 
-		$message = str_replace('_userId_', '<a href = "viewUser.php?id=' . $log['userId'] . '">' . $log['userId'] . '</a>', $message);
-		$message = str_replace('_nodeConfigId_', '<a href = "viewRemoteConfig.php?id=' . $log['nodeConfigId'] . '">' . $log['nodeConfigId'] . '</a>', $message);
-		$message = str_replace('_serviceDefinitionId_', '<a href = "updateRemoteConfigurationService.php?id=' . $log['serviceDefinitionId'] . '">' . $log['serviceDefinitionId'] . '</a>', $message);
+        $message = str_replace('_userId_', '<a href = "viewUser.php?id=' . $log['userId'] . '">' . $log['userId'] . '</a>', $message);
+        $message = str_replace('_nodeConfigId_', '<a href = "viewRemoteConfig.php?id=' . $log['nodeConfigId'] . '">' . $log['nodeConfigId'] . '</a>', $message);
+        $message = str_replace('_serviceDefinitionId_', '<a href = "updateRemoteConfigurationService.php?id=' . $log['serviceDefinitionId'] . '">' . $log['serviceDefinitionId'] . '</a>', $message);
 
-		$logs[$key]['message'] = $message;
-	}
+        $logs[$key]['message'] = $message;
+    }
 
-	return $logs;
+    return $logs;
 }
 
 function instanceCoverageFilter() {
-	$filters = new \libAllure\FilterTracker();
-	$filters->addString('identifier', 'Identifier');
-	$filters->addSelect('node', getNodes(), 'identifier');
+    $filters = new \libAllure\FilterTracker();
+    $filters->addString('identifier', 'Identifier');
+    $filters->addSelect('node', getNodes(), 'identifier');
 
-	return $filters;
+    return $filters;
 }
 
 function getServiceMetadata($identifier) {
-	$sql = 'SELECT sm.actions, sm.metrics, sm.defaultMetric, sm.room, cm.id AS commandMetadataId, IF(sm.icon IS NULL, cm.icon, sm.icon) AS icon, sm.criticalCast, sm.goodCast FROM services s LEFT JOIN service_metadata sm ON s.identifier = sm.service LEFT JOIN command_metadata cm ON s.commandIdentifier = cm.commandIdentifier WHERE s.identifier = :serviceIdentifier LIMIT 1';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':serviceIdentifier', $identifier);
-	$stmt->execute();
+    $sql = 'SELECT sm.actions, sm.metrics, sm.defaultMetric, sm.room, cm.id AS commandMetadataId, IF(sm.icon IS NULL, cm.icon, sm.icon) AS icon, sm.criticalCast, sm.goodCast FROM services s LEFT JOIN service_metadata sm ON s.identifier = sm.service LEFT JOIN command_metadata cm ON s.commandIdentifier = cm.commandIdentifier WHERE s.identifier = :serviceIdentifier LIMIT 1';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':serviceIdentifier', $identifier);
+    $stmt->execute();
 
-	if ($stmt->numRows() == 0) {
-		$metadata = array();
-		$metadata['actions'] = null;
-		$metadata['metrics'] = '';
-		$metadata['defaultMetric'] = null;
-	} else {
-		$metadata = $stmt->fetchRow();
-	}
+    if ($stmt->numRows() == 0) {
+        $metadata = array();
+        $metadata['actions'] = null;
+        $metadata['metrics'] = '';
+        $metadata['defaultMetric'] = null;
+    } else {
+        $metadata = $stmt->fetchRow();
+    }
 
-	$metadata['metrics'] = explodeOrEmpty("\n", trim($metadata['metrics']));
+    $metadata['metrics'] = explodeOrEmpty("\n", $metadata['metrics']);
 
-	return $metadata;
+    return $metadata;
 }
 
 function classInstanceFilter() {
-	$filters = new \libAllure\FilterTracker();
-	$filters->addString('identifier', 'Identifier');
-	$filters->addSelect('class', array(), 'Class');
+    $filters = new \libAllure\FilterTracker();
+    $filters->addString('identifier', 'Identifier');
+    $filters->addSelect('class', array(), 'Class');
 
-	return $filters;
+    return $filters;
 }
 
 function savePageInHistory() {
-	if (!isset($_SESSION['history'])) {
-		$_SESSION['history'] = array();
-	}
+    if (!isset($_SESSION['history'])) {
+        $_SESSION['history'] = array();
+    }
 
-	$_SESSION['history'] = array_slice($_SESSION['history'], -10);
-	$_SESSION['history'][] = $_SERVER['REQUEST_URI'];
+    $_SESSION['history'] = array_slice($_SESSION['history'], -10);
+    $_SESSION['history'][] = $_SERVER['REQUEST_URI'];
 }
 
 function redirectToLast() {
-	$search = func_get_args();
+    $search = func_get_args();
 
-	foreach (array_reverse($_SESSION['history']) as $page) {
-		foreach ($search as $term) {
-			if (stripos($page, $term) !== FALSE) {
-				redirect($page);
-			}
-		}
-	}
+    foreach (array_reverse($_SESSION['history']) as $page) {
+        foreach ($search as $term) {
+            if (stripos($page, $term) !== FALSE) {
+                redirect($page);
+            }
+        }
+    }
 
-	redirect('index.php');
+    redirect('index.php');
 }
 
 function getRemoteConfigService($id) {
-	$sql = 'SELECT s.id, s.name FROM remote_config_services s WHERE s.id = :id';
-	$stmt = stmt($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'SELECT s.id, s.name FROM remote_config_services s WHERE s.id = :id';
+    $stmt = stmt($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	return $stmt->fetchRow();
+    return $stmt->fetchRow();
 }
 
 function touchConfigService($service, $config, $reason) {
-	$service = getRemoteConfigService($service);
-	$nodes = getConfigNodes($config);
+    $service = getRemoteConfigService($service);
+    $nodes = getConfigNodes($config);
 
-	$sql = 'INSERT IGNORE INTO services (identifier, node, output, karma, lastUpdated) VALUES (:identifier, :node, :output, "SKIPPED", utc_timestamp()) ';	
-	$stmtServices = stmt($sql);
+    $sql = 'INSERT IGNORE INTO services (identifier, node, output, karma, lastUpdated) VALUES (:identifier, :node, :output, "SKIPPED", utc_timestamp()) ';	
+    $stmtServices = stmt($sql);
 
-	$sql = 'INSERT INTO service_check_results (service, node, checked, karma, output) VALUES (:service, :node, utc_timestamp(), "SKIPPED", :reason) ';
-	$stmtServiceResult = stmt($sql);
+    $sql = 'INSERT INTO service_check_results (service, node, checked, karma, output) VALUES (:service, :node, utc_timestamp(), "SKIPPED", :reason) ';
+    $stmtServiceResult = stmt($sql);
 
-	foreach ($nodes as $node) {
-		$stmtServices->bindValue(':identifier', $service['name']);
-		$stmtServices->bindValue(':node', $node['identifier']);
-		$stmtServices->bindValue(':output', $reason);
-		$stmtServices->execute();
+    foreach ($nodes as $node) {
+        $stmtServices->bindValue(':identifier', $service['name']);
+        $stmtServices->bindValue(':node', $node['identifier']);
+        $stmtServices->bindValue(':output', $reason);
+        $stmtServices->execute();
 
-		$stmtServiceResult->bindValue(':service', $service['name']);
-		$stmtServiceResult->bindValue(':node', $node['identifier']);
-		$stmtServiceResult->bindValue(':reason', $reason);
-		$stmtServiceResult->execute();
-	}
+        $stmtServiceResult->bindValue(':service', $service['name']);
+        $stmtServiceResult->bindValue(':node', $node['identifier']);
+        $stmtServiceResult->bindValue(':reason', $reason);
+        $stmtServiceResult->execute();
+    }
 }
 
 function getClassCandidate($id) {
-	$sql = 'SELECT id, externalAlias FROM class_candidates WHERE id = :id';
-	$stmt = DatabaseFactory::getInstance()->prepare($sql);
-	$stmt->bindValue(':id', $id);
-	$stmt->execute();
+    $sql = 'SELECT id, externalAlias FROM class_candidates WHERE id = :id';
+    $stmt = DatabaseFactory::getInstance()->prepare($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
 
-	return $stmt->fetchRowNotNull();
+    return $stmt->fetchRowNotNull();
 }
 
 ?>

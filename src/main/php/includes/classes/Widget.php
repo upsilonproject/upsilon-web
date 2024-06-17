@@ -3,6 +3,7 @@
 require_once 'libAllure/HtmlLinksCollection.php';
 
 use \libAllure\ElementSelect;
+use \libAllure\ElementCheckbox;
 use \libAllure\ElementInput;
 use \libAllure\DatabaseFactory;
 use \libAllure\HtmlLinksCollection;
@@ -10,131 +11,152 @@ use \libAllure\HtmlLinksCollection;
 require_once 'includes/classes/ElementFilteringSelect.php';
 
 class Widget {
-	protected $arguments = array();
+        protected $arguments = array();
 
-	public function __construct() {
-		$this->arguments['title'] = get_class($this);
-	}
+        protected $widgetArguments = array();
 
-	public function getTitle() {
-		return $this->getArgumentValue('title');
-	}
+        public function __construct() {
+            $this->arguments['title'] = get_class($this);
+        }
 
-	public function getHeaderLink() {
-		return '#';
-	}
+        public function getTitle() {
+            return $this->getArgumentValue('title');
+        }
 
-	public function loadArguments($id) {
-		$this->id = $id;
+        public function getHeaderLink() {
+            return '#';
+        }
 
-		$sql = 'SELECT name, value FROM widget_instance_arguments WHERE instance = :id';
-		$stmt = DatabaseFactory::getInstance()->prepare($sql);
-		$stmt->bindValue(':id', $id);
-		$stmt->execute();
+        public function defineWidgetArgument($name, $caption, $type) {
+            $this->widgetArguments[$name] = array (
+                'name' => $name,
+                'caption' => $caption,
+                'type' => $type,
+            );
 
-		foreach ($stmt->fetchAll() as $arg) {
-			$this->setArgument($arg['name'], $arg['value']);
-		}
-	}
+            $this->arguments[$name] = null;
+        }
 
-	public function render() {
-		echo 'Empty Widget!';
-	}
+        public function loadArguments($id) {
+            $this->id = $id;
 
-	private function getFormElementService($multi = false) {
-		$filters = getFilterServices();
+            $sql = 'SELECT name, value FROM widget_instance_arguments WHERE instance = :id';
+            $stmt = DatabaseFactory::getInstance()->prepare($sql);
+            $stmt->bindValue(':id', $id);
+            $stmt->execute();
 
-		if (!$multi) {
-			$el = new ElementFilteringSelect('service', 'Service', $filters, 'filterService');
-		} else if ($multi) {
-			$el = new ElementSelect('serviceList', 'Services');
-			$el->setSize(5);
-			$el->multiple = true;
-		} else {
-			throw new Exception('No service arg in widget');
-		}
+            foreach ($stmt->fetchAll() as $arg) {
+                    $this->setArgument($arg['name'], $arg['value']);
+            }
+        }
 
-		$sql = 'SELECT s.id, s.identifier FROM services s';
-		$stmt = DatabaseFactory::getInstance()->prepare($sql);
-		$stmt->execute();
+        public function render() {
+            echo 'Empty Widget!';
+        }
 
-		foreach ($stmt->fetchAll() as $service) {
-#			$el->addOption($service['identifier'], $service['id']);
-		}
+        private function getFormElementService($multi = false) {
+            $filters = getFilterServices();
 
-		return $el;
-	}
+            if (!$multi) {
+                    $el = new ElementFilteringSelect('service', 'Service', $filters, 'filterService');
+            } else if ($multi) {
+                    $el = new ElementSelect('serviceList', 'Services');
+                    $el->setSize(5);
+                    $el->multiple = true;
+            } else {
+                    throw new Exception('No service arg in widget');
+            }
 
-	public function getArguments() {
-		return $this->arguments;
-	}
+            $sql = 'SELECT s.id, s.identifier FROM services s';
+            $stmt = DatabaseFactory::getInstance()->prepare($sql);
+            $stmt->execute();
 
-	public function setArgument($key, $value) {
-		$this->arguments[$key] = $value;
-	}
+            foreach ($stmt->fetchAll() as $service) {
+    #               $el->addOption($service['identifier'], $service['id']);
+            }
 
-	public function getArgumentValue($key) {
-		if (!isset($this->arguments[$key])) {
-			return null;
-		}
+            return $el;
+        }
 
-		$val = $this->arguments[$key];
+        public function getArguments() {
+            return $this->arguments;
+        }
 
-		return $val;
-	}
+        public function setArgument($key, $value) {
+            $this->arguments[$key] = $value;
+        }
 
-	public function getArgumentValueArray($key) {
-		$val = $this->getArgumentValue($key);
-		$val = explode(';', $val);
+        public function getArgumentValue($key) {
+            if (!isset($this->arguments[$key])) {
+                    return null;
+            }
 
-		return $val;
-	}
+            $val = $this->arguments[$key];
 
-	private function getGroupSelectionElement($group = null) {
-		$el = new ElementSelect('group', 'Group');
+            return $val;
+        }
 
-		foreach (getGroups() as $group) {
-			$el->addOption($group['name'], $group['id']);
-		}
+        public function getArgumentValueArray($key) {
+            $val = $this->getArgumentValue($key);
+            $val = explode(';', $val);
 
+            return $val;
+        }
 
-		return $el;
-	}
+        private function getGroupSelectionElement($group = null) {
+            $el = new ElementSelect('group', 'Group');
 
-	public function getArgumentFormElement($optionName) {
-		switch ($optionName) {
-		case 'serviceList':
-			return $this->getFormElementService(true);
-		case 'service':
-			return $this->getFormElementService(false);
-		case 'group':
-			return $this->getGroupSelectionElement();
-		default:
-			$input = new ElementInput($optionName, ucwords($optionName), null);
-			$input->setMinMaxLengths(0, 128);
+            foreach (getGroups() as $group) {
+                    $el->addOption($group['name'], $group['id']);
+            }
 
-			return $input;
-		}
-		
-	}
+            return $el;
+        }
 
-	protected function addLinks() {}
+        public function getArgumentFormElement($optionName) {
+            if (isset($this->widgetArguments[$optionName])) {
+                $arg = $this->widgetArguments[$optionName];
 
-	public function getLinks() {
-		if (!isset($this->links)) {
-			$this->links = new HtmlLinksCollection();
-			$this->addLinks();
-			$this->links->add('updateWidgetInstance.php?id=' . $this->id, 'Update');
-			$this->links->add('deleteWidgetInstance.php?id=' . $this->id, 'Delete');
-		}
+                switch ($arg['type']) {
+                case 'checkbox':
+                    return new ElementCheckbox($optionName, $arg['caption']);
+                default:
+                    throw new Exception('Unhandled type ' . $arg['type']);
+                }
+            }
 
-		return $this->links;
-	}
+            switch ($optionName) {
+            case 'serviceList':
+                    return $this->getFormElementService(true);
+            case 'service':
+                    return $this->getFormElementService(false);
+            case 'group':
+                    return $this->getGroupSelectionElement();
+            default:
+                    $input = new ElementInput($optionName, ucwords($optionName), null);
+                    $input->setMinMaxLengths(0, 128);
 
-	public function init() {}
+                    return $input;
+            }
+        }
 
-	public function isShown() {
-		return true;
-	}
+        protected function addLinks() {}
+
+        public function getLinks() {
+            if (!isset($this->links)) {
+                    $this->links = new HtmlLinksCollection();
+                    $this->addLinks();
+                    $this->links->add('updateWidgetInstance.php?id=' . $this->id, 'Update');
+                    $this->links->add('deleteWidgetInstance.php?id=' . $this->id, 'Delete');
+            }
+
+            return $this->links;
+        }
+
+        public function init() {}
+
+        public function isShown() {
+            return true;
+        }
 }
 ?>
