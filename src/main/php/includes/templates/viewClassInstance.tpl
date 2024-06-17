@@ -36,7 +36,9 @@
 					<td>
 						{if not empty($itemInstanceRequirement.service)}
 							{if !empty($itemInstanceRequirement.icon)}
+							<!--
 							<img src = "resources/images/serviceIcons/{$itemInstanceRequirement.icon}" alt = "serviceIcon" style = "padding-top: 4px"/>
+							!-->
 							{/if}
 							<a href = "viewService.php?id={$itemInstanceRequirement.service}">{$itemInstanceRequirement.serviceIdentifier}</a>
 						{/if}

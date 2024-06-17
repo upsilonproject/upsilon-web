@@ -12,7 +12,7 @@
 	<div id = "legend{$instanceChartIndex}">legend</div>
 	{/if}
 
-	<a class = "fakeButton" href = "viewServiceResultChart.php?serviceIds[]={$listServiceId|implode:','}">Larger</a>
+	<a class = "fakeButton" href = "viewServiceResultChart.php?serviceIds[]={$listServiceId|implode}">Larger</a>
 	<span id = "lblResolution">?</span>
 	<button onclick = "changeChartResolution(-10)">Res -</button>
 	<button onclick = "changeChartResolution(+10)">Res +</button>

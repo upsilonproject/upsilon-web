@@ -15,7 +15,7 @@ function add_include_path($path) {
 }
 
 add_include_path(dirname(__FILE__) . '/libraries/');
-add_include_path(dirname(__FILE__) . '/libraries/jwread/lib-allure/src/main/php/');
+
 add_include_path('/etc/upsilon-web/');
 
 require_once 'includes/functions.php';

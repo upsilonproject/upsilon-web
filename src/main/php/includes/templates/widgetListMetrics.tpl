@@ -13,24 +13,22 @@
 	{if isset($service.listMetrics)} 
 
 	<h2>{$metricsTitle|default:'Metrics'}</h2>
-	<ul class = "subresults">
+	<div class = "metricList">
 	{foreach from = $service.listMetrics item = itemMetric}
-		<li>
-			<span class = "metricIndicator {$itemMetric.karma|strtolower}">&nbsp;</span>
-				{if not empty($itemMetric.caption)}
-					{$itemMetric.caption}
+		<span class = "metricIndicator {$itemMetric.karma|strtolower}">&nbsp;</span>
+			{if not empty($itemMetric.caption)}
+				{$itemMetric.caption}
+			{else}
+				{if not empty($itemMetric.url)}
+				<a target = "_blank" href = "{$itemMetric.url}">{$itemMetric.name}</a>
 				{else}
-					{if not empty($itemMetric.url)}
-					<a target = "_blank" href = "{$itemMetric.url}">{$itemMetric.name}</a>
-					{else}
-					{$itemMetric.name}
-					{/if}
+				{$itemMetric.name}
 				{/if}
-				: {$itemMetric.value} 
-			{if not empty($itemMetric.comment)}<span class = "subtle">({$itemMetric.comment})</span>{/if}
-		</li>
+			{/if}
+			: {$itemMetric.value} 
+		{if not empty($itemMetric.comment)}<span class = "subtle">({$itemMetric.comment})</span>{/if}
 	{/foreach}
-	</ul>
+	</div>
 	{else}
 	No subresults!
 	{/if}

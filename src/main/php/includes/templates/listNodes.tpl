@@ -12,6 +12,8 @@
 	<p>0 nodes in database.</p> 
 	<p>Visit the wiki to understand how to <a href = "http://docs.upsilonproject.io/#_database">configure your node to write to a database</a>.</p>
 {else}
+
+{include "filters.tpl"}
 <table class = "hover dataTable">
 	<thead>
 		<tr>

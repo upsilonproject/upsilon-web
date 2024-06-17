@@ -784,7 +784,7 @@ function setIconSource(dir) {
 }
 
 function loadGetCommands(commands) {
-	setIconSource("serviceIcons");
+	//setIconSource("serviceIcons");
 
 	loadGridContentView("gridCommands", commands, "Commands", {
 		id: "gridCommands",

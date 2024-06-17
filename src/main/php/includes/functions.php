@@ -543,10 +543,10 @@ function getServicesWithFilter($groupId = null, $filters = null) {
 
     $qb = new \libAllure\QueryBuilder();
     $qb->from('services')->fields('id', 'identifier', array('ifnull(s.alias, s.identifier)', 'alias'), 'commandLine executable', 'estimatedNextCheck', 'lastChanged', 'output', 'lastUpdated', 'karma', 'node');
-    $qb->leftJoin('service_metadata', 'm')->on('s.identifier', 'm.service')->fields('m.goodCast', 'm.criticalCast');
+    $qb->leftJoin('service_metadata', 'm')->onEq('s.identifier', 'm.service')->fields('m.goodCast', 'm.criticalCast');
 
     if ($filters->isUsed('problems')) {
-        $qb->whereNotEquals('karma', 'good');
+        $qb->whereNotEquals('s.karma', 'good');
     }
 
     if ($filters->isUsed('ungrouped'))  {
@@ -564,10 +564,10 @@ function getServicesWithFilter($groupId = null, $filters = null) {
         $qb->whereEquals('node', 'node');
     }
 
-    $qb->leftJoin('remote_config_allocated_nodes', 'rn')->on('s.node', 'rn.node');
-    $qb->leftJoin('remote_config_allocated_services', 'ras')->on('ras.config', 'rn.config');
-    $qb->leftJoin('remote_config_services', 'rs')->on('ras.service', 'rs.id')->on('rs.name', 'identifier');
-    $qb->leftJoin('remote_configs', 'rc')->on('rn.config', 'rc.id')->onImpl(null, null, 'not(isnull(rs.id))');
+    $qb->leftJoin('remote_config_allocated_nodes', 'rn')->onEq('s.node', 'rn.node');
+    $qb->leftJoin('remote_config_allocated_services', 'ras')->onEq('ras.config', 'rn.config');
+    $qb->leftJoin('remote_config_services', 'rs')->onEq('ras.service', 'rs.id')->onEq('rs.name', 'identifier');
+    $qb->leftJoin('remote_configs', 'rc')->onEq('rn.config', 'rc.id');
     $qb->fields(array('rc.id', 'remote_config_id'));
     $qb->fields(array('rs.id', 'remote_config_service_id'));
     $qb->fields(array('rs.name', 'remote_config_service_identifier'));

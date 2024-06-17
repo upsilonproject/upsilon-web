@@ -13,14 +13,17 @@
 		{foreach from = $listInstances item = widget}
 			{if $widget.instance->isShown()}
 			<div class = "block">
+				<div class = "blockHeader">
+				<h2><a href = "{$widget.instance->getHeaderLink()}">{$widget.instance->getTitle()}</a></h2>
 				{if $sessionOptions->drawNavigation}
-				<div style = "float: right">
-					<span>&#9881;</span>
-
+				<div class = "menu hasSubmenu">
+					<span class = "menuItemLabel">&#9881;</span>
+					<div class = "dropdownContent">
 						{include file = "links.tpl" links = $widget.instance->getLinks() skipTitle = true sub = true}
+						</div>
 				</div>
 				{/if}
-				<h3><a href = "{$widget.instance->getHeaderLink()}">{$widget.instance->getTitle()}</a></h3>
+				</div>
 
 				{$widget.instance->render()}
 			</div>

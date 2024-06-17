@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libAllure/HtmlLinksCollection.php';
-
 use \libAllure\ElementSelect;
 use \libAllure\ElementCheckbox;
 use \libAllure\ElementInput;

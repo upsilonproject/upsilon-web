@@ -20,20 +20,6 @@
 </head>
 
 <body>
-	<!--
-<div id = "header">
-	{if $sessionOptions->drawHeader}
-	<div class = "title">
-		<img alt = "upsilon logo" src = "resources/images/icons/logo96pxdarkbg.webp" width = "16" style = "margin-right: 1em; margin-bottom: 4px; display: inline-block; vertical-align: middle;" />
-		<h1 style = "display: inline-block">
-			<a href = "index.php">{$siteTitle}</a>
-			&raquo;
-			<span class = "navTitle">{$navTitle}</span>
-		</h1>
-	</div>
-	{/if}
-</div>
-	!-->
 	{if $sessionOptions->drawNavigation}
 	<header title = "header">
 		<a href = "#content" id = "a11yContentSkip">Skip to content</a>
@@ -63,5 +49,7 @@
 {if $isNighttime && $sessionOPtions->drawBigClock}<p style = "margin: 0; font-size:9em; font-weight: bold; background-color: white; color: black;">{$datetime}</p>{/if}
 <main title = "content" id = "content">
 
+<script src="resources/javascript/modules.js" type = "module"></script>
 <script src="resources/javascript/hud.js"></script>
+
 

@@ -2,6 +2,14 @@
 
 require_once 'jsonCommon.php';
 
-outputJson(getClassInstances());
+$gid = null;
+
+if ($gid != null) {
+    $classInstances = getClassInstancesNotInGroup($gid);
+} else {
+    $classInstances = getClassInstances();
+}
+
+outputJson($classInstances);
 
 ?>

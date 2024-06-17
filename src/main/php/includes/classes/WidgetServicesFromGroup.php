@@ -9,6 +9,7 @@ class WidgetServicesFromGroup extends Widget {
 	public function __construct() {
 		$this->arguments['title'] = null;
 		$this->arguments['group'] = null;
+
 	}
 
 	public function init() {
@@ -44,10 +45,11 @@ class WidgetServicesFromGroup extends Widget {
 	}
 
 	public function render() {
-		global $tpl;
+                global $tpl;
+
 		$tpl->assign('ref', rand());
-		$tpl->assign('url', 'json/getGroup.php');
-		$tpl->assign('queryParams', json_encode(array('id' => $this->getArgumentValue('group'))));
+		$tpl->assign('url', 'json/getGroup.php?id=' . $this->getArgumentValue('group'));
+                $tpl->assign('queryParams', '{}');
 		$tpl->assign('callback', 'renderGroup');
 		$tpl->assign('repeat', 60000);
 		$tpl->display('widgetAjax.tpl');

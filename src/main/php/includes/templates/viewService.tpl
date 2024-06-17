@@ -68,7 +68,12 @@
 					<tr>
 						<td>{$requirement.requirementTitle}</td>
 						<td><a href = "viewService.php?id={$requirement.service}">{$requirement.serviceIdentifier}</a></td>
+
+						{if empty($requirement.karma)}
+						<td>-</td>
+						{else}
 						<td class = "{$requirement.karma|strtolower}">{$requirement.karma}</td>
+						{/if}
 					</tr>
 					{/foreach}
 				</table>

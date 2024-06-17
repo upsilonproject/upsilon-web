@@ -22,7 +22,7 @@
 			{foreach $classInstance.requirements item = itemRequirement}
 			<tr>
 				<td>
-					<span class = "metricIndicator {$itemRequirement.karma|strtolower}">&nbsp;</span> {$itemRequirement.identifier}<br />
+					<span class = "metricIndicator {$itemRequirement.karma}">&nbsp;</span> {$itemRequirement.identifier}<br />
 				</td>
 			</tr>
 			{/foreach}

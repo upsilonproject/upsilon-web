@@ -6,7 +6,7 @@
 	{if !empty($apiClient)}
 		<strong>API Client:</strong> {$apiClient}
 	{else}
-		<strong>Server time:</strong> <span class ="date">{$date}</span> 
+		<strong>Server time:</strong> <span><span class ="date">{$date}</span></span> 
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<strong>Client time:</strong> <span><span class = "date">now</span></span>
 		&nbsp;&nbsp;&nbsp;&nbsp;

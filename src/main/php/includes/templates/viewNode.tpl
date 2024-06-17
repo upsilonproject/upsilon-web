@@ -8,7 +8,7 @@
 <p><strong>App Version</strong>: {$itemNode.instanceApplicationVersion}</p>
 </div>
 
-
+{if getSiteSetting('enableDroneConfig')}
 <div style = "float:right; vertical-align: top;">
 	<h3>Remote Configurations</h3>
 
@@ -58,5 +58,6 @@
 	</table>
 	<p><a href = "createRemoteConfiguration.php?node={$itemNode.identifier}">Create</a></p>
 </div>
+{/if}
 <div style = "clear: both;">.</div>
 </div>
