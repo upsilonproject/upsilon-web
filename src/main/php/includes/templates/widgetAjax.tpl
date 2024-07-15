@@ -4,7 +4,10 @@
 
 <script type = "text/Javascript">
 	var qp = {$queryParams};
-	request("{$url}", qp, {$callback}, "{$ref}", "{$repeat}");
+	var base = window.location.href.substring(0, window.location.href.lastIndexOf("/"))
+	var url = base + "/{$url}"
+
+	request(url, qp, {$callback}, "{$ref}", "{$repeat}");
 </script>
 
 

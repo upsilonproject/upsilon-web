@@ -935,7 +935,7 @@ function getTasks() {
 
 function array_utf8_encode_recursive($dat) { 
     if (is_string($dat)) { 
-        return utf8_encode($dat); 
+        return mb_convert_encoding($dat, 'UTF-8'); 
     } 
 
     if (is_object($dat)) { 

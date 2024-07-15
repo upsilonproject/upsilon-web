@@ -29,6 +29,7 @@ $tpl = new \libAllure\Template('upsilonWeb');
 $tpl->registerModifier('strtolower', 'strtolower');
 $tpl->registerModifier('implode', 'implode');
 $tpl->registerModifier('trim', 'trim');
+$tpl->registerModifier('htmlentities', 'htmlentities');
 
 use \libAllure\AuthBackendDatabase;
 use \libAllure\Session;
