@@ -1,5 +1,7 @@
-<div class = "box">
+<section>
 	<h2>Widgets</h2>
+
+	<p>List of widgets.</p>
 	
 	<table class = "hover">
 		<thead>
@@ -18,4 +20,4 @@
 			{/foreach}
 		</tbody>
 	</table>
-</div>
+</section>

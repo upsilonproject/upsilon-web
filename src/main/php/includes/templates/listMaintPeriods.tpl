@@ -1,4 +1,4 @@
-<div class = "box">
+<section>
 	<h2>Maintenence Periods</h2>
 
 	{if empty($listMaintPeriods)}
@@ -26,4 +26,4 @@
 		</tbody>
 	</table>
 	{/if}
-</div>
+</section>

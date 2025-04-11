@@ -1,4 +1,4 @@
-<div class = "box">
+<section>
 	<h2>Usergroups</h2>
 
 	{if empty($listUsergroups)}
@@ -21,4 +21,4 @@
 			</tbody>
 		</table>
 	{/if}
-</div>
+</section>

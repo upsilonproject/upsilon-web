@@ -1,11 +1,11 @@
 {if $tutorialMode}
-<div class = "box tutorialMessage">
+<section class = "tutorialMessage">
 	<p><strong>Nodes</strong> are responsible for executing <a href = "index.php">service checks</a> and optionally sending those results their node peers.</p>
 	<p style = "font-size: x-small " class = "subtle">This message is being shown because <a href = "preferences.php">tutorial mode</a> is enabled.</p>
-</div>
+</section>
 {/if}
 
-<div class = "box">
+<section>
 	<h2>Nodes</h2>
 
 {if empty($listNodes)}
@@ -38,4 +38,4 @@
 	</tbody>
 </table>
 {/if}
-</div>
+</section>

@@ -1,9 +1,9 @@
 {if $links->hasLinks()}
 {if not isset($sub)}
 <nav title = "{$links->getTitle()}">
-<ul class = "menu" role = "menubar">
+<ul class = "menu-bar" role = "menubar">
 {else}
-<ul class = "submenu">
+<ul class = "submenu" role = "menubar foo">
 {/if}
 	{if not isset($skipTitle)}
 		<h3>{$links->getTitle()}</h3>
@@ -11,7 +11,7 @@
 
 	{foreach from = $links item = link}
 		{if $link.children|count > 0}
-			<li class = "hasSubmenu" role = "none">
+			<li class = "menu hasSubmenu" role = "none">
 				<a role = "menuitem" aria-expanded = "false" aria-haspopup = "true" {if not $link.enabled}disabled = "disabled"{/if} class = "menuItemLabel" href = "{$link.url}">{$link.title}</a>
 				<div class = "dropdownContent">
 						{include file = "links.tpl" links = $link.children skipTitle = true sub = true}

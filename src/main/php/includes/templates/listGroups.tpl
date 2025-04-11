@@ -1,9 +1,12 @@
-<div class = "box">
+<section>
 	<h2>Groups</h2>
-	
+
 	{if $listGroups|@count == 0}
 	<p>There are no groups defined at the moment. Create a group by going to <strong>Group Actions</strong> &raquo; <strong>Create Group</strong> on the menu.</p>
 	{else}
+
+	<p>This is a list of service groups.</p>
+
 	<table class = "dataTable">
 		<thead>
 			<tr>
@@ -30,4 +33,4 @@
 	</tbody>
 	</table>
 	{/if}
-</div>
+</section>

@@ -1,4 +1,4 @@
-<div class = "box">
+<section>
 <h2>Service Results ({$listServices|@count})</h2>
 	{include "filters.tpl"}
 {if empty($listServices)}
@@ -53,4 +53,4 @@
 
 	</form>
 {/if}
-</div>
+</section>

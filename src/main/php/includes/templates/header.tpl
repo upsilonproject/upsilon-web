@@ -4,10 +4,8 @@
 <head>
 	<title>{$pageTitle} &laquo; {$siteTitle}</title>
 
-	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/main.css" />
-	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/phone-thin.css" title = "mobile" media = "(max-width: 366px)" />
-	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/phone-wide.css" title = "mobile" media = "(max-width: 400px)" />
-	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/tablet.css" title = "mobile" media = "(max-width: 400px)" />
+	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/brightandsimple/style.css" />
+	<link rel = "stylesheet" type = "text/css" href = "resources/stylesheets/extra.css" />
 
 	<link rel = "manifest" type = "manifest.json" />
 
@@ -21,8 +19,8 @@
 
 <body>
 	{if $sessionOptions->drawNavigation}
-	<header title = "header">
-		<a href = "#content" id = "a11yContentSkip">Skip to content</a>
+	<header title = "header" class = "grid-display">
+		<a href = "#content" class = "a11yhidden">Skip to content</a>
 
 		<a id = "headerLogo" href = "index.php">
 			<img alt = "upsilon logo" src = "resources/images/icons/logo96pxdarkbg.webp" width = "24" id = "logo" />

@@ -1,0 +1,3 @@
+[submodule "src/main/php/resources/stylesheets/brightandsimple"]
+	path = src/main/php/resources/stylesheets/brightandsimple
+	url = git@github.com:jamesread/BrightAndSimpleTheme.git

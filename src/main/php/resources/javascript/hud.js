@@ -47,19 +47,16 @@ function makeDateHumanReadable(element) {
   }
 
   if (element.classList.contains("relative")) {
-    description = "<strong>" + toLocalIsoLikeString(utcDate) + "</strong>";
+    description = toLocalIsoLikeString(utcDate);
     element.textContent = secondsToString(nowUnixTimestamp - elementUnixTimestamp);
   } else {
-    description = "<strong>" + secondsToString(nowUnixTimestamp - elementUnixTimestamp) + "</strong>";
+    description = secondsToString(nowUnixTimestamp - elementUnixTimestamp);
     element.textContent = toLocalIsoLikeString(utcDate);
   }
 
-  description += "<br />Original: " + utcDate.toString()
+  description += ". Original: " + utcDate.toString()
 
-  var tooltip = document.createElement("div");
-  tooltip.classList.add("tooltip");
-  tooltip.innerHTML = description;
-  tooltip.setAttribute("role", "tooltip");
+  element.title = description
 
   element.classList.add("hastooltip")
   element.append(tooltip);
@@ -469,6 +466,7 @@ function renderClassInstances(data, owner) {
     }
 
     container = generateElClass('p', 'classInstances');
+    container.classList.add('grid')
     owner.appendChild(container);
   }
 
@@ -549,6 +547,7 @@ function renderServiceList(data, owner) {
     container.appendChild(p)
   } else {
     let list = generateElClass('div', 'metricList');
+    list.classList.add('grid')
     container.appendChild(list);
 
     data.forEach(function(service, index) {

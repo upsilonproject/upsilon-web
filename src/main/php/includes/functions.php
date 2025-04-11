@@ -824,7 +824,7 @@ function handleApiLogin($redirect = true) {
             $_SESSION['user'] = $user;
             $_SESSION['username'] = $username;
 
-            sessionOptions()->drawHeaders = $apiClient['drawHeader'];
+            sessionOptions()->drawHeader = $apiClient['drawHeader'];
             sessionOptions()->drawNavigation = $apiClient['drawNavigation'];
             sessionOptions()->drawBigClock = $apiClient['drawBigClock'];
 

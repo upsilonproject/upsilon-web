@@ -5,7 +5,7 @@
 		<h3>{$form->getTitle()}</h3>
 	{/if}
 {else}
-<div class = "{if isset($form->containerClass)}{$form->containerClass}{else}box{/if}">
+<section class = "{if isset($form->containerClass)}{$form->containerClass}{else}box{/if}">
 	<h2>{$form->getTitle()}</h2>
 {/if}
 
@@ -23,5 +23,5 @@
 	</form>
 
 {if not $excludeBox eq true}
-</div>
+</section>
 {/if}

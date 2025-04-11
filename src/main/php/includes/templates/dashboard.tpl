@@ -6,27 +6,29 @@
 </div>
 {/if}
 
-<div class = "blockContainer">
+<div class = "grid gc-xl">
 {if empty($listInstances)}
 	<p>This dashboard is empty. Select <strong>Actions</strong> &raquo; <strong>Add Widget</strong> from the Dashboard menu.</p>
 {else}
 		{foreach from = $listInstances item = widget}
 			{if $widget.instance->isShown()}
-			<div class = "block">
+			<section>
 				<div class = "blockHeader">
 				<h2><a href = "{$widget.instance->getHeaderLink()}">{$widget.instance->getTitle()}</a></h2>
 				{if $sessionOptions->drawNavigation}
-				<div class = "menu hasSubmenu">
+				<ul role = "menubar">
+					<li>
 					<span class = "menuItemLabel">&#9881;</span>
 					<div class = "dropdownContent">
 						{include file = "links.tpl" links = $widget.instance->getLinks() skipTitle = true sub = true}
 						</div>
-				</div>
+					</li>
+				</ul>
 				{/if}
 				</div>
 
 				{$widget.instance->render()}
-			</div>
+			</section>
 			{/if}
 		{/foreach}
 {/if}

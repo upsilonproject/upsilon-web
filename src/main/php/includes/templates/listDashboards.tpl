@@ -5,7 +5,7 @@
 </div>
 {/if}
 
-<div class = "box">
+<section>
 	<h2>Dashboards</h2>
 
 	{if empty($listDashboards)}
@@ -30,4 +30,4 @@
 		</tbody>
 	</table>
 	{/if}
-</div>
+</section>

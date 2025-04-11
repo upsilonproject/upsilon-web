@@ -51,7 +51,6 @@
 		</form>
 		<br />
 
-	<hr />
 	{/if}
 
 	<br /><p id = "filteringSelectLoadingIndicator" class = "subtle">..</p>

@@ -3,8 +3,6 @@
 $title = 'Preferences';
 require_once 'includes/common.php';
 
-require_once 'libAllure/FormHandler.php';
-
 use \libAllure\FormHandler;
 use \libAllure\Form;
 use \libAllure\ElementInput;

@@ -1,4 +1,4 @@
-<div class = "box">
+<section>
 	<h2>Users</h2>
 
 	<table>
@@ -18,4 +18,4 @@
 			{/foreach}
 		</body>
 	</table>
-</div>
+</section>

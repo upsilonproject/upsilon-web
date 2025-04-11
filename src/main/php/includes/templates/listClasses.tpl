@@ -6,7 +6,7 @@
 </div>
 {/if}
 
-<div class = "box" style = "vertical-align: top;">
+<section>
 		<div style = "display:inline-block; width: 40%; vertical-align: top;">
 			<h2>
 				{if !empty($itemClass.icon)}
@@ -34,9 +34,9 @@
 			</ul>
 		</div>
 		{/if}
-</div>
+</section>
 
-<div class = "box">
+<section>
 <h2>Sub Classes</h2>
 
 {if $listSubClasses|@count eq 0}
@@ -46,9 +46,9 @@
 	{include file = "listClassesTree.tpl" listSubClasses = $listSubClasses}
 	</p>
 {/if}
-</div>
+</section>
 
-<div class = "box">
+<section>
 <h2>All Instances</h2>
 	<a href = "createClassInstance.php?parent={$itemClass.id}">Create class instance</a>
 
@@ -77,4 +77,4 @@
 	<tbody>
 </table>
 {/if}
-</div>
+</section>

@@ -1,5 +1,7 @@
-<div class = "box">
+<section>
 	<h2>Logs</h2>
+	<p>These are your logs.</p>
+
 	<table>
 		<tr>
 			<th>timestamp</th>
@@ -14,4 +16,4 @@
 	{/foreach}
 		</tbody>
 	</table>
-</div>
+</section>

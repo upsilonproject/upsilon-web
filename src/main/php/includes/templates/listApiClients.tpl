@@ -1,4 +1,4 @@
-<div class = "box">
+<section>
 	<h2>API Clients</h2>
 {if empty($listApiClients)} 
 	<p>There are 0 API clients at the moment. Create one from teh API Clients context menu.</p>
@@ -24,4 +24,4 @@
 	</tbody>
 	</table>
 {/if}
-</div>
+</section>

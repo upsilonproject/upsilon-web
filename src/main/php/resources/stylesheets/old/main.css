@@ -413,6 +413,7 @@ header #headerLogo {
 
 header #searchBox {
 	grid-area: 1 / 3 / 2 / 4;
+	padding: 1em;
 	text-align: right;
 }
 
